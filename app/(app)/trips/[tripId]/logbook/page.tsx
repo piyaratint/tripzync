@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { trips, events, expenses, hotels } from '@/lib/db/schema'
