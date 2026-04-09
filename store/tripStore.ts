@@ -35,6 +35,7 @@ interface TripStore {
 
   // Optimistic expense mutations
   addExpenseOptimistic: (expense: Expense) => void
+  updateExpenseOptimistic: (id: string, patch: Partial<Expense>) => void
   deleteExpenseOptimistic: (id: string) => void
 
   expenseTotal: () => number
@@ -71,6 +72,9 @@ export const useTripStore = create<TripStore>()(
 
       addExpenseOptimistic: (expense) =>
         set(s => ({ expenses: [...s.expenses, expense] })),
+
+      updateExpenseOptimistic: (id, patch) =>
+        set(s => ({ expenses: s.expenses.map(e => e.id === id ? { ...e, ...patch } : e) })),
 
       deleteExpenseOptimistic: (id) =>
         set(s => ({ expenses: s.expenses.filter(e => e.id !== id) })),

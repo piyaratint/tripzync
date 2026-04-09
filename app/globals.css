@@ -191,6 +191,29 @@ body {
 .sheet-sync-label { font-family: 'Barlow Condensed', sans-serif; font-size: 7px; letter-spacing: .1em; color: rgba(255,255,255,.25); text-transform: uppercase; flex: 1; }
 .sheet-link { display: block; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-size: 7px; letter-spacing: .1em; font-weight: 500; color: rgba(255,255,255,.25); text-decoration: none; padding: 4px; border: 1px solid rgba(255,255,255,.06); border-radius: 6px; text-transform: uppercase; transition: color .2s, border-color .2s; }
 .sheet-link:hover { color: #3ecf78; border-color: rgba(62,207,120,.3); }
+.exp-toggle-btn { background: none; border: 1px solid rgba(255,255,255,.1); border-radius: 20px; color: rgba(255,255,255,.35); font-family: 'Barlow Condensed', sans-serif; font-size: 7px; letter-spacing: .08em; padding: 2px 7px; cursor: pointer; transition: all .18s; }
+.exp-toggle-btn:hover { border-color: rgba(255,255,255,.28); color: rgba(255,255,255,.75); }
+.exp-list { margin-top: 6px; border-top: 1px solid rgba(255,255,255,.06); padding-top: 4px; display: flex; flex-direction: column; gap: 1px; }
+.exp-list-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,.04); }
+.exp-list-row:last-child { border-bottom: none; }
+.exp-list-info { display: flex; align-items: center; gap: 5px; min-width: 0; flex: 1; }
+.exp-list-cat-badge { font-family: 'Barlow Condensed', sans-serif; font-size: 7px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: 1px 6px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+.exp-list-item { font-family: 'Noto Sans JP', sans-serif; font-size: 9px; color: rgba(255,255,255,.75); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.exp-list-right { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.exp-list-amount { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700; font-style: italic; color: #fff; white-space: nowrap; }
+.exp-act-btn { background: none; border: none; cursor: pointer; font-size: 10px; padding: 2px 4px; border-radius: 4px; line-height: 1; transition: all .15s; opacity: .35; }
+.exp-act-btn:hover { opacity: 1; }
+.exp-act-btn.edit:hover { color: #65d0f7; }
+.exp-act-btn.delete:hover { color: #f76e6e; }
+.exp-act-btn.save { color: #3ecf78; font-size: 11px; }
+.exp-act-btn.cancel { color: rgba(255,255,255,.5); }
+.exp-act-btn.save:hover { opacity: 1; }
+.exp-act-btn.cancel:hover { opacity: 1; color: #f76e6e; }
+.exp-edit-form { display: flex; align-items: center; gap: 3px; width: 100%; flex-wrap: wrap; }
+.exp-edit-form .exp-input { flex: 1; min-width: 60px; }
+.exp-edit-form .narrow { flex: 0 0 55px; }
+.exp-cat-select { flex: 0 0 90px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.09); border-radius: 6px; padding: 5px 4px; font-family: 'Barlow Condensed', sans-serif; font-size: 8px; color: #fff; outline: none; cursor: pointer; }
+.exp-edit-actions { display: flex; gap: 2px; flex-shrink: 0; }
 
 /* ── LINKS ── */
 .links-row { display: flex; gap: 10px; margin-bottom: 28px; animation: fadeUp .6s .15s ease both; }
@@ -347,6 +370,31 @@ body {
 .ai-quick-pills { display: flex; gap: 6px; padding: 0 14px 10px; flex-wrap: wrap; flex-shrink: 0; }
 .ai-pill { font-family: 'Barlow Condensed', sans-serif; font-size: 9px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(168,85,247,.3); color: rgba(168,85,247,.8); background: rgba(168,85,247,.07); cursor: pointer; white-space: nowrap; transition: all .2s; }
 .ai-pill:hover { background: rgba(168,85,247,.18); border-color: rgba(168,85,247,.5); color: #fff; }
+
+/* ── AI MARKDOWN ── */
+.ai-md { display: flex; flex-direction: column; gap: 4px; }
+.ai-md-h2 { font-size: 12px; font-weight: 700; color: #fff; margin: 6px 0 2px; }
+.ai-md-h3 { font-size: 11px; font-weight: 700; color: rgba(168,85,247,.9); margin: 4px 0 2px; }
+.ai-md-p { margin: 0; line-height: 1.55; }
+.ai-md-bold { font-weight: 700; margin: 0; }
+.ai-md-ul { margin: 2px 0 4px; padding-left: 14px; display: flex; flex-direction: column; gap: 2px; }
+.ai-md-ul li { line-height: 1.5; }
+
+/* ── TRANSPORT CARD ── */
+.ai-msg.no-pad { padding: 0; background: transparent; border: none; }
+.tc-wrap { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+.tc-route { font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.45); padding: 6px 2px 2px; }
+.tc-option { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.09); border-radius: 14px; overflow: hidden; }
+.tc-option-head { display: flex; align-items: center; gap: 8px; padding: 11px 13px 9px; }
+.tc-num { width: 22px; height: 22px; border-radius: 50%; background: rgba(110,62,245,.35); border: 1px solid rgba(110,62,245,.5); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #a78bfa; flex-shrink: 0; }
+.tc-title { font-size: 12px; font-weight: 700; color: #fff; flex: 1; }
+.tc-badge { font-size: 9px; font-weight: 600; letter-spacing: .04em; padding: 2px 8px; border-radius: 20px; border: 1px solid; color: #34d399; border-color: rgba(52,211,153,.4); background: rgba(52,211,153,.08); white-space: nowrap; }
+.tc-fields { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: rgba(255,255,255,.06); border-top: 1px solid rgba(255,255,255,.06); border-bottom: 1px solid rgba(255,255,255,.06); }
+.tc-field { background: rgba(255,255,255,.03); padding: 8px 10px; }
+.tc-field-label { font-size: 9px; color: rgba(255,255,255,.38); letter-spacing: .04em; margin-bottom: 3px; }
+.tc-field-value { font-size: 11px; font-weight: 600; color: rgba(255,255,255,.85); line-height: 1.3; }
+.tc-note { font-size: 10px; color: rgba(255,255,255,.55); padding: 8px 13px; border-left: 2px solid rgba(110,62,245,.5); margin: 8px 10px; border-radius: 0 4px 4px 0; background: rgba(110,62,245,.06); line-height: 1.5; }
+.tc-protip { font-size: 10px; color: rgba(52,211,153,.85); background: rgba(52,211,153,.07); border: 1px solid rgba(52,211,153,.2); border-radius: 10px; padding: 9px 12px; line-height: 1.5; }
 
 /* ── ANIMATIONS ── */
 @keyframes fadeUp {

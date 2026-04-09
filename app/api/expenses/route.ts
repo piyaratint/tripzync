@@ -79,6 +79,37 @@ export async function POST(req: Request) {
   }
 }
 
+// PATCH /api/expenses?id=xxx
+export async function PATCH(req: Request) {
+  const session = await auth()
+  if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const { searchParams } = new URL(req.url)
+  const id = searchParams.get('id')
+  if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
+
+  const [existing] = await db.select().from(expenses).where(eq(expenses.id, id))
+  if (!existing || !await ownedTrip(existing.tripId, session.user.id))
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
+
+  try {
+    const body = await req.json()
+    const parsed = createExpenseSchema.partial().parse(body)
+
+    const [updated] = await db
+      .update(expenses)
+      .set({ ...parsed, ...(parsed.amount !== undefined ? { amount: String(parsed.amount) } : {}) })
+      .where(eq(expenses.id, id))
+      .returning()
+
+    return NextResponse.json({ expense: updated, success: true })
+  } catch (err) {
+    if (err instanceof z.ZodError)
+      return NextResponse.json({ error: 'Validation failed', issues: err.issues }, { status: 422 })
+    return NextResponse.json({ error: 'Failed to update expense' }, { status: 500 })
+  }
+}
+
 // DELETE /api/expenses?id=xxx
 export async function DELETE(req: Request) {
   const session = await auth()

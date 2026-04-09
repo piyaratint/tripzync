@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTripStore } from '@/store/tripStore'
 import type { CreateExpenseInput } from '@/lib/validations'
+import type { Expense } from '@/lib/db/schema'
 import { tripKeys } from './useTrip'
 
 // ─── FETCH EXPENSES ───────────────────────────────────────────────────────────
@@ -53,6 +54,35 @@ export function useAddExpense(tripId: string) {
     },
     onError: (_err, _vars, ctx) => {
       if (ctx?.tempId) deleteOptimistic(ctx.tempId)
+    },
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: tripKeys.expenses(tripId) })
+    },
+  })
+}
+
+// ─── EDIT EXPENSE ────────────────────────────────────────────────────────────
+export function useEditExpense(tripId: string) {
+  const qc = useQueryClient()
+  const updateOptimistic = useTripStore(s => s.updateExpenseOptimistic)
+
+  return useMutation({
+    mutationFn: async ({ id, patch }: { id: string; patch: Partial<Omit<Expense, 'id' | 'tripId' | 'createdAt'>> & { amount?: number } }) => {
+      const res = await fetch(`/api/expenses?id=${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(patch),
+      })
+      if (!res.ok) throw new Error('Failed to update expense')
+      return res.json()
+    },
+    onMutate: ({ id, patch }) => {
+      const prev = useTripStore.getState().expenses.find(e => e.id === id)
+      updateOptimistic(id, { ...patch, ...(patch.amount !== undefined ? { amount: String(patch.amount) as any } : {}) })
+      return { prev }
+    },
+    onError: (_err, { id }, ctx) => {
+      if (ctx?.prev) updateOptimistic(id, ctx.prev)
     },
     onSettled: () => {
       qc.invalidateQueries({ queryKey: tripKeys.expenses(tripId) })
