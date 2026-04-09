@@ -8,7 +8,7 @@ import { AddEventBar } from '@/components/itinerary/AddEventBar'
 import { ExpenseLog } from '@/components/expense/ExpenseLog'
 import { EditEventModal } from '@/components/itinerary/EditEventModal'
 import { HotelModal } from '@/components/hotel/HotelModal'
-import { toISO, fmtShort, getDayTitle, detectCurrency, daysBetween } from '@/lib/utils'
+import { toISO, fmtShort, getDayTitle, detectCurrency, daysBetween, CURRENCIES } from '@/lib/utils'
 import { EditTripModal } from '@/components/trip/EditTripModal'
 
 interface Props {
@@ -74,7 +74,7 @@ export function TripClient({ trip, hotels, events, expenses, flights }: Props) {
 
   const itinerary = buildItinerary(trip, storeHotels, storeEvents)
   const activeDay = itinerary[activeDayIndex] ?? itinerary[0]
-  const currency = CURRENCIES.find(c => c.code === trip.currency) || { symbol: "¥", code: "JPY" }
+  const currency = detectCurrency(trip.destCity ?? trip.destination ?? '')
   const expenseTotal = storeExpenses.reduce((sum, e) => sum + parseFloat(String(e.amount)), 0)
 
   return (
