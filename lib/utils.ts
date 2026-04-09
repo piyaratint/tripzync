@@ -58,10 +58,10 @@ const CITY_COUNTRY: Record<string, string> = {
   mumbai:'IN', delhi:'IN',
 }
 
-export function detectCurrency(city: string) {
+export function detectCurrency(city: string): { symbol: string; code: string } {
   const key = city.toLowerCase().trim()
   const country = CITY_COUNTRY[key]
-  return (country && COUNTRY_CURRENCY[country]) ?? { symbol: '¥', code: 'JPY' }
+  return (country ? COUNTRY_CURRENCY[country] : undefined) ?? { symbol: '¥', code: 'JPY' }
 }
 
 // ─── COLOUR HELPERS ───────────────────────────────────────────────────────────
