@@ -92,7 +92,7 @@ export function ExpenseLog({ tripId, currency, expenses, total }: Props) {
 
     await editExpense.mutateAsync({
       id: editing.id,
-      patch: { item: editing.item.trim(), amount: parsed, category: editing.category },
+      patch: { item: editing.item.trim(), amount: String(parsed), category: editing.category },
     })
     setEditing(null)
   }

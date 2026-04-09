@@ -67,7 +67,7 @@ export function useEditExpense(tripId: string) {
   const updateOptimistic = useTripStore(s => s.updateExpenseOptimistic)
 
   return useMutation({
-    mutationFn: async ({ id, patch }: { id: string; patch: Partial<Omit<Expense, 'id' | 'tripId' | 'createdAt'>> & { amount?: number } }) => {
+    mutationFn: async ({ id, patch }: { id: string; patch: Partial<Omit<Expense, 'id' | 'tripId' | 'createdAt'>> }) => {
       const res = await fetch(`/api/expenses?id=${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -78,7 +78,7 @@ export function useEditExpense(tripId: string) {
     },
     onMutate: ({ id, patch }) => {
       const prev = useTripStore.getState().expenses.find(e => e.id === id)
-      updateOptimistic(id, { ...patch, ...(patch.amount !== undefined ? { amount: String(patch.amount) as any } : {}) })
+      updateOptimistic(id, patch)
       return { prev }
     },
     onError: (_err, { id }, ctx) => {

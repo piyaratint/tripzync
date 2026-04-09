@@ -96,9 +96,10 @@ export async function PATCH(req: Request) {
     const body = await req.json()
     const parsed = createExpenseSchema.partial().parse(body)
 
+    const { amount: parsedAmount, ...parsedRest } = parsed
     const [updated] = await db
       .update(expenses)
-      .set({ ...parsed, ...(parsed.amount !== undefined ? { amount: String(parsed.amount) } : {}) })
+      .set({ ...parsedRest, ...(parsedAmount !== undefined ? { amount: String(parsedAmount) } : {}) })
       .where(eq(expenses.id, id))
       .returning()
 
