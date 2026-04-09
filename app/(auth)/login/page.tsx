@@ -9,7 +9,7 @@ export default function LoginPage() {
             TripZync®
           </div>
           <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 'clamp(48px,10vw,80px)', fontWeight: 900, fontStyle: 'italic', textTransform: 'uppercase', lineHeight: .9, color: '#fff' }}>
-            Your<br /><em style={{ color: 'var(--red)' }}>Logbook</em>
+            Your<br /><em style={{ color: 'var(--red)' }}>Travel Logbook</em>
           </div>
         </div>
 
