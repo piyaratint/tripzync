@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(head -80 /Users/nonamezzzint/Desktop/TripZync/tripzync/app/\\\\\\(app\\\\\\)/trips/[tripId]/TripClient.tsx)"
+    ]
+  }
+}
