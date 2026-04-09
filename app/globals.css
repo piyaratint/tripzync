@@ -421,6 +421,108 @@ body {
 .invite-remove-btn { background: none; border: 1px solid rgba(232,0,29,.3); border-radius: 6px; padding: 3px 10px; color: rgba(232,0,29,.6); font-family: 'Barlow Condensed', sans-serif; font-size: 9px; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; transition: all .2s; }
 .invite-remove-btn:hover { background: rgba(232,0,29,.1); border-color: rgba(232,0,29,.5); color: #e8001d; }
 
+/* ── PRINT / PDF ── */
+@media print {
+  /* White background throughout */
+  *, *::before, *::after { color-adjust: exact; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  :root {
+    --bg: #fff;
+    --border: rgba(0,0,0,0.12);
+    --muted: #666;
+    --sakura: #c0606a;
+    --red: #c8001a;
+  }
+
+  body { background: #fff !important; color: #111 !important; }
+
+  /* Hide interactive / decorative elements */
+  #petals-canvas,
+  .ai-fab,
+  .ai-drawer,
+  .tabs-row,
+  .add-event-bar,
+  .ev-actions,
+  .exp-form,
+  .exp-cat-row,
+  .exp-toggle-btn,
+  .btn-ae,
+  .fl-tabs,
+  .fl-pane:not(.active),
+  .sheet-sync-row,
+  .sheet-link,
+  .hotel-chip .edit-hint,
+  .edit-title-hint,
+  .print-btn,
+  button:not(.tab-btn) { display: none !important; }
+
+  /* Full-width single column */
+  .page { max-width: 100%; padding: 0 16px !important; }
+  .page-inner { grid-template-columns: 1fr !important; gap: 0 !important; }
+  .sidebar { position: static !important; }
+  .main-col { padding-top: 12px !important; }
+
+  /* Hero */
+  .hero { border-bottom: 2px solid #ddd !important; padding: 16px 0 12px !important; margin-bottom: 16px !important; }
+  .hero-title { color: #111 !important; font-size: 48px !important; }
+  .hero-title .em { color: var(--red) !important; }
+  .hero-subtitle { color: #888 !important; }
+  .eyebrow-text { color: #888 !important; }
+  .eyebrow-dots span { background: #ccc !important; }
+  .eyebrow-dots span.r { background: var(--red) !important; }
+  .meta-label { color: #888 !important; }
+  .meta-val { color: #222 !important; }
+  .hotel-chip { background: #f5f5f5 !important; border-color: #ddd !important; }
+  .hotel-chip .meta-val { color: #444 !important; }
+
+  /* Weather — hide on print */
+  .weather-full { display: none !important; }
+
+  /* Section head */
+  .section-line { background: #ddd !important; }
+  .section-label { color: #888 !important; }
+
+  /* Day panel */
+  .day-panel { background: #fafafa !important; border: 1px solid #ddd !important; margin-bottom: 16px !important; page-break-inside: avoid; }
+  .day-panel-head { background: #f0f0f0 !important; border-bottom: 1px solid #ddd !important; }
+  .day-date { color: #888 !important; }
+  .day-title { color: #111 !important; }
+  .day-panel.is-today .day-title { color: var(--red) !important; }
+  .hotel-banner { background: #fdf5f7 !important; border-bottom: 1px solid #eee !important; color: #666 !important; }
+
+  /* Timeline */
+  .ev-dot { background: #ccc !important; border-color: #aaa !important; }
+  .event-item.key .ev-dot { background: var(--red) !important; border-color: var(--red) !important; box-shadow: none !important; }
+  .ev-line { background: #e0e0e0 !important; }
+  .ev-body { border-bottom-color: #eee !important; }
+  .ev-time { color: #888 !important; }
+  .ev-act { color: #111 !important; }
+  .ev-sub { color: #666 !important; }
+  .ev-route .route-stop { background: #f0f0f0 !important; border-color: #ddd !important; color: #444 !important; }
+  .ev-route .route-arrow { color: #aaa !important; }
+  .ev-badge { color: #444 !important; background: #f0f0f0 !important; }
+
+  /* Expenses */
+  .card-expense { background: #fafafa !important; border: 1px solid #ddd !important; }
+  .card-title { color: #888 !important; }
+  .total-num { color: #111 !important; }
+  .exp-list { border-top-color: #eee !important; }
+  .exp-list-row { border-bottom-color: #eee !important; }
+  .exp-list-item { color: #333 !important; }
+  .exp-list-amount { color: #111 !important; }
+  .exp-list-cat-badge { background: #eee !important; color: #555 !important; }
+
+  /* Flight card */
+  .flight-card { background: #fafafa !important; border: 1px solid #ddd !important; }
+  .flight-card-title { color: #888 !important; }
+  .fl-d-block .fl-d-time { color: #111 !important; }
+  .fl-d-block .fl-d-label { color: #888 !important; }
+  .fl-d-block .fl-d-port { color: #555 !important; }
+  .fl-sep { color: #aaa !important; }
+  .fl-chip { background: #eee !important; color: #555 !important; border-color: #ddd !important; }
+  .fl-connect-note { color: #888 !important; border-color: #ddd !important; }
+}
+
 /* ── ANIMATIONS ── */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(14px); }

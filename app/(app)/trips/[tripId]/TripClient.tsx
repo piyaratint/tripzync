@@ -119,6 +119,12 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
                     letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer',
                   }}>👥 Invite</button>
                 )}
+                <button className="print-btn" onClick={() => window.print()} style={{
+                  background: 'none', border: '1px solid rgba(255,255,255,.15)',
+                  borderRadius: 6, padding: '4px 10px', color: 'rgba(255,255,255,.4)',
+                  fontFamily: "'Barlow Condensed'", fontSize: 10,
+                  letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer',
+                }}>🖨 Print / PDF</button>
                 {!isOwner && (
                   <span style={{
                     display: 'inline-block', border: '1px solid rgba(168,85,247,.25)',
