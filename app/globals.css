@@ -429,9 +429,49 @@ body {
 
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {
-  .page { padding: 0 16px 80px; }
-  .page-inner { grid-template-columns: 1fr; }
+  .page { padding: 0 14px 100px; }
+  .page-inner { grid-template-columns: 1fr; gap: 0; }
   .sidebar { position: static; }
+  .sidebar .hero { padding: 24px 0 16px; }
   .hero-title { font-size: clamp(44px, 14vw, 70px); }
+  .hero-subtitle { font-size: 11px; }
   .cards-grid { grid-template-columns: 1fr; }
+
+  /* Trip header meta row — wrap on mobile */
+  .hero-meta { flex-wrap: wrap; gap: 10px; }
+  .meta-item { min-width: 100px; }
+
+  /* Day tabs scroll horizontally */
+  .tabs-row { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; flex-wrap: nowrap; }
+  .tab-btn { flex-shrink: 0; }
+
+  /* Day panel */
+  .day-panel { padding: 14px 12px; }
+
+  /* Weather widget — stack vertically */
+  .wx-top-row { flex-direction: column; gap: 12px; }
+  .wx-forecast { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .wx-days { flex-wrap: nowrap; }
+  .wx-day { min-width: 52px; }
+
+  /* Expense log */
+  .card-expense { padding: 14px; }
+
+  /* AI drawer — full width */
+  .ai-drawer { left: 8px; right: 8px; max-width: 100%; bottom: 76px; max-height: 70vh; }
+  .ai-fab { bottom: 16px; right: 16px; }
+
+  /* Transport card fields — 1 col on very small screens */
+  .tc-fields { grid-template-columns: repeat(2, 1fr); }
+
+  /* Invite modal */
+  .invite-modal { padding: 18px; }
+  .invite-url-row { flex-direction: column; }
+  .invite-copy-btn { width: 100%; }
+
+  /* Edit / hotel modal */
+  .modal-box { padding: 20px; }
+
+  /* Section head */
+  .section-head { margin: 14px 0 10px; }
 }
