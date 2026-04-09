@@ -74,7 +74,7 @@ export function TripClient({ trip, hotels, events, expenses, flights }: Props) {
 
   const itinerary = buildItinerary(trip, storeHotels, storeEvents)
   const activeDay = itinerary[activeDayIndex] ?? itinerary[0]
-  const currency = detectCurrency(trip.destCity ?? trip.destination ?? '')
+  const currency = detectCurrency(trip.destCity ?? trip.destination ?? '') || { symbol: '¥', code: 'JPY' }
   const expenseTotal = storeExpenses.reduce((sum, e) => sum + parseFloat(String(e.amount)), 0)
 
   return (
