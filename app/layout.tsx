@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { SessionProvider } from 'next-auth/react'
 import { QueryProvider } from '@/components/ui/QueryProvider'
 import './globals.css'
@@ -6,7 +6,12 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'TripZync®',
   description: 'Your personal travel logbook',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
