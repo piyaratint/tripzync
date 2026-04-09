@@ -8,7 +8,7 @@ import { AddEventBar } from '@/components/itinerary/AddEventBar'
 import { ExpenseLog } from '@/components/expense/ExpenseLog'
 import { EditEventModal } from '@/components/itinerary/EditEventModal'
 import { HotelModal } from '@/components/hotel/HotelModal'
-import { toISO, fmtShort, getDayTitle, detectCurrency, daysBetween, CURRENCIES } from '@/lib/utils'
+import { toISO, fmtShort, getDayTitle, detectCurrency, daysBetween } from '@/lib/utils'
 import { EditTripModal } from '@/components/trip/EditTripModal'
 
 interface Props {
