@@ -22,6 +22,13 @@
       "when": 1775641415815,
       "tag": "0002_premium_skin",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1775700000000,
+      "tag": "0003_trip_collab",
+      "breakpoints": true
     }
   ]
 }

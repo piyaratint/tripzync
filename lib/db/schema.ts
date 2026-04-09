@@ -96,6 +96,29 @@ export const flights = pgTable('flights', {
   tripIdx: index('flights_trip_idx').on(t.tripId),
 }))
 
+// ─── TRIP MEMBERS ─────────────────────────────────────────────────────────────
+export const tripMembers = pgTable('trip_members', {
+  id:       uuid('id').primaryKey().defaultRandom(),
+  tripId:   uuid('trip_id').notNull().references(() => trips.id, { onDelete: 'cascade' }),
+  userId:   text('user_id').notNull().references(() => authUsers.id, { onDelete: 'cascade' }),
+  role:     text('role').notNull().default('editor'),
+  joinedAt: timestamp('joined_at').defaultNow().notNull(),
+}, t => ({
+  tripUserIdx: index('trip_members_trip_user_idx').on(t.tripId, t.userId),
+}))
+
+// ─── TRIP INVITES ─────────────────────────────────────────────────────────────
+export const tripInvites = pgTable('trip_invites', {
+  id:        uuid('id').primaryKey().defaultRandom(),
+  tripId:    uuid('trip_id').notNull().references(() => trips.id, { onDelete: 'cascade' }),
+  token:     text('token').notNull().unique(),
+  createdBy: text('created_by').notNull().references(() => authUsers.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, t => ({
+  tokenIdx: index('trip_invites_token_idx').on(t.token),
+  tripIdx:  index('trip_invites_trip_idx').on(t.tripId),
+}))
+
 // ─── RELATIONS ────────────────────────────────────────────────────────────────
 export const usersRelations = relations(users, ({ many }) => ({
   trips: many(trips),
@@ -138,6 +161,8 @@ export type NewHotel   = typeof hotels.$inferInsert
 export type NewEvent   = typeof events.$inferInsert
 export type NewExpense = typeof expenses.$inferInsert
 export type NewFlight  = typeof flights.$inferInsert
+export type TripMember = typeof tripMembers.$inferSelect
+export type TripInvite = typeof tripInvites.$inferSelect
 
 // ─── AUTH TABLES (required by Auth.js) ───────────────────────────────────────
 export const accounts = pgTable('account', {

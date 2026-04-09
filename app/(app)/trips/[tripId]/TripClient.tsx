@@ -11,12 +11,16 @@ import { HotelModal } from '@/components/hotel/HotelModal'
 import { toISO, fmtShort, getDayTitle, detectCurrency, daysBetween } from '@/lib/utils'
 import { EditTripModal } from '@/components/trip/EditTripModal'
 
+interface Member { userId: string; name: string | null; image: string | null; joinedAt: Date }
+
 interface Props {
   trip: Trip
   hotels: Hotel[]
   events: Event[]
   expenses: Expense[]
   flights: Flight[]
+  isOwner: boolean
+  members: Member[]
 }
 
 // Build the day-by-day itinerary structure from DB data
@@ -54,10 +58,11 @@ function buildItinerary(trip: Trip, hotels: Hotel[], events: Event[]) {
   return days
 }
 
-export function TripClient({ trip, hotels, events, expenses, flights }: Props) {
+export function TripClient({ trip, hotels, events, expenses, flights, isOwner, members }: Props) {
   const { setTrip, setHotels, setEvents, setExpenses, setFlights, activeDayIndex, setActiveDayIndex } = useTripStore()
   const [hotelModalOpen, setHotelModalOpen] = useState(false)
   const [editTripOpen, setEditTripOpen] = useState(false)
+  const [inviteOpen, setInviteOpen] = useState(false)
 
   // Hydrate store from server-fetched data
   useEffect(() => {
@@ -97,13 +102,32 @@ export function TripClient({ trip, hotels, events, expenses, flights }: Props) {
                 <div className="hero-title"><em className="em">{trip.title2}</em></div>
               </div>
               <p className="hero-subtitle">{trip.subtitle}</p>
-              <button onClick={() => setEditTripOpen(true)} style={{
-                background: 'none', border: '1px solid rgba(255,255,255,.15)',
-                borderRadius: 6, padding: '4px 10px', color: 'rgba(255,255,255,.4)',
-                fontFamily: "'Barlow Condensed'", fontSize: 10,
-                letterSpacing: '.12em', textTransform: 'uppercase',
-                cursor: 'pointer', marginBottom: 8,
-              }}>✏️ Edit Trip</button>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+                {isOwner && (
+                  <button onClick={() => setEditTripOpen(true)} style={{
+                    background: 'none', border: '1px solid rgba(255,255,255,.15)',
+                    borderRadius: 6, padding: '4px 10px', color: 'rgba(255,255,255,.4)',
+                    fontFamily: "'Barlow Condensed'", fontSize: 10,
+                    letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer',
+                  }}>✏️ Edit Trip</button>
+                )}
+                {isOwner && (
+                  <button onClick={() => setInviteOpen(true)} style={{
+                    background: 'none', border: '1px solid rgba(168,85,247,.35)',
+                    borderRadius: 6, padding: '4px 10px', color: 'rgba(168,85,247,.8)',
+                    fontFamily: "'Barlow Condensed'", fontSize: 10,
+                    letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer',
+                  }}>👥 Invite</button>
+                )}
+                {!isOwner && (
+                  <span style={{
+                    display: 'inline-block', border: '1px solid rgba(168,85,247,.25)',
+                    borderRadius: 6, padding: '4px 10px', color: 'rgba(168,85,247,.6)',
+                    fontFamily: "'Barlow Condensed'", fontSize: 10,
+                    letterSpacing: '.12em', textTransform: 'uppercase',
+                  }}>👥 Shared Trip</span>
+                )}
+              </div>
               <div className="hero-meta">
                 <div className="meta-item">
                   <span className="meta-label">Destination</span>
@@ -177,7 +201,10 @@ export function TripClient({ trip, hotels, events, expenses, flights }: Props) {
       </div>
 
       {/* Edit trip modal */}
-      <EditTripModal open={editTripOpen} onClose={() => setEditTripOpen(false)} />
+      {isOwner && <EditTripModal open={editTripOpen} onClose={() => setEditTripOpen(false)} />}
+
+      {/* Invite modal */}
+      {isOwner && <InviteModal tripId={trip.id} open={inviteOpen} onClose={() => setInviteOpen(false)} initialMembers={members} />}
 
       {/* Hotel modal */}
       <HotelModal
@@ -197,6 +224,106 @@ export function TripClient({ trip, hotels, events, expenses, flights }: Props) {
       {/* Sakura animation bootstrap */}
       <SakuraPetals />
     </>
+  )
+}
+
+// ─── INVITE MODAL ─────────────────────────────────────────────────────────────
+function InviteModal({
+  tripId,
+  open,
+  onClose,
+  initialMembers,
+}: {
+  tripId: string
+  open: boolean
+  onClose: () => void
+  initialMembers: Member[]
+}) {
+  const [inviteUrl, setInviteUrl] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [copied, setCopied] = useState(false)
+  const [members, setMembers] = useState<Member[]>(initialMembers)
+
+  useEffect(() => {
+    if (!open) return
+    fetch(`/api/trips/${tripId}/invite`)
+      .then(r => r.json())
+      .then(d => { if (d.url) setInviteUrl(d.url) })
+  }, [open, tripId])
+
+  async function generateLink() {
+    setLoading(true)
+    const res = await fetch(`/api/trips/${tripId}/invite`, { method: 'POST' })
+    const data = await res.json()
+    setInviteUrl(data.url)
+    setLoading(false)
+  }
+
+  async function copyLink() {
+    if (!inviteUrl) return
+    await navigator.clipboard.writeText(inviteUrl)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  async function removeMember(userId: string) {
+    await fetch(`/api/trips/${tripId}/members?userId=${userId}`, { method: 'DELETE' })
+    setMembers(prev => prev.filter(m => m.userId !== userId))
+  }
+
+  if (!open) return null
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-box invite-modal" onClick={e => e.stopPropagation()}>
+        <div className="modal-head">
+          <span style={{ fontSize: 16 }}>👥</span>
+          <div>
+            <div className="modal-title">Invite to Trip</div>
+            <div className="modal-sub">Share a link — anyone who opens it can join</div>
+          </div>
+          <button className="modal-close" onClick={onClose}>✕</button>
+        </div>
+
+        <div className="invite-link-section">
+          {inviteUrl ? (
+            <>
+              <div className="invite-url-row">
+                <input className="invite-url-input" value={inviteUrl} readOnly />
+                <button className="invite-copy-btn" onClick={copyLink}>
+                  {copied ? '✓ Copied' : 'Copy'}
+                </button>
+              </div>
+              <button className="invite-regen-btn" onClick={generateLink} disabled={loading}>
+                {loading ? 'Generating…' : '↺ Reset link'}
+              </button>
+            </>
+          ) : (
+            <button className="invite-gen-btn" onClick={generateLink} disabled={loading}>
+              {loading ? 'Generating…' : '🔗 Generate Invite Link'}
+            </button>
+          )}
+        </div>
+
+        {members.length > 0 && (
+          <div className="invite-members">
+            <div className="invite-members-label">Members</div>
+            {members.map(m => (
+              <div key={m.userId} className="invite-member-row">
+                <div className="invite-avatar">
+                  {m.image
+                    ? <img src={m.image} alt={m.name ?? ''} style={{ width: 28, height: 28, borderRadius: '50%' }} />
+                    : <span>{(m.name ?? '?')[0].toUpperCase()}</span>
+                  }
+                </div>
+                <span className="invite-member-name">{m.name ?? 'Unknown'}</span>
+                <button className="invite-remove-btn" onClick={() => removeMember(m.userId)}>Remove</button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
   )
 }
 

@@ -1,19 +1,13 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
-import { events, trips } from '@/lib/db/schema'
-import { eq, and, asc } from 'drizzle-orm'
+import { events } from '@/lib/db/schema'
+import { eq, asc } from 'drizzle-orm'
 import { createEventSchema, updateEventSchema } from '@/lib/validations'
 import { z } from 'zod'
+import { canAccessTrip } from '@/lib/tripAccess'
 
-// Verify trip ownership
-async function ownedTrip(tripId: string, userId: string) {
-  const [trip] = await db.select({ id: trips.id })
-    .from(trips).where(and(eq(trips.id, tripId), eq(trips.userId, userId)))
-  return !!trip
-}
-
-// GET /api/events?tripId=xxx[&date=YYYY-MM-DD]
+// GET /api/events?tripId=xxx
 export async function GET(req: Request) {
   const session = await auth()
   if (!session?.user?.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -22,7 +16,7 @@ export async function GET(req: Request) {
   const tripId = searchParams.get('tripId')
   if (!tripId) return NextResponse.json({ error: 'tripId required' }, { status: 400 })
 
-  if (!await ownedTrip(tripId, session.user.id))
+  if (!await canAccessTrip(tripId, session.user.id))
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   const rows = await db
@@ -44,7 +38,7 @@ export async function POST(req: Request) {
     const { tripId, ...input } = body
     const parsed = createEventSchema.parse(input)
 
-    if (!await ownedTrip(tripId, session.user.id))
+    if (!await canAccessTrip(tripId, session.user.id))
       return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
     const [event] = await db
@@ -69,9 +63,8 @@ export async function PATCH(req: Request) {
   const id = searchParams.get('id')
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
 
-  // Verify ownership via trip join
   const [existing] = await db.select().from(events).where(eq(events.id, id))
-  if (!existing || !await ownedTrip(existing.tripId, session.user.id))
+  if (!existing || !await canAccessTrip(existing.tripId, session.user.id))
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   try {
@@ -102,7 +95,7 @@ export async function DELETE(req: Request) {
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
 
   const [existing] = await db.select().from(events).where(eq(events.id, id))
-  if (!existing || !await ownedTrip(existing.tripId, session.user.id))
+  if (!existing || !await canAccessTrip(existing.tripId, session.user.id))
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   await db.delete(events).where(eq(events.id, id))

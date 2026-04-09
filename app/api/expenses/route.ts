@@ -1,16 +1,11 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
-import { expenses, trips } from '@/lib/db/schema'
-import { eq, and, sum, desc } from 'drizzle-orm'
+import { expenses } from '@/lib/db/schema'
+import { eq, sum, desc } from 'drizzle-orm'
 import { createExpenseSchema } from '@/lib/validations'
 import { z } from 'zod'
-
-async function ownedTrip(tripId: string, userId: string) {
-  const [trip] = await db.select({ id: trips.id })
-    .from(trips).where(and(eq(trips.id, tripId), eq(trips.userId, userId)))
-  return !!trip
-}
+import { canAccessTrip } from '@/lib/tripAccess'
 
 // GET /api/expenses?tripId=xxx
 export async function GET(req: Request) {
@@ -21,7 +16,7 @@ export async function GET(req: Request) {
   const tripId = searchParams.get('tripId')
   if (!tripId) return NextResponse.json({ error: 'tripId required' }, { status: 400 })
 
-  if (!await ownedTrip(tripId, session.user.id))
+  if (!await canAccessTrip(tripId, session.user.id))
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   const rows = await db
@@ -30,7 +25,6 @@ export async function GET(req: Request) {
     .where(eq(expenses.tripId, tripId))
     .orderBy(desc(expenses.createdAt))
 
-  // Compute grand total server-side
   const [totRow] = await db
     .select({ total: sum(expenses.amount) })
     .from(expenses)
@@ -53,7 +47,7 @@ export async function POST(req: Request) {
     const { tripId, ...input } = body
     const parsed = createExpenseSchema.parse(input)
 
-    if (!await ownedTrip(tripId, session.user.id))
+    if (!await canAccessTrip(tripId, session.user.id))
       return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
     const [expense] = await db
@@ -61,7 +55,6 @@ export async function POST(req: Request) {
       .values({ tripId, ...parsed, amount: String(parsed.amount) })
       .returning()
 
-    // Return updated grand total (mirrors old GAS behaviour)
     const [totRow] = await db
       .select({ total: sum(expenses.amount) })
       .from(expenses)
@@ -89,7 +82,7 @@ export async function PATCH(req: Request) {
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
 
   const [existing] = await db.select().from(expenses).where(eq(expenses.id, id))
-  if (!existing || !await ownedTrip(existing.tripId, session.user.id))
+  if (!existing || !await canAccessTrip(existing.tripId, session.user.id))
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   try {
@@ -121,7 +114,7 @@ export async function DELETE(req: Request) {
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
 
   const [existing] = await db.select().from(expenses).where(eq(expenses.id, id))
-  if (!existing || !await ownedTrip(existing.tripId, session.user.id))
+  if (!existing || !await canAccessTrip(existing.tripId, session.user.id))
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   await db.delete(expenses).where(eq(expenses.id, id))
