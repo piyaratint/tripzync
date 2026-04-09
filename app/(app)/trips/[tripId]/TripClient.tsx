@@ -190,18 +190,21 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
               ))}
             </div>
 
-            {/* Day panel */}
-            {activeDay && (
-              <div className={`day-panel${activeDay.date === toISO(new Date()) ? ' is-today' : ''}`}>
+            {/* Day panels — all rendered, inactive ones hidden via CSS (visible on print) */}
+            {itinerary.map((day, i) => (
+              <div
+                key={day.date}
+                className={`day-panel${day.date === toISO(new Date()) ? ' is-today' : ''}${i !== activeDayIndex ? ' day-panel-hidden' : ''}`}
+              >
                 <DayPanel
                   tripId={trip.id}
-                  day={activeDay}
+                  day={day}
                   startDate={trip.startDate}
                   endDate={trip.endDate}
                 />
-                <AddEventBar tripId={trip.id} date={activeDay.date} dayIndex={activeDayIndex} />
+                <AddEventBar tripId={trip.id} date={day.date} dayIndex={i} />
               </div>
-            )}
+            ))}
           </main>
         </div>
       </div>

@@ -421,6 +421,9 @@ body {
 .invite-remove-btn { background: none; border: 1px solid rgba(232,0,29,.3); border-radius: 6px; padding: 3px 10px; color: rgba(232,0,29,.6); font-family: 'Barlow Condensed', sans-serif; font-size: 9px; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; transition: all .2s; }
 .invite-remove-btn:hover { background: rgba(232,0,29,.1); border-color: rgba(232,0,29,.5); color: #e8001d; }
 
+/* Hidden day panels — shown during print */
+.day-panel-hidden { display: none; }
+
 /* ── PRINT / PDF ── */
 @media print {
   /* White background throughout */
@@ -481,6 +484,9 @@ body {
   /* Section head */
   .section-line { background: #ddd !important; }
   .section-label { color: #888 !important; }
+
+  /* Show all day panels when printing */
+  .day-panel-hidden { display: block !important; }
 
   /* Day panel */
   .day-panel { background: #fafafa !important; border: 1px solid #ddd !important; margin-bottom: 16px !important; page-break-inside: avoid; }
