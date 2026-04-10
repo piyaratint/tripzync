@@ -583,3 +583,10 @@ body {
   /* Section head */
   .section-head { margin: 14px 0 10px; }
 }
+
+/* ── LANDSCAPE MOBILE: unwrap event text ── */
+@media (orientation: landscape) and (max-height: 600px) {
+  .ev-act { white-space: normal; overflow: visible; text-overflow: unset; }
+  .ev-sub { white-space: normal; overflow: visible; text-overflow: unset; }
+  .exp-list-item { white-space: normal; overflow: visible; text-overflow: unset; }
+}
