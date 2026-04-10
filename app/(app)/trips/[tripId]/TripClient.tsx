@@ -76,6 +76,7 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
   const storeEvents = useTripStore(s => s.events)
   const storeExpenses = useTripStore(s => s.expenses)
   const storeHotels = useTripStore(s => s.hotels)
+  const storeFlights = useTripStore(s => s.flights)
 
   const itinerary = buildItinerary(trip, storeHotels, storeEvents)
   const activeDay = itinerary[activeDayIndex] ?? itinerary[0]
@@ -166,6 +167,9 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
               expenses={storeExpenses}
               total={expenseTotal}
             />
+
+            {/* Flight Card */}
+            <FlightCard tripId={trip.id} flights={storeFlights} />
           </aside>
 
           {/* ── MAIN COLUMN ── */}
@@ -235,6 +239,105 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
       {/* Sakura animation bootstrap */}
       <SakuraPetals />
     </>
+  )
+}
+
+// ─── FLIGHT CARD ──────────────────────────────────────────────────────────────
+function FlightCard({ tripId, flights }: { tripId: string; flights: Flight[] }) {
+  const [tab, setTab] = useState<'outbound' | 'return'>('outbound')
+  const [editing, setEditing] = useState<'outbound' | 'return' | null>(null)
+  const [saving, setSaving] = useState(false)
+  const setFlights = useTripStore(s => s.setFlights)
+
+  const outbound = flights.find(f => f.direction === 'outbound')
+  const ret = flights.find(f => f.direction === 'return')
+  const current = tab === 'outbound' ? outbound : ret
+
+  const blankForm = { flightNum: '', airline: '', depAirport: '', arrAirport: '', depTime: '', arrTime: '', flightDate: '' }
+  const [form, setForm] = useState(blankForm)
+
+  function startEdit(dir: 'outbound' | 'return') {
+    const f = dir === 'outbound' ? outbound : ret
+    setForm({ flightNum: f?.flightNum ?? '', airline: f?.airline ?? '', depAirport: f?.depAirport ?? '', arrAirport: f?.arrAirport ?? '', depTime: f?.depTime ?? '', arrTime: f?.arrTime ?? '', flightDate: f?.flightDate ?? '' })
+    setEditing(dir)
+  }
+
+  async function save() {
+    setSaving(true)
+    const res = await fetch(`/api/trips/${tripId}/flights`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ direction: editing, ...form }),
+    })
+    const data = await res.json()
+    if (data.flights) setFlights(data.flights)
+    setEditing(null)
+    setSaving(false)
+  }
+
+  const inp = (field: string, placeholder: string, value: string) => (
+    <input className="fl-input" placeholder={placeholder} value={value}
+      onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))} />
+  )
+
+  return (
+    <div className="card flight-card">
+      <div className="flight-card-title">✈ Flights</div>
+      <div className="fl-tabs">
+        {(['outbound', 'return'] as const).map(d => (
+          <button key={d} className={`fl-tab${tab === d ? ' active' : ''}`} onClick={() => { setTab(d); setEditing(null) }}>
+            {d === 'outbound' ? 'Outbound' : 'Return'}
+          </button>
+        ))}
+      </div>
+
+      {editing ? (
+        <div>
+          <div className="fl-grid">
+            <div className="fl-field"><span className="fl-label">Flight No.</span>{inp('flightNum', 'TG 661', form.flightNum)}</div>
+            <div className="fl-field"><span className="fl-label">Airline</span>{inp('airline', 'Thai Airways', form.airline)}</div>
+          </div>
+          <div className="fl-grid">
+            <div className="fl-field"><span className="fl-label">From</span>{inp('depAirport', 'BKK', form.depAirport)}</div>
+            <div className="fl-field"><span className="fl-label">To</span>{inp('arrAirport', 'ICN', form.arrAirport)}</div>
+          </div>
+          <div className="fl-row">
+            <div className="fl-field"><span className="fl-label">Dep</span>{inp('depTime', '08:30', form.depTime)}</div>
+            <div className="fl-field"><span className="fl-label">Arr</span>{inp('arrTime', '16:00', form.arrTime)}</div>
+            <div className="fl-field"><span className="fl-label">Date</span>{inp('flightDate', 'YYYY-MM-DD', form.flightDate)}</div>
+            <button className="btn-fl-save" onClick={save} disabled={saving}>{saving ? '...' : 'Save'}</button>
+          </div>
+        </div>
+      ) : current ? (
+        <div>
+          <div className="fl-display">
+            <div className="fl-d-block">
+              <div className="fl-d-label">Departure</div>
+              <div className="fl-d-time">{current.depTime ?? '--:--'}</div>
+              <div className="fl-d-port">{current.depAirport ?? '---'}</div>
+            </div>
+            <div className="fl-sep">✈</div>
+            <div className="fl-d-block" style={{ textAlign: 'right' }}>
+              <div className="fl-d-label">Arrival</div>
+              <div className="fl-d-time">{current.arrTime ?? '--:--'}</div>
+              <div className="fl-d-port">{current.arrAirport ?? '---'}</div>
+            </div>
+          </div>
+          <div className="fl-meta">
+            {current.flightNum && <span className="fl-chip hi">{current.flightNum}</span>}
+            {current.airline && <span className="fl-chip">{current.airline}</span>}
+            {current.flightDate && <span className="fl-chip">{current.flightDate}</span>}
+          </div>
+          <button onClick={() => startEdit(tab)} style={{ marginTop: 8, background: 'none', border: '1px solid rgba(255,255,255,.12)', borderRadius: 6, padding: '3px 10px', color: 'rgba(255,255,255,.4)', fontSize: 10, fontFamily: "'Barlow Condensed'", letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer' }}>
+            ✏️ Edit
+          </button>
+        </div>
+      ) : (
+        <button onClick={() => startEdit(tab)} style={{ width: '100%', background: 'none', border: '1px dashed rgba(255,255,255,.15)', borderRadius: 10, padding: '10px', color: 'rgba(255,255,255,.35)', fontSize: 11, fontFamily: "'Barlow Condensed'", letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer' }}>
+          + Add {tab === 'outbound' ? 'Outbound' : 'Return'} Flight
+        </button>
+      )}
+    </div>
   )
 }
 
