@@ -99,7 +99,7 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
               </div>
               <div className="hero-title-wrap">
                 <div className="hero-title">{trip.title1}</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
                   <div className="hero-title"><em className="em">{trip.title2}</em></div>
                   <div className="hotel-chip" onClick={() => setHotelModalOpen(true)} style={{ cursor: 'pointer', flexShrink: 0 }}>
                     <div className="meta-label">Basecamp</div>
