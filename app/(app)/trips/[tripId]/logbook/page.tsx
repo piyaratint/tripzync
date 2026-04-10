@@ -2,7 +2,7 @@ import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { trips, events, expenses, hotels } from '@/lib/db/schema'
 import { eq, and, asc, sum, count } from 'drizzle-orm'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { detectCurrency, fmtDate, daysBetween } from '@/lib/utils'
 
@@ -11,10 +11,11 @@ type Props = { params: Promise<{ tripId: string }> }
 export default async function LogbookPage({ params }: Props) {
   const { tripId } = await params
   const session = await auth()
+  if (!session?.user?.id) redirect('/login')
 
   const [trip] = await db.select()
     .from(trips)
-    .where(and(eq(trips.id, tripId), eq(trips.userId, session!.user!.id!)))
+    .where(and(eq(trips.id, tripId), eq(trips.userId, session.user.id)))
   if (!trip) notFound()
 
   const [eventRows, expenseRows, hotelRows] = await Promise.all([

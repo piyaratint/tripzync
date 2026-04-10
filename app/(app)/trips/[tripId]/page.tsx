@@ -2,7 +2,7 @@ import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { trips, hotels, events, expenses, flights, tripMembers, authUsers } from '@/lib/db/schema'
 import { eq, asc, desc, and, or } from 'drizzle-orm'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { TripClient } from './TripClient'
 import { canAccessTrip } from '@/lib/tripAccess'
 
@@ -19,7 +19,8 @@ export async function generateMetadata({ params }: Props) {
 export default async function TripPage({ params }: Props) {
   const { tripId } = await params
   const session = await auth()
-  const userId = session!.user!.id!
+  if (!session?.user?.id) redirect('/login')
+  const userId = session.user.id
 
   const [trip] = await db.select().from(trips).where(eq(trips.id, tripId))
   if (!trip) notFound()

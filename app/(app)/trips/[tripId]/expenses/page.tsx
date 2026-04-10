@@ -2,7 +2,7 @@ import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { trips, expenses } from '@/lib/db/schema'
 import { eq, and, desc, sum } from 'drizzle-orm'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { detectCurrency } from '@/lib/utils'
 import Link from 'next/link'
 
@@ -26,10 +26,11 @@ const CAT_TEXT: Record<string, string> = {
 export default async function ExpensesPage({ params }: Props) {
   const { tripId } = await params
   const session = await auth()
+  if (!session?.user?.id) redirect('/login')
 
   const [trip] = await db.select()
     .from(trips)
-    .where(and(eq(trips.id, tripId), eq(trips.userId, session!.user!.id!)))
+    .where(and(eq(trips.id, tripId), eq(trips.userId, session.user.id)))
   if (!trip) notFound()
 
   const rows = await db.select()

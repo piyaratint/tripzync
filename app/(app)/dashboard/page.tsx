@@ -3,11 +3,13 @@ import { db } from '@/lib/db'
 import { trips, tripMembers } from '@/lib/db/schema'
 import { eq, desc, inArray } from 'drizzle-orm'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { fmtDate, daysBetween } from '@/lib/utils'
 
 export default async function DashboardPage() {
   const session = await auth()
-  const userId = session!.user!.id!
+  if (!session?.user?.id) redirect('/login')
+  const userId = session.user.id
 
   const ownedTrips = await db
     .select()
