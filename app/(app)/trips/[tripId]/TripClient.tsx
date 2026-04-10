@@ -97,13 +97,12 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
                 <div className="eyebrow-dots"><span /><span className="r" /><span /></div>
                 <span className="eyebrow-text">TripZync® · {new Date(trip.startDate + 'T00:00').getFullYear()}</span>
               </div>
-              <div className="hero-title-wrap">
-                <div className="hero-title">{trip.title1}</div>
-                <div className="hero-title"><em className="em">{trip.title2}</em></div>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, marginBottom: 16 }}>
-                <p className="hero-subtitle" style={{ margin: 0, flex: 1 }}>{trip.subtitle}</p>
-                <div className="hotel-chip" onClick={() => setHotelModalOpen(true)} style={{ cursor: 'pointer', flexShrink: 0 }}>
+              <div className="hero-title-wrap" style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
+                <div style={{ flex: 1 }}>
+                  <div className="hero-title">{trip.title1}</div>
+                  <div className="hero-title"><em className="em">{trip.title2}</em></div>
+                </div>
+                <div className="hotel-chip" onClick={() => setHotelModalOpen(true)} style={{ cursor: 'pointer', flexShrink: 0, marginTop: 6 }}>
                   <div className="meta-label">Basecamp</div>
                   <div className="meta-val">
                     {storeHotels.length > 0 ? storeHotels[0].name : 'Set hotel'}
@@ -111,6 +110,7 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
                   <div className="edit-hint">tap to edit</div>
                 </div>
               </div>
+              <p className="hero-subtitle">{trip.subtitle}</p>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
                 {isOwner && (
                   <button onClick={() => setEditTripOpen(true)} style={{
