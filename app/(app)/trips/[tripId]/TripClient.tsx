@@ -62,6 +62,22 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
   const { setTrip, setHotels, setEvents, setExpenses, setFlights, activeDayIndex, setActiveDayIndex } = useTripStore()
   const [hotelModalOpen, setHotelModalOpen] = useState(false)
   const [editTripOpen, setEditTripOpen] = useState(false)
+  const [showPetals, setShowPetals] = useState(true)
+
+  useEffect(() => {
+    const saved = localStorage.getItem('tripzync-petals')
+    if (saved !== null) setShowPetals(saved === 'true')
+  }, [])
+
+  function togglePetals() {
+    setShowPetals(prev => {
+      const next = !prev
+      localStorage.setItem('tripzync-petals', String(next))
+      const canvas = document.getElementById('petals-canvas') as HTMLCanvasElement | null
+      if (canvas) canvas.style.display = next ? '' : 'none'
+      return next
+    })
+  }
   const [inviteOpen, setInviteOpen] = useState(false)
 
   // Hydrate store from server-fetched data
@@ -135,6 +151,14 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
                   fontFamily: "'Barlow Condensed'", fontSize: 10,
                   letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer',
                 }}>🖨 Print / PDF</button>
+                <button onClick={togglePetals} title={showPetals ? 'Hide petals' : 'Show petals'} style={{
+                  background: showPetals ? 'rgba(244,167,192,.12)' : 'none',
+                  border: `1px solid ${showPetals ? 'rgba(244,167,192,.35)' : 'rgba(255,255,255,.15)'}`,
+                  borderRadius: 6, padding: '4px 10px',
+                  color: showPetals ? 'rgba(244,167,192,.9)' : 'rgba(255,255,255,.4)',
+                  fontFamily: "'Barlow Condensed'", fontSize: 10,
+                  letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer',
+                }}>🌸 Petals</button>
                 {!isOwner && (
                   <span style={{
                     display: 'inline-block', border: '1px solid rgba(168,85,247,.25)',
@@ -675,6 +699,8 @@ function SakuraPetals() {
   useEffect(() => {
     const c = document.getElementById('petals-canvas') as HTMLCanvasElement
     if (!c) return
+    const saved = localStorage.getItem('tripzync-petals')
+    if (saved === 'false') { c.style.display = 'none'; return }
     const ctx = c.getContext('2d')!
     let W: number, H: number
     const COLS = ['#f4a7c0','#e8839f','#fde8f0','#f2b4ca','#eba3b8']
