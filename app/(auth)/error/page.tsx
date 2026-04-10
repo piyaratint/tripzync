@@ -1,9 +1,10 @@
-export default function AuthErrorPage({
+export default async function AuthErrorPage({
   searchParams,
 }: {
-  searchParams: { error?: string }
+  searchParams: Promise<{ error?: string }>
 }) {
-  const error = searchParams?.error ?? 'Unknown'
+  const params = await searchParams
+  const error = params?.error ?? 'Unknown'
 
   const messages: Record<string, string> = {
     Configuration: 'AUTH_SECRET or database env var is missing/wrong.',
