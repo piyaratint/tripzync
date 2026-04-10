@@ -5,6 +5,7 @@ import { db } from '@/lib/db'
 import { authUsers, accounts, sessions, verificationTokens } from '@/lib/db/schema'
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  secret: process.env.AUTH_SECRET,
   adapter: DrizzleAdapter(db, {
     usersTable: authUsers,
     accountsTable: accounts,
