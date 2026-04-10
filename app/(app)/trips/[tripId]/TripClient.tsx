@@ -361,7 +361,7 @@ function WeatherWidget({ city }: { city: string }) {
         const today = new Date().toISOString().slice(0, 10)
         const days = el('wx-days')
         if (days) days.innerHTML = (wx.daily.time ?? []).map((t: string, i: number) => {
-          const dn = new Date(t + 'T00:00').toLocaleDateString('en', { weekday: 'short' })
+          const dn = new Date(t + 'T00:00').toLocaleDateString('en', { month: 'short', day: 'numeric' })
           return `<div class="wx-day${t === today ? ' today' : ''}"><div class="wx-day-name">${t === today ? 'Today' : dn}</div><div class="wx-day-icon">${WX_ICONS[wx.daily.weathercode[i]] ?? '🌡'}</div><div class="wx-day-hi">${Math.round(wx.daily.temperature_2m_max[i])}°</div><div class="wx-day-lo">${Math.round(wx.daily.temperature_2m_min[i])}°</div><div class="wx-day-rain">${wx.daily.precipitation_probability_max[i] ?? 0}%</div></div>`
         }).join('')
       } catch { /* silent */ }
