@@ -145,7 +145,17 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
                     letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer',
                   }}>👥 Invite</button>
                 )}
-                <button className="print-btn" onClick={() => window.print()} style={{
+                <button className="print-btn" onClick={() => {
+                  // Force-show all hidden day panels before printing
+                  const hidden = document.querySelectorAll<HTMLElement>('.day-panel-hidden')
+                  hidden.forEach(el => el.style.setProperty('display', 'block', 'important'))
+                  const restore = () => {
+                    hidden.forEach(el => el.style.removeProperty('display'))
+                    window.removeEventListener('afterprint', restore)
+                  }
+                  window.addEventListener('afterprint', restore)
+                  window.print()
+                }} style={{
                   background: 'none', border: '1px solid rgba(255,255,255,.15)',
                   borderRadius: 6, padding: '4px 10px', color: 'rgba(255,255,255,.4)',
                   fontFamily: "'Barlow Condensed'", fontSize: 10,
