@@ -146,11 +146,15 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
                   }}>👥 Invite</button>
                 )}
                 <button className="print-btn" onClick={() => {
-                  // Force-show all hidden day panels before printing
-                  const hidden = document.querySelectorAll<HTMLElement>('.day-panel-hidden')
-                  hidden.forEach(el => el.style.setProperty('display', 'block', 'important'))
+                  // Force-show all hidden day panels
+                  const hiddenDays = document.querySelectorAll<HTMLElement>('.day-panel-hidden')
+                  hiddenDays.forEach(el => el.style.setProperty('display', 'block', 'important'))
+                  // Force-show all flight panes
+                  const hiddenFlightPanes = document.querySelectorAll<HTMLElement>('.fl-pane')
+                  hiddenFlightPanes.forEach(el => el.style.setProperty('display', 'block', 'important'))
                   const restore = () => {
-                    hidden.forEach(el => el.style.removeProperty('display'))
+                    hiddenDays.forEach(el => el.style.removeProperty('display'))
+                    hiddenFlightPanes.forEach(el => el.style.removeProperty('display'))
                     window.removeEventListener('afterprint', restore)
                   }
                   window.addEventListener('afterprint', restore)
