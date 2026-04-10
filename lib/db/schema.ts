@@ -1,6 +1,6 @@
 import {
   pgTable, uuid, text, timestamp,
-  numeric, integer, boolean, jsonb, index,
+  numeric, integer, boolean, jsonb, index, primaryKey,
 } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
 
@@ -177,7 +177,9 @@ export const accounts = pgTable('account', {
   scope:             text('scope'),
   id_token:          text('id_token'),
   session_state:     text('session_state'),
-})
+}, t => ({
+  pk: primaryKey({ columns: [t.provider, t.providerAccountId] }),
+}))
 
 export const sessions = pgTable('session', {
   sessionToken: text('sessionToken').primaryKey(),
@@ -197,4 +199,6 @@ export const verificationTokens = pgTable('verificationToken', {
   identifier: text('identifier').notNull(),
   token:      text('token').notNull(),
   expires:    timestamp('expires').notNull(),
-})
+}, t => ({
+  pk: primaryKey({ columns: [t.identifier, t.token] }),
+}))

@@ -29,6 +29,13 @@
       "when": 1775700000000,
       "tag": "0003_trip_collab",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1775800000000,
+      "tag": "0004_auth_pk",
+      "breakpoints": true
     }
   ]
 }
