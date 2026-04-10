@@ -99,18 +99,18 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
               </div>
               <div className="hero-title-wrap">
                 <div className="hero-title">{trip.title1}</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
-                  <div className="hero-title"><em className="em">{trip.title2}</em></div>
-                  <div className="hotel-chip" onClick={() => setHotelModalOpen(true)} style={{ cursor: 'pointer', flexShrink: 0 }}>
-                    <div className="meta-label">Basecamp</div>
-                    <div className="meta-val">
-                      {storeHotels.length > 0 ? storeHotels[0].name : 'Set hotel'}
-                    </div>
-                    <div className="edit-hint">tap to edit</div>
+                <div className="hero-title"><em className="em">{trip.title2}</em></div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 24, marginBottom: 16 }}>
+                <p className="hero-subtitle" style={{ margin: 0, flex: 1 }}>{trip.subtitle}</p>
+                <div className="hotel-chip" onClick={() => setHotelModalOpen(true)} style={{ cursor: 'pointer', flexShrink: 0 }}>
+                  <div className="meta-label">Basecamp</div>
+                  <div className="meta-val">
+                    {storeHotels.length > 0 ? storeHotels[0].name : 'Set hotel'}
                   </div>
+                  <div className="edit-hint">tap to edit</div>
                 </div>
               </div>
-              <p className="hero-subtitle">{trip.subtitle}</p>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
                 {isOwner && (
                   <button onClick={() => setEditTripOpen(true)} style={{
