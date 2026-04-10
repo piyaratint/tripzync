@@ -584,8 +584,28 @@ body {
   .section-head { margin: 14px 0 10px; }
 }
 
-/* ── LANDSCAPE MOBILE: unwrap event text ── */
+/* ── LANDSCAPE MOBILE: single-column scrollable layout ── */
 @media (orientation: landscape) and (max-height: 600px) {
+  /* Force single column like portrait mobile */
+  .page { padding: 0 14px 100px; }
+  .page-inner { grid-template-columns: 1fr; gap: 0; }
+  .sidebar { position: static; }
+  .sidebar .hero { padding: 24px 0 16px; }
+  .hero-title { font-size: clamp(44px, 10vw, 70px); }
+  .hero-subtitle { font-size: 11px; }
+  .cards-grid { grid-template-columns: 1fr; }
+  .hero-meta { flex-wrap: wrap; gap: 10px; }
+  .tabs-row { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; flex-wrap: nowrap; }
+  .tab-btn { flex-shrink: 0; }
+  .day-panel { padding: 14px 12px; }
+  .wx-top-row { flex-direction: column; gap: 12px; }
+  .wx-forecast { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .wx-days { flex-wrap: nowrap; }
+  .wx-day { min-width: 52px; }
+  .ai-drawer { left: 8px; right: 8px; max-width: 100%; bottom: 76px; max-height: 70vh; }
+  .ai-fab { bottom: 16px; right: 16px; }
+
+  /* Unwrap truncated text */
   .ev-act { white-space: normal; overflow: visible; text-overflow: unset; }
   .ev-sub { white-space: normal; overflow: visible; text-overflow: unset; }
   .exp-list-item { white-space: normal; overflow: visible; text-overflow: unset; }
