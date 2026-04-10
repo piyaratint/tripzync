@@ -318,6 +318,63 @@ function FlightCard({ tripId, flights }: { tripId: string; flights: Flight[] }) 
       onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))} />
   )
 
+  function FlightPane({ dir, flight }: { dir: 'outbound' | 'return'; flight: Flight | undefined }) {
+    const isActive = tab === dir && !editing
+    return (
+      <div className={`fl-pane${isActive ? ' active' : ''}`}>
+        {editing === dir ? (
+          <div>
+            <div className="fl-grid">
+              <div className="fl-field"><span className="fl-label">Flight No.</span>{inp('flightNum', 'TG 661', form.flightNum)}</div>
+              <div className="fl-field"><span className="fl-label">Airline</span>{inp('airline', 'Thai Airways', form.airline)}</div>
+            </div>
+            <div className="fl-grid">
+              <div className="fl-field"><span className="fl-label">From</span>{inp('depAirport', 'BKK', form.depAirport)}</div>
+              <div className="fl-field"><span className="fl-label">To</span>{inp('arrAirport', 'ICN', form.arrAirport)}</div>
+            </div>
+            <div className="fl-row">
+              <div className="fl-field"><span className="fl-label">Dep</span>{inp('depTime', '08:30', form.depTime)}</div>
+              <div className="fl-field"><span className="fl-label">Arr</span>{inp('arrTime', '16:00', form.arrTime)}</div>
+              <div className="fl-field"><span className="fl-label">Date</span>{inp('flightDate', 'YYYY-MM-DD', form.flightDate)}</div>
+              <button className="btn-fl-save" onClick={save} disabled={saving}>{saving ? '...' : 'Save'}</button>
+            </div>
+          </div>
+        ) : flight ? (
+          <div>
+            <div className="fl-d-label" style={{ marginBottom: 4, fontFamily: "'Barlow Condensed'", fontSize: 10, letterSpacing: '.15em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+              {dir === 'outbound' ? '▶ Outbound' : '◀ Return'}
+            </div>
+            <div className="fl-display">
+              <div className="fl-d-block">
+                <div className="fl-d-label">Departure</div>
+                <div className="fl-d-time">{flight.depTime ?? '--:--'}</div>
+                <div className="fl-d-port">{flight.depAirport ?? '---'}</div>
+              </div>
+              <div className="fl-sep">✈</div>
+              <div className="fl-d-block" style={{ textAlign: 'right' }}>
+                <div className="fl-d-label">Arrival</div>
+                <div className="fl-d-time">{flight.arrTime ?? '--:--'}</div>
+                <div className="fl-d-port">{flight.arrAirport ?? '---'}</div>
+              </div>
+            </div>
+            <div className="fl-meta">
+              {flight.flightNum && <span className="fl-chip hi">{flight.flightNum}</span>}
+              {flight.airline && <span className="fl-chip">{flight.airline}</span>}
+              {flight.flightDate && <span className="fl-chip">{flight.flightDate}</span>}
+            </div>
+            <button onClick={() => startEdit(dir)} style={{ marginTop: 8, background: 'none', border: '1px solid rgba(255,255,255,.12)', borderRadius: 6, padding: '3px 10px', color: 'rgba(255,255,255,.4)', fontSize: 10, fontFamily: "'Barlow Condensed'", letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer' }}>
+              ✏️ Edit
+            </button>
+          </div>
+        ) : (
+          <button onClick={() => startEdit(dir)} style={{ width: '100%', background: 'none', border: '1px dashed rgba(255,255,255,.15)', borderRadius: 10, padding: '10px', color: 'rgba(255,255,255,.35)', fontSize: 11, fontFamily: "'Barlow Condensed'", letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer' }}>
+            + Add {dir === 'outbound' ? 'Outbound' : 'Return'} Flight
+          </button>
+        )}
+      </div>
+    )
+  }
+
   return (
     <div className="card flight-card">
       <div className="flight-card-title">✈ Flights</div>
@@ -328,53 +385,9 @@ function FlightCard({ tripId, flights }: { tripId: string; flights: Flight[] }) 
           </button>
         ))}
       </div>
-
-      {editing ? (
-        <div>
-          <div className="fl-grid">
-            <div className="fl-field"><span className="fl-label">Flight No.</span>{inp('flightNum', 'TG 661', form.flightNum)}</div>
-            <div className="fl-field"><span className="fl-label">Airline</span>{inp('airline', 'Thai Airways', form.airline)}</div>
-          </div>
-          <div className="fl-grid">
-            <div className="fl-field"><span className="fl-label">From</span>{inp('depAirport', 'BKK', form.depAirport)}</div>
-            <div className="fl-field"><span className="fl-label">To</span>{inp('arrAirport', 'ICN', form.arrAirport)}</div>
-          </div>
-          <div className="fl-row">
-            <div className="fl-field"><span className="fl-label">Dep</span>{inp('depTime', '08:30', form.depTime)}</div>
-            <div className="fl-field"><span className="fl-label">Arr</span>{inp('arrTime', '16:00', form.arrTime)}</div>
-            <div className="fl-field"><span className="fl-label">Date</span>{inp('flightDate', 'YYYY-MM-DD', form.flightDate)}</div>
-            <button className="btn-fl-save" onClick={save} disabled={saving}>{saving ? '...' : 'Save'}</button>
-          </div>
-        </div>
-      ) : current ? (
-        <div>
-          <div className="fl-display">
-            <div className="fl-d-block">
-              <div className="fl-d-label">Departure</div>
-              <div className="fl-d-time">{current.depTime ?? '--:--'}</div>
-              <div className="fl-d-port">{current.depAirport ?? '---'}</div>
-            </div>
-            <div className="fl-sep">✈</div>
-            <div className="fl-d-block" style={{ textAlign: 'right' }}>
-              <div className="fl-d-label">Arrival</div>
-              <div className="fl-d-time">{current.arrTime ?? '--:--'}</div>
-              <div className="fl-d-port">{current.arrAirport ?? '---'}</div>
-            </div>
-          </div>
-          <div className="fl-meta">
-            {current.flightNum && <span className="fl-chip hi">{current.flightNum}</span>}
-            {current.airline && <span className="fl-chip">{current.airline}</span>}
-            {current.flightDate && <span className="fl-chip">{current.flightDate}</span>}
-          </div>
-          <button onClick={() => startEdit(tab)} style={{ marginTop: 8, background: 'none', border: '1px solid rgba(255,255,255,.12)', borderRadius: 6, padding: '3px 10px', color: 'rgba(255,255,255,.4)', fontSize: 10, fontFamily: "'Barlow Condensed'", letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer' }}>
-            ✏️ Edit
-          </button>
-        </div>
-      ) : (
-        <button onClick={() => startEdit(tab)} style={{ width: '100%', background: 'none', border: '1px dashed rgba(255,255,255,.15)', borderRadius: 10, padding: '10px', color: 'rgba(255,255,255,.35)', fontSize: 11, fontFamily: "'Barlow Condensed'", letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer' }}>
-          + Add {tab === 'outbound' ? 'Outbound' : 'Return'} Flight
-        </button>
-      )}
+      {/* Both panes always in DOM — inactive hidden via CSS, both shown on print */}
+      <FlightPane dir="outbound" flight={outbound} />
+      <FlightPane dir="return" flight={ret} />
     </div>
   )
 }
