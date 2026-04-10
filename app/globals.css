@@ -266,7 +266,7 @@ body {
 /* ── DAY PANEL ── */
 .day-panel { background: rgba(255,255,255,.025); border: 1px solid rgba(255,255,255,.07); border-radius: 22px; overflow: hidden; animation: fadeUp .6s .25s ease both; }
 .day-panel-head { padding: 16px 14px 14px; border-bottom: 1px solid rgba(255,255,255,.06); display: flex; justify-content: space-between; align-items: flex-end; position: relative; overflow: hidden; }
-.day-panel-head::after { content: '🌸'; position: absolute; right: 22px; top: 12px; font-size: 52px; opacity: .07; pointer-events: none; }
+.day-panel-head::after { content: none; }
 .day-date { font-family: 'Barlow Condensed', sans-serif; font-size: 17px; font-weight: 500; letter-spacing: .2em; color: var(--muted); text-transform: uppercase; margin-bottom: 5px; }
 .day-title { font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 900; font-style: italic; text-transform: uppercase; color: #fff; line-height: 1; letter-spacing: -.01em; }
 .day-panel.is-today .day-panel-head { background: linear-gradient(135deg,rgba(232,0,29,.12) 0%,transparent 55%); border-bottom-color: rgba(232,0,29,.18); }
