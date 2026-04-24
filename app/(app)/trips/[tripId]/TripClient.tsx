@@ -110,10 +110,6 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
           {/* ── SIDEBAR ── */}
           <aside className="sidebar">
             <header className="hero">
-              <div className="hero-eyebrow">
-                <div className="eyebrow-dots"><span /><span className="r" /><span /></div>
-                <span className="eyebrow-text">TripZync® · {new Date(trip.startDate + 'T00:00').getFullYear()}</span>
-              </div>
               <div className="hero-title-wrap">
                 <div className="hero-title">{trip.title1}</div>
                 <div className="hero-title"><em className="em">{trip.title2}</em></div>
