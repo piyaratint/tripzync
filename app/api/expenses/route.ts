@@ -87,6 +87,7 @@ export async function PATCH(req: Request) {
 
   try {
     const body = await req.json()
+    if (body.amount !== undefined) body.amount = parseFloat(body.amount)
     const parsed = createExpenseSchema.partial().parse(body)
 
     const { amount: parsedAmount, ...parsedRest } = parsed
