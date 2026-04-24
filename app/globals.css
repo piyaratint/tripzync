@@ -50,8 +50,7 @@ body {
 
 /* ── TOP NAV ── */
 .top-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 2000; height: 52px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; background: rgba(13,13,13,.85); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,.07); }
-.top-nav-logo { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: .06em; color: #fff; text-decoration: none; }
-.top-nav-logo em { color: var(--red); font-style: normal; }
+.top-nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
 .top-nav-user { display: flex; align-items: center; gap: 10px; }
 .top-nav-avatar { width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(255,255,255,.15); object-fit: cover; flex-shrink: 0; }
 .top-nav-avatar-fallback { background: rgba(232,0,29,.2); border: 1px solid rgba(232,0,29,.3); display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; color: var(--red); }

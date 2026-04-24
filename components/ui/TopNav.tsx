@@ -16,7 +16,12 @@ export function TopNav({ name, email, image }: Props) {
   return (
     <nav className="top-nav">
       <Link href="/dashboard" className="top-nav-logo">
-        TripZync<em>®</em>
+        <div className="eyebrow-dots">
+          <span />
+          <span className="r" />
+          <span />
+        </div>
+        <span className="eyebrow-text">TripZync® · {new Date().getFullYear()}</span>
       </Link>
 
       <div className="top-nav-user">
