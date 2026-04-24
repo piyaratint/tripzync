@@ -7,6 +7,7 @@ import { CategoryPills } from './CategoryPills'
 import type { ExpenseCategory } from '@/lib/validations'
 import { EXPENSE_CATEGORIES } from '@/lib/validations'
 import { toISO } from '@/lib/utils'
+import { useToast } from '@/components/ui/Toaster'
 
 interface Props {
   tripId: string
@@ -41,13 +42,15 @@ export function ExpenseLog({ tripId, currency, expenses, total }: Props) {
   const addExpense  = useAddExpense(tripId)
   const deleteExpense = useDeleteExpense(tripId)
   const editExpense = useEditExpense(tripId)
+  const { toast } = useToast()
 
-  const [item,     setItem]     = useState('')
-  const [amount,   setAmount]   = useState('')
-  const [category, setCategory] = useState<ExpenseCategory>('Dining')
-  const [status,   setStatus]   = useState<'idle' | 'syncing' | 'ok' | 'err'>('idle')
-  const [showList, setShowList] = useState(true)
-  const [editing,  setEditing]  = useState<EditState | null>(null)
+  const [item,       setItem]       = useState('')
+  const [amount,     setAmount]     = useState('')
+  const [category,   setCategory]   = useState<ExpenseCategory>('Dining')
+  const [status,     setStatus]     = useState<'idle' | 'syncing' | 'ok' | 'err'>('idle')
+  const [showList,   setShowList]   = useState(true)
+  const [editing,    setEditing]    = useState<EditState | null>(null)
+  const [confirmDel, setConfirmDel] = useState<string | null>(null)
 
   const statusMsg = {
     idle: 'Ready',
@@ -58,7 +61,10 @@ export function ExpenseLog({ tripId, currency, expenses, total }: Props) {
 
   async function handleAdd() {
     const parsed = parseFloat(amount)
-    if (!item.trim() || !parsed || isNaN(parsed)) return
+    if (!item.trim() || !parsed || isNaN(parsed) || parsed <= 0) {
+      toast('Please enter a valid item and amount', 'error')
+      return
+    }
 
     setStatus('syncing')
     try {
@@ -71,8 +77,10 @@ export function ExpenseLog({ tripId, currency, expenses, total }: Props) {
       })
       setItem(''); setAmount('')
       setStatus('ok')
+      toast('Expense added')
     } catch {
       setStatus('err')
+      toast('Failed to add expense', 'error')
     }
   }
 
@@ -88,13 +96,21 @@ export function ExpenseLog({ tripId, currency, expenses, total }: Props) {
   async function handleSaveEdit() {
     if (!editing) return
     const parsed = parseFloat(editing.amount)
-    if (!editing.item.trim() || !parsed || isNaN(parsed)) return
+    if (!editing.item.trim() || !parsed || isNaN(parsed) || parsed <= 0) {
+      toast('Please enter a valid item and amount', 'error')
+      return
+    }
 
-    await editExpense.mutateAsync({
-      id: editing.id,
-      patch: { item: editing.item.trim(), amount: String(parsed), category: editing.category },
-    })
-    setEditing(null)
+    try {
+      await editExpense.mutateAsync({
+        id: editing.id,
+        patch: { item: editing.item.trim(), amount: String(parsed), category: editing.category },
+      })
+      setEditing(null)
+      toast('Expense updated')
+    } catch {
+      toast('Failed to update expense', 'error')
+    }
   }
 
   function handleCancelEdit() {
@@ -206,13 +222,33 @@ export function ExpenseLog({ tripId, currency, expenses, total }: Props) {
                     <span className="exp-list-amount">
                       {currency.symbol}{parseFloat(String(e.amount)).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                     </span>
-                    <button className="exp-act-btn edit" onClick={() => startEdit(e)} title="Edit">✎</button>
-                    <button
-                      className="exp-act-btn delete"
-                      onClick={() => deleteExpense.mutate(e.id)}
-                      disabled={deleteExpense.isPending}
-                      title="Delete"
-                    >✕</button>
+                    {confirmDel === e.id ? (
+                      <>
+                        <button
+                          className="exp-act-btn save"
+                          title="Confirm delete"
+                          onClick={() => {
+                            deleteExpense.mutate(e.id)
+                            setConfirmDel(null)
+                            toast('Expense deleted')
+                          }}
+                        >✓</button>
+                        <button
+                          className="exp-act-btn cancel"
+                          title="Cancel"
+                          onClick={() => setConfirmDel(null)}
+                        >✕</button>
+                      </>
+                    ) : (
+                      <>
+                        <button className="exp-act-btn edit" onClick={() => startEdit(e)} title="Edit">✎</button>
+                        <button
+                          className="exp-act-btn delete"
+                          onClick={() => setConfirmDel(e.id)}
+                          title="Delete"
+                        >✕</button>
+                      </>
+                    )}
                   </div>
                 </>
               )}

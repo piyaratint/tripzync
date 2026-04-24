@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useDeleteEvent } from '@/hooks/useTrip'
 import { useUIStore } from '@/store/uiStore'
 import type { Event } from '@/lib/db/schema'
@@ -11,8 +12,9 @@ interface Props {
 }
 
 export function EventItem({ tripId, event: ev, isLast }: Props) {
-  const deleteEvent  = useDeleteEvent(tripId)
+  const deleteEvent   = useDeleteEvent(tripId)
   const openEditEvent = useUIStore(s => s.openEditEvent)
+  const [confirmDel, setConfirmDel] = useState(false)
 
   const isUserEvent = !ev.isKey && !ev.isSakura
   const cls = ev.isKey ? 'key' : ev.isSakura ? 'sakura' : ''
@@ -48,16 +50,33 @@ export function EventItem({ tripId, event: ev, isLast }: Props) {
 
       {isUserEvent ? (
         <div className="ev-actions">
-          <button
-            className="ev-act-btn edit"
-            title="Edit"
-            onClick={() => openEditEvent(ev.id)}
-          >✎</button>
-          <button
-            className="ev-act-btn del"
-            title="Delete"
-            onClick={() => deleteEvent.mutate(ev.id)}
-          >✕</button>
+          {confirmDel ? (
+            <>
+              <button
+                className="ev-act-btn del"
+                title="Confirm delete"
+                onClick={() => { deleteEvent.mutate(ev.id); setConfirmDel(false) }}
+              >✓</button>
+              <button
+                className="ev-act-btn edit"
+                title="Cancel"
+                onClick={() => setConfirmDel(false)}
+              >✕</button>
+            </>
+          ) : (
+            <>
+              <button
+                className="ev-act-btn edit"
+                title="Edit"
+                onClick={() => openEditEvent(ev.id)}
+              >✎</button>
+              <button
+                className="ev-act-btn del"
+                title="Delete"
+                onClick={() => setConfirmDel(true)}
+              >✕</button>
+            </>
+          )}
         </div>
       ) : (
         <div className="ev-actions" style={{ visibility: 'hidden' }} />

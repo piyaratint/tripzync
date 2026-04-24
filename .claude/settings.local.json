@@ -1,7 +1,25 @@
 {
   "permissions": {
     "allow": [
-      "Bash(head -80 /Users/nonamezzzint/Desktop/TripZync/tripzync/app/\\\\\\(app\\\\\\)/trips/[tripId]/TripClient.tsx)"
+      "Bash(head -80 /Users/nonamezzzint/Desktop/TripZync/tripzync/app/\\\\\\(app\\\\\\)/trips/[tripId]/TripClient.tsx)",
+      "Bash(xargs ls:*)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(curl -s https://ipinfo.io/json)",
+      "Bash(rm '/Users/nonamezzzint/Desktop/TripZync/tripzync-fresh/.git/index.lock')",
+      "Bash(git commit -m ':*)",
+      "Bash(git commit -m 'feat: transport card renderer, markdown AI responses, expense fixes, and chat API:*)",
+      "Bash(git push:*)",
+      "Bash(npx tsc:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m 'fix: resolve TypeScript errors blocking Vercel build:*)",
+      "Bash(npx vercel:*)",
+      "Bash(npx drizzle-kit:*)",
+      "Bash(git commit:*)",
+      "Bash(grep -v \"^[^a-zA-Z]*$\")",
+      "Bash(textutil -convert txt -output /tmp/spec_output.txt \"/Users/nonamezzzint/Desktop/TripZync/tripzync/TripZync — Product Specification v1.0.pages\")",
+      "Read(//tmp/**)",
+      "Bash(python3)",
+      "Bash(npm run *)"
     ]
   }
 }

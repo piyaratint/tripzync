@@ -26,6 +26,8 @@ export function EditTripModal({ open, onClose }: Props) {
   const [loading, setLoading] = useState(false)
   const [showDelete, setShowDelete] = useState(false)
 
+  const datesChanged = trip && (form.startDate !== trip.startDate || form.endDate !== trip.endDate)
+
   if (!open || !trip) return null
 
   async function handleSave() {
@@ -175,6 +177,13 @@ export function EditTripModal({ open, onClose }: Props) {
             <option value="SGD">SGD — Singapore Dollar</option>
           </select>
         </div>
+
+        {/* Date range warning */}
+        {datesChanged && (
+          <div style={{ background: 'rgba(255,180,0,.08)', border: '1px solid rgba(255,180,0,.2)', borderRadius: 8, padding: '8px 12px', fontSize: 12, color: 'rgba(255,200,60,.75)', fontFamily: "'Noto Sans JP'", lineHeight: 1.5 }}>
+            ⚠️ Events scheduled outside the new date range will be hidden but not deleted.
+          </div>
+        )}
 
         {/* Buttons */}
         <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>

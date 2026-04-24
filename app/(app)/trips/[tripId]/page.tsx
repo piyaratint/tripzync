@@ -6,6 +6,8 @@ import { notFound, redirect } from 'next/navigation'
 import { TripClient } from './TripClient'
 import { canAccessTrip } from '@/lib/tripAccess'
 
+type SessionUser = { name?: string | null; email?: string | null; image?: string | null }
+
 type Props = { params: Promise<{ tripId: string }> }
 
 export async function generateMetadata({ params }: Props) {
@@ -59,6 +61,7 @@ export default async function TripPage({ params }: Props) {
       flights={flightRows}
       isOwner={isOwner}
       members={members}
+      currentUser={{ name: session.user.name, email: session.user.email, image: session.user.image }}
     />
   )
 }

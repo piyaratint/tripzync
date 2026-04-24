@@ -10,8 +10,10 @@ import { EditEventModal } from '@/components/itinerary/EditEventModal'
 import { HotelModal } from '@/components/hotel/HotelModal'
 import { toISO, fmtShort, getDayTitle, detectCurrency, daysBetween } from '@/lib/utils'
 import { EditTripModal } from '@/components/trip/EditTripModal'
+import { SignOutButton } from '@/components/ui/SignOutButton'
 
 interface Member { userId: string; name: string | null; image: string | null; joinedAt: Date }
+interface CurrentUser { name?: string | null; email?: string | null; image?: string | null }
 
 interface Props {
   trip: Trip
@@ -21,6 +23,7 @@ interface Props {
   flights: Flight[]
   isOwner: boolean
   members: Member[]
+  currentUser: CurrentUser
 }
 
 // Build the day-by-day itinerary structure from DB data
@@ -58,7 +61,7 @@ function buildItinerary(trip: Trip, hotels: Hotel[], events: Event[]) {
   return days
 }
 
-export function TripClient({ trip, hotels, events, expenses, flights, isOwner, members }: Props) {
+export function TripClient({ trip, hotels, events, expenses, flights, isOwner, members, currentUser }: Props) {
   const { setTrip, setHotels, setEvents, setExpenses, setFlights, activeDayIndex, setActiveDayIndex } = useTripStore()
   const [hotelModalOpen, setHotelModalOpen] = useState(false)
   const [editTripOpen, setEditTripOpen] = useState(false)
@@ -128,6 +131,37 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
                   <div className="edit-hint">tap to edit</div>
                 </div>
               </div>
+              {/* User avatar + logout */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                {currentUser.image && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={currentUser.image}
+                    alt={currentUser.name ?? ''}
+                    style={{ width: 24, height: 24, borderRadius: '50%', border: '1px solid rgba(255,255,255,.15)', flexShrink: 0 }}
+                  />
+                )}
+                {!currentUser.image && (
+                  <div style={{
+                    width: 24, height: 24, borderRadius: '50%',
+                    background: 'rgba(232,0,29,.2)', border: '1px solid rgba(232,0,29,.3)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontFamily: "'Barlow Condensed'", fontSize: 11, fontWeight: 700, color: 'var(--red)', flexShrink: 0,
+                  }}>
+                    {(currentUser.name ?? currentUser.email ?? '?')[0].toUpperCase()}
+                  </div>
+                )}
+                <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 10, letterSpacing: '.1em', color: 'rgba(255,255,255,.35)', textTransform: 'uppercase', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {currentUser.name ?? currentUser.email}
+                </span>
+                <SignOutButton style={{
+                  background: 'none', border: '1px solid rgba(255,255,255,.1)',
+                  borderRadius: 5, padding: '3px 8px', color: 'rgba(255,255,255,.3)',
+                  fontFamily: "'Barlow Condensed'", fontSize: 9,
+                  letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer',
+                }} />
+              </div>
+
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
                 {isOwner && (
                   <button onClick={() => setEditTripOpen(true)} style={{

@@ -1,11 +1,13 @@
 import type { Metadata, Viewport } from 'next'
 import { SessionProvider } from 'next-auth/react'
 import { QueryProvider } from '@/components/ui/QueryProvider'
+import { ToastProvider } from '@/components/ui/Toaster'
 import './globals.css'
 
 export const metadata: Metadata = {
   title: 'TripZync®',
   description: 'Your personal travel logbook',
+  icons: { icon: '/favicon.svg' },
 }
 
 export const viewport: Viewport = {
@@ -26,7 +28,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <SessionProvider>
-          <QueryProvider>{children}</QueryProvider>
+          <QueryProvider>
+            <ToastProvider>{children}</ToastProvider>
+          </QueryProvider>
         </SessionProvider>
       </body>
     </html>
