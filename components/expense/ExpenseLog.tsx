@@ -128,15 +128,13 @@ export function ExpenseLog({ tripId, currency, expenses, total }: Props) {
         </span>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <span className="total-badge">{currency.code}</span>
-          {expenses.length > 0 && (
-            <button
-              className="exp-toggle-btn"
-              onClick={() => setShowList(v => !v)}
-              title={showList ? 'Hide list' : 'Show list'}
-            >
-              {showList ? '▲' : '▼'} {expenses.length}
-            </button>
-          )}
+          <button
+            className="exp-toggle-btn"
+            onClick={() => setShowList(v => !v)}
+            title={showList ? 'Hide list' : 'Show list'}
+          >
+            {showList ? '▲ Hide' : '▼ Show'}
+          </button>
         </div>
       </div>
 
