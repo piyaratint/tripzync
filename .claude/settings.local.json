@@ -19,7 +19,8 @@
       "Bash(textutil -convert txt -output /tmp/spec_output.txt \"/Users/nonamezzzint/Desktop/TripZync/tripzync/TripZync — Product Specification v1.0.pages\")",
       "Read(//tmp/**)",
       "Bash(python3)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(vercel --prod --yes)"
     ]
   }
 }
