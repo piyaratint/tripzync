@@ -48,6 +48,18 @@ body {
   pointer-events: none; z-index: 0; opacity: .3;
 }
 
+/* ── TOP NAV ── */
+.top-nav { position: fixed; top: 0; left: 0; right: 0; z-index: 2000; height: 52px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; background: rgba(13,13,13,.85); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,.07); }
+.top-nav-logo { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: .06em; color: #fff; text-decoration: none; }
+.top-nav-logo em { color: var(--red); font-style: normal; }
+.top-nav-user { display: flex; align-items: center; gap: 10px; }
+.top-nav-avatar { width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(255,255,255,.15); object-fit: cover; flex-shrink: 0; }
+.top-nav-avatar-fallback { background: rgba(232,0,29,.2); border: 1px solid rgba(232,0,29,.3); display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; color: var(--red); }
+.top-nav-name { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.4); max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.top-nav-signout { background: none; border: 1px solid rgba(255,255,255,.12); border-radius: 6px; padding: 4px 10px; color: rgba(255,255,255,.35); font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; cursor: pointer; transition: border-color .2s, color .2s; }
+.top-nav-signout:hover { border-color: rgba(255,255,255,.3); color: rgba(255,255,255,.7); }
+@media (max-width: 480px) { .top-nav-name { display: none; } }
+
 /* ── PAGE LAYOUT ── */
 .page { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 0 32px 80px; }
 .page-inner { display: grid; grid-template-columns: 340px 1fr; gap: 32px; align-items: start; }
