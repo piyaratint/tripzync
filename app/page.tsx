@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 
 // ── TYPES ────────────────────────────────────────────────────────────────────
 type Screen = 'hero' | 'map' | 'places' | 'hotels' | 'auth-choice'
@@ -148,49 +148,6 @@ export default function LandingPage() {
   const [selHotels,     setSelHotels]     = useState<string[]>([])
   const [loadingPlaces, setLoadingPlaces] = useState(false)
 
-  const mapRef      = useRef<HTMLDivElement>(null)
-  const mapInstance = useRef<any>(null)
-  const mapReady    = useRef(false)
-
-  // ── LEAFLET MAP INIT (decorative only — no click handlers) ────────────────
-  useEffect(() => {
-    if (screen !== 'map') return
-    if (mapReady.current) return
-
-    const loadLeaflet = () => {
-      if ((window as any).L) { initMap(); return }
-      const script = document.createElement('script')
-      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js'
-      script.onload = initMap
-      document.head.appendChild(script)
-    }
-
-    const initMap = () => {
-      if (mapReady.current || !mapRef.current) return
-      mapReady.current = true
-      const L = (window as any).L
-
-      const map = L.map('ob-map', {
-        center: [20, 15], zoom: 2,
-        scrollWheelZoom: false,
-        dragging: false,
-        touchZoom: false,
-        doubleClickZoom: false,
-        boxZoom: false,
-        keyboard: false,
-        zoomControl: false,
-        attributionControl: false,
-      })
-      mapInstance.current = map
-
-      L.tileLayer(
-        'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',
-        { subdomains: 'abcd', maxZoom: 20 }
-      ).addTo(map)
-    }
-
-    setTimeout(loadLeaflet, 50)
-  }, [screen])
 
   // ── PLACES FETCH ──────────────────────────────────────────────────────────
   const fetchPlaces = async (country: string) => {
@@ -230,7 +187,7 @@ export default function LandingPage() {
     if (typeof window !== 'undefined') {
       localStorage.setItem('tripzync_onboarding', JSON.stringify(data))
     }
-    window.location.href = action === 'signup' ? '/login' : '/home'
+    window.location.href = action === 'signup' ? '/login' : '/plan'
   }
 
   const mapNextDisabled = selectedISOs.length === 0
@@ -287,11 +244,6 @@ export default function LandingPage() {
         <div className="ob-step-num">STEP 01 / 03</div>
         <h2 className="ob-screen-title">WHERE ARE YOU HEADED?</h2>
         <p className="ob-screen-sub">Choose a region, then select your countries</p>
-
-        {/* Decorative world map */}
-        <div className="ob-map-deco">
-          <div id="ob-map" ref={mapRef} style={{ width: '100%', height: '100%' }} />
-        </div>
 
         {/* Continent selection */}
         <div className="ob-region-label">Select a region</div>
