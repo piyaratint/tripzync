@@ -498,7 +498,52 @@ const PLACES_DB: Record<string, Omit<Place, 'rank'>[]> = {
   ],
 }
 
-// Attempt Google Places API (server-side only)
+// ── Wikipedia image fetcher ───────────────────────────────────────────────────
+// Module-level cache: survives across requests within the same warm serverless
+// instance. Key = place name (lowercased), value = resolved image URL.
+const wikiCache = new Map<string, string>()
+
+async function fetchWikiImage(placeName: string): Promise<string> {
+  const key = placeName.toLowerCase()
+  if (wikiCache.has(key)) return wikiCache.get(key)!
+
+  const ua = 'TripZync/1.0 (https://tripzync.vercel.app; privacy@tripzync.com)'
+
+  // 1st attempt — direct article lookup by place name
+  try {
+    const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(placeName)}`
+    const res = await fetch(url, { headers: { 'User-Agent': ua }, next: { revalidate: 604800 } })
+    if (res.ok) {
+      const data = await res.json()
+      const img: string = data.thumbnail?.source || data.originalimage?.source || ''
+      if (img) { wikiCache.set(key, img); return img }
+    }
+  } catch { /* fall through */ }
+
+  // 2nd attempt — Wikipedia search API, grab top article, then its image
+  try {
+    const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(placeName)}&format=json&srlimit=1&origin=*`
+    const sRes = await fetch(searchUrl, { headers: { 'User-Agent': ua }, next: { revalidate: 604800 } })
+    if (sRes.ok) {
+      const sData = await sRes.json()
+      const title: string = sData.query?.search?.[0]?.title || ''
+      if (title) {
+        const imgUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`
+        const iRes = await fetch(imgUrl, { headers: { 'User-Agent': ua }, next: { revalidate: 604800 } })
+        if (iRes.ok) {
+          const iData = await iRes.json()
+          const img: string = iData.thumbnail?.source || ''
+          if (img) { wikiCache.set(key, img); return img }
+        }
+      }
+    }
+  } catch { /* fall through */ }
+
+  wikiCache.set(key, '') // cache miss so we don't retry on every request
+  return ''
+}
+
+// ── Google Places API (server-side only) ─────────────────────────────────────
 async function fetchFromGooglePlaces(country: string): Promise<Place[] | null> {
   const key = process.env.GOOGLE_PLACES_API_KEY
   if (!key) return null
@@ -546,7 +591,15 @@ export async function GET(req: NextRequest) {
   ) ?? '_default'
 
   const raw = PLACES_DB[normalised] ?? PLACES_DB['_default']
-  const places: Place[] = raw.map((p, i) => ({ ...p, rank: i + 1 }))
 
-  return NextResponse.json({ places, source: 'static' })
+  // Enrich each place with a real Wikipedia photo in parallel.
+  // Falls back to the Unsplash URL in PLACES_DB if Wikipedia has no image.
+  const places: Place[] = await Promise.all(
+    raw.map(async (p, i) => {
+      const wikiImg = await fetchWikiImage(p.name)
+      return { ...p, image: wikiImg || p.image, rank: i + 1 }
+    })
+  )
+
+  return NextResponse.json({ places, source: 'wiki' })
 }
