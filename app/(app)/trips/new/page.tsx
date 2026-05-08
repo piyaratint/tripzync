@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
+const todayStr = new Date().toISOString().split('T')[0]
+
 export default function NewTripPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -122,12 +124,12 @@ export default function NewTripPage() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div>
             <label style={labelStyle}>Start Date *</label>
-            <input type="date" style={inputStyle} value={form.startDate}
+            <input type="date" style={inputStyle} value={form.startDate} min={todayStr}
               onChange={e => setForm(f => ({ ...f, startDate: e.target.value }))} />
           </div>
           <div>
             <label style={labelStyle}>End Date *</label>
-            <input type="date" style={inputStyle} value={form.endDate}
+            <input type="date" style={inputStyle} value={form.endDate} min={form.startDate || todayStr}
               onChange={e => setForm(f => ({ ...f, endDate: e.target.value }))} />
           </div>
         </div>

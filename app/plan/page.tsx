@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 
+const todayStr = new Date().toISOString().split('T')[0]
+
 export default function PlanPage() {
   const [step, setStep] = useState<'form' | 'auth'>('form')
   const [form, setForm] = useState({
@@ -96,6 +98,7 @@ export default function PlanPage() {
                     type="date"
                     style={inputStyle}
                     value={form.startDate}
+                    min={todayStr}
                     onChange={e => setForm(f => ({ ...f, startDate: e.target.value }))}
                   />
                 </div>
@@ -105,6 +108,7 @@ export default function PlanPage() {
                     type="date"
                     style={inputStyle}
                     value={form.endDate}
+                    min={form.startDate || todayStr}
                     onChange={e => setForm(f => ({ ...f, endDate: e.target.value }))}
                   />
                 </div>
