@@ -87,13 +87,13 @@ const HOTEL_DB: HotelDB = {
 const BRAND_ACCENT: Record<string, string> = {
   marriott:'#B5924C', hilton:'#003087', hyatt:'#7B2D8B', ihg:'#003F87', accor:'#C8102E',
 }
-// Google's favicon cache — reliable, official brand icons, no API key needed
+// Self-hosted in /public/logos — served from Vercel CDN, always available
 const BRAND_LOGOS: Record<string, string> = {
-  marriott: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.marriott.com&size=128',
-  hilton:   'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.hilton.com&size=128',
-  ihg:      'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.ihg.com&size=128',
-  hyatt:    'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.hyatt.com&size=128',
-  accor:    'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.accor.com&size=128',
+  marriott: '/logos/marriott.svg',
+  hilton:   '/logos/hilton.svg',
+  ihg:      '/logos/ihg.svg',
+  hyatt:    '/logos/hyatt.svg',
+  accor:    '/logos/accor.svg',
 }
 const BRAND_INITIALS: Record<string, string> = {
   marriott:'M', hilton:'H', ihg:'IHG', hyatt:'Hy', accor:'A',
