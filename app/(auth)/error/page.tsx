@@ -22,7 +22,7 @@ export default async function AuthErrorPage({
       <div style={{ maxWidth: 480, padding: 32, border: '1px solid rgba(255,0,0,.3)', borderRadius: 16, textAlign: 'center' }}>
         <div style={{ color: '#e8001d', fontSize: 11, letterSpacing: '.2em', textTransform: 'uppercase', marginBottom: 12 }}>Auth Error</div>
         <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>Error code: <span style={{ color: '#e8001d' }}>{error}</span></div>
-        <div style={{ fontSize: 13, color: 'rgba(255,255,255,.6)', marginBottom: 24 }}>{messages[error] ?? messages.Default}</div>
+        <div style={{ fontSize: 13, color: '#fff', marginBottom: 24 }}>{messages[error] ?? messages.Default}</div>
         <a href="/login" style={{ color: '#fff', background: '#e8001d', padding: '10px 24px', borderRadius: 8, textDecoration: 'none', fontSize: 12, letterSpacing: '.1em', textTransform: 'uppercase' }}>
           Try again
         </a>

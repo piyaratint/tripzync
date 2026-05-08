@@ -31,7 +31,7 @@ export default function NotFound() {
         fontSize: 14,
         letterSpacing: '.18em',
         textTransform: 'uppercase',
-        color: 'rgba(255,255,255,.35)',
+        color: '#fff',
         marginBottom: 32,
       }}>
         Page not found

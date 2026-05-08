@@ -46,7 +46,7 @@ export default async function DashboardPage() {
         <Link href="/trips/new" style={{ textDecoration: 'none' }}>
           <div style={{ background: 'rgba(255,255,255,.03)', border: '1px dashed rgba(255,255,255,.15)', borderRadius: 18, padding: 24, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, minHeight: 160, cursor: 'pointer', transition: 'border-color .2s' }}>
             <span style={{ fontSize: 28, opacity: .5 }}>+</span>
-            <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 11, letterSpacing: '.16em', textTransform: 'uppercase', color: 'rgba(255,255,255,.35)' }}>New Trip</span>
+            <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 11, letterSpacing: '.16em', textTransform: 'uppercase', color: '#fff' }}>New Trip</span>
           </div>
         </Link>
 
@@ -57,13 +57,13 @@ export default async function DashboardPage() {
 
       {/* Empty state */}
       {ownedTrips.length === 0 && (
-        <div style={{ textAlign: 'center', padding: '48px 0', color: 'rgba(255,255,255,.25)' }}>
+        <div style={{ textAlign: 'center', padding: '48px 0', color: '#fff' }}>
           <div style={{ fontSize: 36, marginBottom: 12, opacity: .4 }}>🌸</div>
           <p style={{ fontFamily: "'Barlow Condensed'", fontSize: 13, letterSpacing: '.14em', textTransform: 'uppercase', marginBottom: 6 }}>
             No trips yet
           </p>
-          <p style={{ fontFamily: "'Noto Sans JP'", fontSize: 12, color: 'rgba(255,255,255,.18)' }}>
-            Tap <strong style={{ color: 'rgba(255,255,255,.3)' }}>+ New Trip</strong> above to plan your first adventure.
+          <p style={{ fontFamily: "'Noto Sans JP'", fontSize: 12, color: '#fff' }}>
+            Tap <strong style={{ color: '#fff' }}>+ New Trip</strong> above to plan your first adventure.
           </p>
         </div>
       )}
@@ -72,7 +72,7 @@ export default async function DashboardPage() {
         <>
           <div style={{ margin: '40px 0 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
-            <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 10, letterSpacing: '.18em', textTransform: 'uppercase', color: 'rgba(255,255,255,.35)' }}>Shared With Me</span>
+            <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 10, letterSpacing: '.18em', textTransform: 'uppercase', color: '#fff' }}>Shared With Me</span>
             <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: 16 }}>

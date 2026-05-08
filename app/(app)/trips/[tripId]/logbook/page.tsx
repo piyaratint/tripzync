@@ -79,18 +79,18 @@ export default async function LogbookPage({ params }: Props) {
       <div style={{ marginBottom: 32, display: 'flex', gap: 20, flexWrap: 'wrap' }}>
         <div>
           <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 8, letterSpacing: '.18em', color: 'var(--muted)', textTransform: 'uppercase', marginBottom: 3 }}>Dates</div>
-          <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 13, color: 'rgba(255,255,255,.8)' }}>{fmtDate(start)} – {fmtDate(end)}</div>
+          <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 13, color: '#fff' }}>{fmtDate(start)} – {fmtDate(end)}</div>
         </div>
         <div>
           <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 8, letterSpacing: '.18em', color: 'var(--muted)', textTransform: 'uppercase', marginBottom: 3 }}>Destination</div>
-          <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 13, color: 'rgba(255,255,255,.8)' }}>{trip.destination}</div>
+          <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 13, color: '#fff' }}>{trip.destination}</div>
         </div>
         {hotelRows.map(h => (
           <div key={h.id}>
             <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 8, letterSpacing: '.18em', color: 'var(--muted)', textTransform: 'uppercase', marginBottom: 3 }}>
               {h.fromDate ? `Hotel from ${h.fromDate}` : 'Hotel'}
             </div>
-            <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 13, color: 'rgba(255,255,255,.8)' }}>{h.name}</div>
+            <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 13, color: '#fff' }}>{h.name}</div>
           </div>
         ))}
       </div>
@@ -118,8 +118,8 @@ export default async function LogbookPage({ params }: Props) {
                   <div key={ev.id} style={{ padding: '8px 16px', borderBottom: i < dayEvents.length - 1 ? '1px solid rgba(255,255,255,.04)' : 'none', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
                     <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 9, color: 'var(--muted)', width: 36, flexShrink: 0, paddingTop: 2 }}>{ev.time ?? ''}</span>
                     <div>
-                      <div style={{ fontFamily: "'Noto Sans JP'", fontSize: 11, color: 'rgba(255,255,255,.85)', marginBottom: 2 }}>{ev.act}</div>
-                      {ev.sub && <div style={{ fontSize: 9, color: 'rgba(255,255,255,.3)' }}>{ev.sub}</div>}
+                      <div style={{ fontFamily: "'Noto Sans JP'", fontSize: 11, color: '#fff', marginBottom: 2 }}>{ev.act}</div>
+                      {ev.sub && <div style={{ fontSize: 9, color: '#fff' }}>{ev.sub}</div>}
                       {(ev.fromPlace || ev.toPlace) && (
                         <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 8, letterSpacing: '.06em', color: 'var(--muted)', textTransform: 'uppercase', marginTop: 3 }}>
                           {ev.fromPlace}{ev.fromPlace && ev.toPlace ? ' → ' : ''}{ev.toPlace}
@@ -134,7 +134,7 @@ export default async function LogbookPage({ params }: Props) {
         })}
       </div>
 
-      <div style={{ marginTop: 48, paddingTop: 24, borderTop: '1px solid var(--border)', textAlign: 'center', fontFamily: "'Barlow Condensed'", fontSize: 9, letterSpacing: '.16em', color: 'rgba(255,255,255,.15)', textTransform: 'uppercase' }}>
+      <div style={{ marginTop: 48, paddingTop: 24, borderTop: '1px solid var(--border)', textAlign: 'center', fontFamily: "'Barlow Condensed'", fontSize: 9, letterSpacing: '.16em', color: '#fff', textTransform: 'uppercase' }}>
         TripZync® · {trip.title1} {trip.title2}
       </div>
     </div>

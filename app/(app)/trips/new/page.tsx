@@ -77,7 +77,7 @@ export default function NewTripPage() {
     fontSize: 10,
     letterSpacing: '.16em',
     textTransform: 'uppercase' as const,
-    color: 'rgba(255,255,255,.4)',
+    color: '#fff',
     marginBottom: 6,
     display: 'block',
   }
@@ -154,7 +154,7 @@ export default function NewTripPage() {
             <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 10, letterSpacing: '.16em', textTransform: 'uppercase', color: 'rgba(0,212,255,.8)', marginBottom: 8 }}>
               ✓ {onboardingPlaces.length} places from your plan will be added to your itinerary
             </div>
-            <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, color: 'rgba(255,255,255,.5)', lineHeight: 1.6 }}>
+            <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, color: '#fff', lineHeight: 1.6 }}>
               {onboardingPlaces.join(' · ')}
             </div>
           </div>
@@ -162,7 +162,7 @@ export default function NewTripPage() {
 
         <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
           <button onClick={() => router.back()}
-            style={{ flex: 1, padding: '12px 0', background: 'transparent', border: '1px solid rgba(255,255,255,.15)', borderRadius: 10, color: 'rgba(255,255,255,.5)', fontFamily: "'Barlow Condensed'", fontSize: 13, letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer' }}>
+            style={{ flex: 1, padding: '12px 0', background: 'transparent', border: '1px solid rgba(255,255,255,.15)', borderRadius: 10, color: '#fff', fontFamily: "'Barlow Condensed'", fontSize: 13, letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer' }}>
             Cancel
           </button>
           <button onClick={handleSubmit} disabled={loading}

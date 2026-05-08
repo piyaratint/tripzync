@@ -56,7 +56,7 @@ export default function PlanPage() {
     fontSize: 10,
     letterSpacing: '.16em',
     textTransform: 'uppercase' as const,
-    color: 'rgba(255,255,255,.65)',
+    color: '#fff',
     marginBottom: 6,
     display: 'block',
   }
@@ -124,7 +124,7 @@ export default function PlanPage() {
               CONTINUE →
             </button>
 
-            <div style={{ marginTop: 16, fontFamily: "'Rajdhani', sans-serif", fontSize: 12, color: 'rgba(255,255,255,.58)', letterSpacing: 1 }}>
+            <div style={{ marginTop: 16, fontFamily: "'Rajdhani', sans-serif", fontSize: 12, color: '#fff', letterSpacing: 1 }}>
               Already have an account?{' '}
               <a href="/login" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Sign in</a>
             </div>

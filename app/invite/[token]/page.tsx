@@ -60,7 +60,7 @@ function InviteLanding({
       <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, maxWidth: 360, padding: '0 24px' }}>
         <div style={{ fontSize: 40 }}>🌸</div>
         <div>
-          <div style={{ fontSize: 10, letterSpacing: '.2em', color: 'rgba(255,255,255,.4)', textTransform: 'uppercase', marginBottom: 8 }}>
+          <div style={{ fontSize: 10, letterSpacing: '.2em', color: '#fff', textTransform: 'uppercase', marginBottom: 8 }}>
             {ownerName ?? 'Someone'} invited you to
           </div>
           <div style={{ fontSize: 52, fontWeight: 900, fontStyle: 'italic', textTransform: 'uppercase', lineHeight: .88 }}>
@@ -69,7 +69,7 @@ function InviteLanding({
           <div style={{ fontSize: 52, fontWeight: 900, fontStyle: 'italic', textTransform: 'uppercase', lineHeight: .88, color: '#e8001d' }}>
             {trip.title2}
           </div>
-          <div style={{ fontSize: 12, color: 'rgba(255,255,255,.45)', marginTop: 12, letterSpacing: '.06em' }}>
+          <div style={{ fontSize: 12, color: '#fff', marginTop: 12, letterSpacing: '.06em' }}>
             {trip.destination} · {trip.startDate} – {trip.endDate}
           </div>
         </div>
@@ -108,7 +108,7 @@ function ErrorPage({ message }: { message: string }) {
       <div style={{ textAlign: 'center' }}>
         <div style={{ fontSize: 40, marginBottom: 16 }}>🔗</div>
         <h1 style={{ fontSize: 24, fontWeight: 900, textTransform: 'uppercase' }}>Invalid Link</h1>
-        <p style={{ color: 'rgba(255,255,255,.5)', marginTop: 8, fontSize: 14 }}>{message}</p>
+        <p style={{ color: '#fff', marginTop: 8, fontSize: 14 }}>{message}</p>
         <a href="/dashboard" style={{
           display: 'inline-block', marginTop: 24, padding: '10px 24px',
           background: '#e8001d', color: '#fff', borderRadius: 8, textDecoration: 'none',

@@ -87,7 +87,7 @@ export default async function ExpensesPage({ params }: Props) {
               <div style={{ flex: 1, height: 3, background: 'rgba(255,255,255,.06)', borderRadius: 2, overflow: 'hidden' }}>
                 <div style={{ height: '100%', width: `${Math.round((amt / grandTotal) * 100)}%`, background: CAT_TEXT[cat] ?? '#fff', borderRadius: 2 }} />
               </div>
-              <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,.7)', minWidth: 60, textAlign: 'right' }}>
+              <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 10, fontWeight: 700, color: '#fff', minWidth: 60, textAlign: 'right' }}>
                 {currency.symbol}{amt.toLocaleString(undefined, { maximumFractionDigits: 0 })}
               </span>
             </div>
@@ -103,14 +103,14 @@ export default async function ExpensesPage({ params }: Props) {
           <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 8, letterSpacing: '.18em', color: 'var(--muted)', textTransform: 'uppercase', textAlign: 'right' }}>Amount</span>
         </div>
         {rows.length === 0 && (
-          <div style={{ padding: '32px 16px', textAlign: 'center', fontFamily: "'Barlow Condensed'", fontSize: 11, letterSpacing: '.1em', color: 'rgba(255,255,255,.2)', textTransform: 'uppercase' }}>
+          <div style={{ padding: '32px 16px', textAlign: 'center', fontFamily: "'Barlow Condensed'", fontSize: 11, letterSpacing: '.1em', color: '#fff', textTransform: 'uppercase' }}>
             No expenses yet
           </div>
         )}
         {rows.map((e, i) => (
           <div key={e.id} style={{ padding: '10px 16px', display: 'grid', gridTemplateColumns: '1fr auto auto', gap: 12, alignItems: 'center', borderBottom: i < rows.length - 1 ? '1px solid rgba(255,255,255,.04)' : 'none' }}>
             <div>
-              <div style={{ fontFamily: "'Noto Sans JP'", fontSize: 11, color: 'rgba(255,255,255,.85)', marginBottom: 2 }}>{e.item}</div>
+              <div style={{ fontFamily: "'Noto Sans JP'", fontSize: 11, color: '#fff', marginBottom: 2 }}>{e.item}</div>
               <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 8, letterSpacing: '.1em', color: 'var(--muted)', textTransform: 'uppercase' }}>{e.date}</div>
             </div>
             <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 8, padding: '2px 8px', borderRadius: 20, background: CAT_COLORS[e.category] ?? 'rgba(255,255,255,.08)', color: CAT_TEXT[e.category] ?? '#fff', fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>

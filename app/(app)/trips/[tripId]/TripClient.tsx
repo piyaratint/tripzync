@@ -128,7 +128,7 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
                 {isOwner && (
                   <button onClick={() => setEditTripOpen(true)} style={{
                     background: 'none', border: '1px solid rgba(255,255,255,.15)',
-                    borderRadius: 6, padding: '4px 10px', color: 'rgba(255,255,255,.4)',
+                    borderRadius: 6, padding: '4px 10px', color: '#fff',
                     fontFamily: "'Barlow Condensed'", fontSize: 10,
                     letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer',
                   }}>✏️ Edit Trip</button>
@@ -157,7 +157,7 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
                   window.print()
                 }} style={{
                   background: 'none', border: '1px solid rgba(255,255,255,.15)',
-                  borderRadius: 6, padding: '4px 10px', color: 'rgba(255,255,255,.4)',
+                  borderRadius: 6, padding: '4px 10px', color: '#fff',
                   fontFamily: "'Barlow Condensed'", fontSize: 10,
                   letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer',
                 }}>🖨 Print / PDF</button>
@@ -354,7 +354,7 @@ function FlightCard({ tripId, flights }: { tripId: string; flights: Flight[] }) 
             </div>
             <button
               onClick={() => setEditing(null)}
-              style={{ marginTop: 6, background: 'none', border: 'none', color: 'rgba(255,255,255,.3)', fontSize: 11, fontFamily: "'Barlow Condensed'", letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer' }}
+              style={{ marginTop: 6, background: 'none', border: 'none', color: '#fff', fontSize: 11, fontFamily: "'Barlow Condensed'", letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer' }}
             >
               Cancel
             </button>
@@ -384,7 +384,7 @@ function FlightCard({ tripId, flights }: { tripId: string; flights: Flight[] }) 
             </div>
             <button
               onClick={() => startEdit(dir)}
-              style={{ marginTop: 8, background: 'none', border: '1px solid rgba(255,255,255,.12)', borderRadius: 6, padding: '3px 10px', color: 'rgba(255,255,255,.4)', fontSize: 10, fontFamily: "'Barlow Condensed'", letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer' }}
+              style={{ marginTop: 8, background: 'none', border: '1px solid rgba(255,255,255,.12)', borderRadius: 6, padding: '3px 10px', color: '#fff', fontSize: 10, fontFamily: "'Barlow Condensed'", letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer' }}
             >
               ✏️ Edit
             </button>
@@ -392,7 +392,7 @@ function FlightCard({ tripId, flights }: { tripId: string; flights: Flight[] }) 
         ) : (
           <button
             onClick={() => startEdit(dir)}
-            style={{ width: '100%', background: 'none', border: '1px dashed rgba(255,255,255,.15)', borderRadius: 10, padding: '10px', color: 'rgba(255,255,255,.35)', fontSize: 11, fontFamily: "'Barlow Condensed'", letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer' }}
+            style={{ width: '100%', background: 'none', border: '1px dashed rgba(255,255,255,.15)', borderRadius: 10, padding: '10px', color: '#fff', fontSize: 11, fontFamily: "'Barlow Condensed'", letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer' }}
           >
             + Add {dir === 'outbound' ? 'Outbound' : 'Return'} Flight
           </button>

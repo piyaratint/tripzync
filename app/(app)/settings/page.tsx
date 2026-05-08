@@ -105,7 +105,7 @@ export default function SettingsPage() {
               onClick={() => handleTheme(t.id)}
             >
               <div className="ob-theme-name" style={{ color: t.accent }}>{t.name}</div>
-              <div className="ob-theme-desc" style={{ color: 'rgba(255,255,255,.5)' }}>{t.desc}</div>
+              <div className="ob-theme-desc" style={{ color: '#fff' }}>{t.desc}</div>
               <div className="ob-theme-swatches">
                 <div className="ob-theme-swatch" style={{ background: t.bg, border: '1px solid rgba(255,255,255,.2)' }} />
                 <div className="ob-theme-swatch" style={{ background: t.accent }} />
@@ -133,7 +133,7 @@ export default function SettingsPage() {
           >
             {saved ? 'Saved ✓' : 'Save Preferences'}
           </button>
-          <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 10, letterSpacing: '.1em', color: 'rgba(255,255,255,.3)', textTransform: 'uppercase' }}>
+          <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 10, letterSpacing: '.1em', color: '#fff', textTransform: 'uppercase' }}>
             Theme applies immediately
           </span>
         </div>
@@ -152,13 +152,13 @@ export default function SettingsPage() {
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div style={{ background: 'rgba(255,255,255,.03)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 13, letterSpacing: '.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,.6)' }}>
+            <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 13, letterSpacing: '.1em', textTransform: 'uppercase', color: '#fff' }}>
               Connected via Google OAuth
             </span>
             <span style={{ fontSize: 18 }}>🔗</span>
           </div>
           <div style={{ background: 'rgba(255,255,255,.03)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 13, letterSpacing: '.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,.6)' }}>
+            <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 13, letterSpacing: '.1em', textTransform: 'uppercase', color: '#fff' }}>
               Hotel Loyalty Programmes
             </span>
             <a href="/dashboard" style={{ fontFamily: "'Barlow Condensed'", fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--red)', textDecoration: 'none' }}>

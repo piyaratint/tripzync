@@ -28,7 +28,7 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p style={{ fontFamily: "'Barlow Condensed'", fontSize: 9, letterSpacing: '.12em', color: 'rgba(255,255,255,.2)', textTransform: 'uppercase' }}>
+        <p style={{ fontFamily: "'Barlow Condensed'", fontSize: 9, letterSpacing: '.12em', color: '#fff', textTransform: 'uppercase' }}>
           Your trips, your data.
         </p>
       </div>
