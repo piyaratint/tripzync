@@ -1,10 +1,11 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function NewTripPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [onboardingPlaces, setOnboardingPlaces] = useState<string[]>([])
   const [form, setForm] = useState({
     title1: 'MY',
     title2: 'TRIP',
@@ -15,6 +16,26 @@ export default function NewTripPage() {
     endDate: '',
     currency: 'JPY',
   })
+
+  // Pre-fill from onboarding data if available
+  useEffect(() => {
+    const raw = localStorage.getItem('tripzync_onboarding')
+    if (!raw) return
+    try {
+      const data = JSON.parse(raw)
+      const dest = data.destination || data.countries?.[0] || ''
+      if (dest) {
+        setForm(f => ({
+          ...f,
+          destination: dest,
+          title2: dest.toUpperCase().split(' ')[0] || 'TRIP',
+        }))
+      }
+      if (data.places?.length > 0) {
+        setOnboardingPlaces(data.places)
+      }
+    } catch { /* ignore */ }
+  }, [])
 
   const handleSubmit = async () => {
     if (!form.destination || !form.startDate || !form.endDate) return
@@ -124,6 +145,18 @@ export default function NewTripPage() {
             <option value="SGD">SGD — Singapore Dollar</option>
           </select>
         </div>
+
+        {/* Onboarding places preview */}
+        {onboardingPlaces.length > 0 && (
+          <div style={{ background: 'rgba(0,212,255,.05)', border: '1px solid rgba(0,212,255,.2)', borderRadius: 10, padding: '12px 16px' }}>
+            <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 10, letterSpacing: '.16em', textTransform: 'uppercase', color: 'rgba(0,212,255,.8)', marginBottom: 8 }}>
+              ✓ {onboardingPlaces.length} places from your plan will be added to your itinerary
+            </div>
+            <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, color: 'rgba(255,255,255,.5)', lineHeight: 1.6 }}>
+              {onboardingPlaces.join(' · ')}
+            </div>
+          </div>
+        )}
 
         <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
           <button onClick={() => router.back()}

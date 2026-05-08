@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { signOut } from 'next-auth/react'
+import { useEffect } from 'react'
 
 interface Props {
   name?: string | null
@@ -12,6 +13,12 @@ interface Props {
 export function TopNav({ name, email, image }: Props) {
   const displayName = name ?? email ?? ''
   const initial = displayName[0]?.toUpperCase() ?? '?'
+
+  // Apply stored theme on mount
+  useEffect(() => {
+    const theme = localStorage.getItem('tripzync_theme') || ''
+    if (theme) document.body.className = theme
+  }, [])
 
   return (
     <nav className="top-nav">
@@ -32,6 +39,14 @@ export function TopNav({ name, email, image }: Props) {
           <div className="top-nav-avatar top-nav-avatar-fallback">{initial}</div>
         )}
         <span className="top-nav-name">{displayName}</span>
+        <Link
+          href="/settings"
+          className="top-nav-signout"
+          style={{ marginRight: 4 }}
+          title="Settings"
+        >
+          Settings
+        </Link>
         <button
           className="top-nav-signout"
           onClick={() => signOut({ callbackUrl: '/login' })}
