@@ -111,6 +111,15 @@ const CONTINENT_HOVER: Record<string, string> = {
   Oceania:     '#1E3D60',
 }
 
+const CONTINENT_EMOJI: Record<string, string> = {
+  Americas:    '🌎',
+  Europe:      '🏰',
+  Africa:      '🦁',
+  'Middle East':'🕌',
+  Asia:        '🏯',
+  Oceania:     '🏝️',
+}
+
 const HOTEL_PROGRAMS = [
   { id: 'marriott', name: 'Marriott Bonvoy', tiers: 'Gold · Platinum · Titanium', emoji: '🏨' },
   { id: 'hilton',   name: 'Hilton Honors',   tiers: 'Gold · Diamond',             emoji: '🏩' },
@@ -131,26 +140,19 @@ const PARTICLES = Array.from({ length: 20 }, (_, i) => ({
 
 // ── COMPONENT ─────────────────────────────────────────────────────────────────
 export default function LandingPage() {
-  const [screen,         setScreen]         = useState<Screen>('hero')
-  const [continent,      setContinent]      = useState('')
-  const [selectedISOs,   setSelectedISOs]   = useState<string[]>([])
-  const [showPanel,      setShowPanel]      = useState(false)
-  const [panelContinent, setPanelContinent] = useState('')
-  const [places,         setPlaces]         = useState<Place[]>([])
-  const [selPlaces,      setSelPlaces]      = useState<string[]>([])
-  const [selHotels,      setSelHotels]      = useState<string[]>([])
-  const [loadingPlaces,  setLoadingPlaces]  = useState(false)
+  const [screen,        setScreen]        = useState<Screen>('hero')
+  const [continent,     setContinent]     = useState('')
+  const [selectedISOs,  setSelectedISOs]  = useState<string[]>([])
+  const [places,        setPlaces]        = useState<Place[]>([])
+  const [selPlaces,     setSelPlaces]     = useState<string[]>([])
+  const [selHotels,     setSelHotels]     = useState<string[]>([])
+  const [loadingPlaces, setLoadingPlaces] = useState(false)
 
-  const mapRef        = useRef<HTMLDivElement>(null)
-  const mapInstance   = useRef<any>(null)
-  const geoLayer      = useRef<any>(null)
-  const mapReady      = useRef(false)
-  const selISOsRef    = useRef<string[]>([])
+  const mapRef      = useRef<HTMLDivElement>(null)
+  const mapInstance = useRef<any>(null)
+  const mapReady    = useRef(false)
 
-  // keep ref in sync with state (needed for Leaflet event closures)
-  useEffect(() => { selISOsRef.current = selectedISOs }, [selectedISOs])
-
-  // ── LEAFLET MAP INIT ──────────────────────────────────────────────────────
+  // ── LEAFLET MAP INIT (decorative only — no click handlers) ────────────────
   useEffect(() => {
     if (screen !== 'map') return
     if (mapReady.current) return
@@ -170,10 +172,12 @@ export default function LandingPage() {
 
       const map = L.map('ob-map', {
         center: [20, 15], zoom: 2,
-        minZoom: 1.5, maxZoom: 5,
         scrollWheelZoom: false,
-        worldCopyJump: false,
-        maxBounds: [[-85,-220],[85,220]],
+        dragging: false,
+        touchZoom: false,
+        doubleClickZoom: false,
+        boxZoom: false,
+        keyboard: false,
         zoomControl: false,
         attributionControl: false,
       })
@@ -183,83 +187,10 @@ export default function LandingPage() {
         'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',
         { subdomains: 'abcd', maxZoom: 20 }
       ).addTo(map)
-
-      const styleFor = (iso: string, hover = false, selected = false) => {
-        const cont = ISO_CONTINENT[iso] || null
-        if (!cont) return { fillColor: '#0a0b12', fillOpacity: 0.6, color: '#1a1b28', weight: 0.4 }
-        if (selected) return { fillColor: '#0D3060', fillOpacity: 0.95, color: '#00D4FF', weight: 2 }
-        if (hover)    return { fillColor: CONTINENT_HOVER[cont] || '#1E2A6A', fillOpacity: 0.92, color: '#00D4FF', weight: 1.2 }
-        return { fillColor: CONTINENT_COLOR[cont] || '#1A2050', fillOpacity: 0.85, color: '#2A3470', weight: 0.6 }
-      }
-
-      // Load GeoJSON
-      const urls = [
-        'https://cdn.jsdelivr.net/gh/datasets/geo-countries@master/data/countries.geojson',
-        'https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson',
-      ]
-      const loadGeo = (idx = 0) => {
-        fetch(urls[idx])
-          .then(r => r.json())
-          .then(data => {
-            const layer = L.geoJSON(data, {
-              style: (feature: any) => {
-                const props = feature.properties
-                const isoKey = ['ISO_A3','iso_a3','ADM0_A3','ISO3'].find(k => props[k]?.length === 3)
-                const iso = isoKey ? props[isoKey] : null
-                return styleFor(iso, false, selISOsRef.current.includes(iso))
-              },
-              onEachFeature: (feature: any, lyr: any) => {
-                const props = feature.properties
-                const isoKey = ['ISO_A3','iso_a3','ADM0_A3','ISO3'].find(k => props[k]?.length === 3)
-                const iso = isoKey ? props[isoKey] : null
-                const cont = iso ? ISO_CONTINENT[iso] : null
-                if (!cont) return
-
-                lyr.on('mouseover', () => {
-                  if (!selISOsRef.current.includes(iso))
-                    lyr.setStyle(styleFor(iso, true, false))
-                })
-                lyr.on('mouseout', () => {
-                  lyr.setStyle(styleFor(iso, false, selISOsRef.current.includes(iso)))
-                })
-                lyr.on('click', () => {
-                  setPanelContinent(cont)
-                  setShowPanel(true)
-                })
-              },
-            })
-            geoLayer.current = layer
-            layer.addTo(map)
-          })
-          .catch(() => { if (idx < urls.length - 1) loadGeo(idx + 1) })
-      }
-      loadGeo()
     }
 
     setTimeout(loadLeaflet, 50)
   }, [screen])
-
-  // Refresh map layer styles when selectedISOs changes
-  useEffect(() => {
-    if (!geoLayer.current) return
-    const L = (window as any).L
-    if (!L) return
-    geoLayer.current.eachLayer((lyr: any) => {
-      const props = lyr.feature?.properties
-      if (!props) return
-      const isoKey = ['ISO_A3','iso_a3','ADM0_A3','ISO3'].find(k => props[k]?.length === 3)
-      const iso = isoKey ? props[isoKey] : null
-      if (!iso) return
-      const cont = ISO_CONTINENT[iso]
-      if (!cont) return
-      const selected = selectedISOs.includes(iso)
-      lyr.setStyle(
-        selected
-          ? { fillColor: '#0D3060', fillOpacity: 0.95, color: '#00D4FF', weight: 2 }
-          : { fillColor: CONTINENT_COLOR[cont] || '#1A2050', fillOpacity: 0.85, color: '#2A3470', weight: 0.6 }
-      )
-    })
-  }, [selectedISOs])
 
   // ── PLACES FETCH ──────────────────────────────────────────────────────────
   const fetchPlaces = async (country: string) => {
@@ -302,8 +233,7 @@ export default function LandingPage() {
     window.location.href = action === 'signup' ? '/login' : '/home'
   }
 
-  const mapNextDisabled  = selectedISOs.length === 0
-  const placeNextDisabled = false // no minimum for places
+  const mapNextDisabled = selectedISOs.length === 0
 
   // ── RENDER: HERO ──────────────────────────────────────────────────────────
   if (screen === 'hero') return (
@@ -323,7 +253,7 @@ export default function LandingPage() {
 
       <nav className="ob-nav">
         <span className="ob-nav-logo">TRIPZYNC</span>
-        <a href="/dashboard" className="ob-nav-link">Already have a plan? Jump to dashboard ↗</a>
+        <a href="/plan" className="ob-nav-link">Already have a plan? Set up your trip ↗</a>
       </nav>
 
       <div className="ob-hero-content">
@@ -344,47 +274,67 @@ export default function LandingPage() {
     </div>
   )
 
-  // ── RENDER: MAP ───────────────────────────────────────────────────────────
+  // ── RENDER: MAP (continent cards + country chips) ─────────────────────────
   if (screen === 'map') return (
     <div className="ob-screen" style={{ justifyContent: 'flex-start' }}>
       <div className="ob-grid-bg" />
       <nav className="ob-nav">
         <span className="ob-nav-logo">TRIPZYNC</span>
-        <a href="/dashboard" className="ob-nav-link">Already have a plan? Jump to dashboard ↗</a>
+        <a href="/plan" className="ob-nav-link">Already have a plan? Set up your trip ↗</a>
       </nav>
 
       <div className="ob-screen-content">
         <div className="ob-step-num">STEP 01 / 03</div>
         <h2 className="ob-screen-title">WHERE ARE YOU HEADED?</h2>
-        <p className="ob-screen-sub">Click a region to expand countries · Select one or more</p>
+        <p className="ob-screen-sub">Choose a region, then select your countries</p>
 
-        <div className="ob-map-wrap">
-          <div id="ob-map" ref={mapRef} />
+        {/* Decorative world map */}
+        <div className="ob-map-deco">
+          <div id="ob-map" ref={mapRef} style={{ width: '100%', height: '100%' }} />
+        </div>
 
-          {/* Country side panel */}
-          <div className={`ob-country-panel${showPanel ? ' open' : ''}`}>
-            <div className="ob-panel-head">
-              {panelContinent || 'Select a region'}
-              <div className="ob-panel-sub">
-                {selectedISOs.filter(i => ISO_CONTINENT[i] === panelContinent).length} selected
-              </div>
+        {/* Continent selection */}
+        <div className="ob-region-label">Select a region</div>
+        <div className="ob-continent-grid">
+          {Object.keys(CONTINENT_ISOS).map(cont => (
+            <button
+              key={cont}
+              className={`ob-continent-card${continent === cont ? ' active' : ''}`}
+              style={{
+                background: continent === cont ? CONTINENT_HOVER[cont] : CONTINENT_COLOR[cont],
+                borderColor: continent === cont ? 'var(--accent)' : 'rgba(255,255,255,.06)',
+              }}
+              onClick={() => {
+                setContinent(cont)
+                setSelectedISOs([])
+              }}
+            >
+              <div className="ob-continent-emoji">{CONTINENT_EMOJI[cont]}</div>
+              <div className="ob-continent-name">{cont}</div>
+              <div className="ob-continent-count">{CONTINENT_ISOS[cont].length} countries</div>
+            </button>
+          ))}
+        </div>
+
+        {/* Country chips */}
+        {continent && (
+          <>
+            <div className="ob-region-label" style={{ marginTop: 20 }}>
+              {continent} — pick your countries
             </div>
-            <div className="ob-country-list">
-              {(CONTINENT_ISOS[panelContinent] || []).map(iso => (
+            <div className="ob-country-chips">
+              {CONTINENT_ISOS[continent].map(iso => (
                 <button
                   key={iso}
-                  className={`ob-country-btn${selectedISOs.includes(iso) ? ' selected' : ''}`}
-                  onClick={() => {
-                    handleCountryToggle(iso)
-                    if (!continent) setContinent(panelContinent)
-                  }}
+                  className={`ob-country-chip${selectedISOs.includes(iso) ? ' selected' : ''}`}
+                  onClick={() => handleCountryToggle(iso)}
                 >
                   {selectedISOs.includes(iso) ? '✓ ' : ''}{ISO_NAME[iso] || iso}
                 </button>
               ))}
             </div>
-          </div>
-        </div>
+          </>
+        )}
 
         {selectedISOs.length > 0 && (
           <div style={{ marginTop: 16, fontFamily: "'Space Mono', monospace", fontSize: 10, letterSpacing: 2, color: 'var(--accent)', textTransform: 'uppercase' }}>
@@ -422,7 +372,7 @@ export default function LandingPage() {
         <div className="ob-grid-bg" />
         <nav className="ob-nav">
           <span className="ob-nav-logo">TRIPZYNC</span>
-          <a href="/dashboard" className="ob-nav-link">Already have a plan? Jump to dashboard ↗</a>
+          <a href="/plan" className="ob-nav-link">Already have a plan? Set up your trip ↗</a>
         </nav>
 
         <div className="ob-screen-content">
@@ -437,7 +387,7 @@ export default function LandingPage() {
             </div>
           ) : (
             <div className="ob-places-grid">
-              {places.map((p, i) => (
+              {places.map((p) => (
                 <div
                   key={p.name}
                   className={`ob-place-card${selPlaces.includes(p.name) ? ' selected' : ''}`}
@@ -498,7 +448,7 @@ export default function LandingPage() {
       <div className="ob-grid-bg" />
       <nav className="ob-nav">
         <span className="ob-nav-logo">TRIPZYNC</span>
-        <a href="/dashboard" className="ob-nav-link">Already have a plan? Jump to dashboard ↗</a>
+        <a href="/plan" className="ob-nav-link">Already have a plan? Set up your trip ↗</a>
       </nav>
 
       <div className="ob-screen-content">
