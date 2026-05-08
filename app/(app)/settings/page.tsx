@@ -7,7 +7,7 @@ const THEMES = [
     id: '',
     name: 'Midnight',
     desc: 'Deep Navy · Cyan · Gold',
-    bg: '#07080F', accent: '#00D4FF', hi: '#FFC947',
+    bg: '#07080F', accent: '#00BFFF', hi: '#FFC947',
   },
   {
     id: 't-obsidian',
