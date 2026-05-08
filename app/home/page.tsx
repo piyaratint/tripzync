@@ -87,12 +87,16 @@ const HOTEL_DB: HotelDB = {
 const BRAND_ACCENT: Record<string, string> = {
   marriott:'#B5924C', hilton:'#003087', hyatt:'#7B2D8B', ihg:'#003F87', accor:'#C8102E',
 }
+// Google's favicon cache — reliable, official brand icons, no API key needed
 const BRAND_LOGOS: Record<string, string> = {
-  marriott: 'https://logo.clearbit.com/marriott.com',
-  hilton:   'https://logo.clearbit.com/hilton.com',
-  ihg:      'https://logo.clearbit.com/ihg.com',
-  hyatt:    'https://logo.clearbit.com/hyatt.com',
-  accor:    'https://logo.clearbit.com/accor.com',
+  marriott: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.marriott.com&size=128',
+  hilton:   'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.hilton.com&size=128',
+  ihg:      'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.ihg.com&size=128',
+  hyatt:    'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.hyatt.com&size=128',
+  accor:    'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.accor.com&size=128',
+}
+const BRAND_INITIALS: Record<string, string> = {
+  marriott:'M', hilton:'H', ihg:'IHG', hyatt:'Hy', accor:'A',
 }
 function getHotelSuggestions(brands: string[], cities: string[]): { brand: string; city: string; hotels: HotelSuggestion[] }[] {
   const results: { brand: string; city: string; hotels: HotelSuggestion[] }[] = []
@@ -296,7 +300,10 @@ export default function GuestHomePage() {
   const hotelBrands     = (data?.hotels || []).filter(h => h && h !== 'none')
   const tripCities      = Object.keys(data?.placesByCity || {}).filter(c => (data?.placesByCity?.[c]?.length ?? 0) > 0)
   const suggestCities   = tripCities.length > 0 ? tripCities : (data?.cities || [data?.destination || '']).filter(Boolean)
-  const hotelSuggestions = getHotelSuggestions(hotelBrands, suggestCities)
+  // If user selected loyalty brands, show those — otherwise show all 5 brands as a discovery panel
+  const allBrands       = ['marriott', 'hilton', 'hyatt', 'ihg', 'accor']
+  const brandsToShow    = hotelBrands.length > 0 ? hotelBrands : allBrands
+  const hotelSuggestions = getHotelSuggestions(brandsToShow, suggestCities)
 
   // city for weather — first city or first selected country
   const weatherCity = data?.cities?.[0] || data?.countries?.[0] || destination
@@ -377,10 +384,15 @@ export default function GuestHomePage() {
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'flex-end' }}>
                 {hotelBrands.map(brand => (
                   <div key={brand} style={{ display: 'flex', alignItems: 'center', gap: 6, background: `${BRAND_ACCENT[brand] || 'var(--accent)'}18`, border: `1px solid ${BRAND_ACCENT[brand] || 'var(--accent)'}44`, borderRadius: 8, padding: '5px 10px' }}>
-                    {BRAND_LOGOS[brand] ? (
-                      <img src={BRAND_LOGOS[brand]} alt={HOTEL_NAMES[brand]} style={{ height: 16, maxWidth: 60, objectFit: 'contain', filter: 'brightness(0) invert(1)' }}
-                        onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
-                    ) : null}
+                    <div style={{ width:28, height:28, borderRadius:6, background:'#fff', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, overflow:'hidden' }}>
+                      {BRAND_LOGOS[brand] ? (
+                        <img src={BRAND_LOGOS[brand]} alt={HOTEL_NAMES[brand]} style={{ width:22, height:22, objectFit:'contain' }}
+                          onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; const fb = e.currentTarget.nextSibling as HTMLElement; if (fb) fb.style.display = 'flex' }} />
+                      ) : null}
+                      <span style={{ display:'none', width:22, height:22, alignItems:'center', justifyContent:'center', fontSize:9, fontWeight:900, color: BRAND_ACCENT[brand] || '#fff', fontFamily:"'Barlow Condensed',sans-serif", letterSpacing:1 }}>
+                        {BRAND_INITIALS[brand] || brand[0].toUpperCase()}
+                      </span>
+                    </div>
                     <span style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', color: '#fff' }}>
                       {HOTEL_NAMES[brand]}
                     </span>
@@ -404,6 +416,17 @@ export default function GuestHomePage() {
           {/* Hotel suggestions */}
           {hotelSuggestions.length > 0 && (
             <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+              {/* Panel heading */}
+              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:11, fontWeight:700, letterSpacing:3, textTransform:'uppercase', color:'rgba(255,255,255,.5)' }}>
+                  {hotelBrands.length > 0 ? 'Your Loyalty Hotels' : 'Top Hotels For Your Trip'}
+                </div>
+                {hotelBrands.length === 0 && (
+                  <a href="/" style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, letterSpacing:2, textTransform:'uppercase', color:'var(--accent)', textDecoration:'none' }}>
+                    Add Loyalty ↗
+                  </a>
+                )}
+              </div>
               {hotelSuggestions.map(({ brand, city, hotels }) => {
                 const accent = BRAND_ACCENT[brand] || 'var(--accent)'
                 return (
@@ -411,11 +434,18 @@ export default function GuestHomePage() {
                     {/* Brand header */}
                     <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 14px', background:`${accent}18`, borderBottom:`1px solid ${accent}33` }}>
                       <div style={{ display:'flex', alignItems:'center', gap: 10 }}>
-                        {BRAND_LOGOS[brand] && (
-                          <img src={BRAND_LOGOS[brand]} alt={HOTEL_NAMES[brand]}
-                            style={{ height: 22, maxWidth: 80, objectFit: 'contain', filter: 'brightness(0) invert(1)', flexShrink: 0 }}
-                            onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
-                        )}
+                        <div style={{ width:36, height:36, borderRadius:8, background:'#fff', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, overflow:'hidden' }}>
+                          <img src={BRAND_LOGOS[brand] || ''} alt={HOTEL_NAMES[brand]}
+                            style={{ width:28, height:28, objectFit:'contain' }}
+                            onError={e => {
+                              (e.currentTarget as HTMLImageElement).style.display = 'none'
+                              const fb = document.getElementById(`hotel-logo-fb-${brand}-${city}`)
+                              if (fb) { fb.style.display = 'flex' }
+                            }} />
+                          <span id={`hotel-logo-fb-${brand}-${city}`} style={{ display:'none', width:28, height:28, alignItems:'center', justifyContent:'center', fontFamily:"'Barlow Condensed',sans-serif", fontSize:11, fontWeight:900, color: accent, letterSpacing:1 }}>
+                            {BRAND_INITIALS[brand] || brand[0].toUpperCase()}
+                          </span>
+                        </div>
                         <div>
                           <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:13, fontWeight:900, letterSpacing:3, textTransform:'uppercase', color: accent }}>
                             {HOTEL_NAMES[brand]}

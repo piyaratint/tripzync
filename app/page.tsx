@@ -192,11 +192,11 @@ const COUNTRY_CITIES: Record<string, string[]> = {
 }
 
 const HOTEL_PROGRAMS = [
-  { id: 'marriott', name: 'Marriott Bonvoy', tiers: 'Gold · Platinum · Titanium', emoji: '🏨', logo: 'https://logo.clearbit.com/marriott.com' },
-  { id: 'hilton',   name: 'Hilton Honors',   tiers: 'Gold · Diamond',             emoji: '🏩', logo: 'https://logo.clearbit.com/hilton.com' },
-  { id: 'ihg',      name: 'IHG One Rewards', tiers: 'Diamond · Royal Ambassador', emoji: '🏪', logo: 'https://logo.clearbit.com/ihg.com' },
-  { id: 'hyatt',    name: 'World of Hyatt',  tiers: 'Globalist',                  emoji: '🏛️', logo: 'https://logo.clearbit.com/hyatt.com' },
-  { id: 'accor',    name: 'Accor ALL',        tiers: 'Platinum · Diamond',         emoji: '🏠', logo: 'https://logo.clearbit.com/accor.com' },
+  { id: 'marriott', name: 'Marriott Bonvoy', tiers: 'Gold · Platinum · Titanium', emoji: '🏨', logo: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.marriott.com&size=128' },
+  { id: 'hilton',   name: 'Hilton Honors',   tiers: 'Gold · Diamond',             emoji: '🏩', logo: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.hilton.com&size=128' },
+  { id: 'ihg',      name: 'IHG One Rewards', tiers: 'Diamond · Royal Ambassador', emoji: '🏪', logo: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.ihg.com&size=128' },
+  { id: 'hyatt',    name: 'World of Hyatt',  tiers: 'Globalist',                  emoji: '🏛️', logo: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.hyatt.com&size=128' },
+  { id: 'accor',    name: 'Accor ALL',        tiers: 'Platinum · Diamond',         emoji: '🏠', logo: 'https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.accor.com&size=128' },
   { id: 'none',     name: 'No Membership',   tiers: 'Best available deals',       emoji: '🌐', logo: '' },
 ]
 
@@ -568,16 +568,23 @@ export default function LandingPage() {
                 prev.includes(h.id) ? prev.filter(i => i !== h.id) : [...prev, h.id]
               )}
             >
-              <div style={{ height: 52, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+              <div style={{ height: 64, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
                 {h.logo ? (
-                  <img
-                    src={h.logo}
-                    alt={h.name}
-                    style={{ maxWidth: 110, maxHeight: 44, objectFit: 'contain', filter: 'brightness(0) invert(1)' }}
-                    onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement).style.display = 'block' }}
-                  />
+                  <div style={{ width: 56, height: 56, borderRadius: 12, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,.3)' }}>
+                    <img
+                      src={h.logo}
+                      alt={h.name}
+                      style={{ width: 44, height: 44, objectFit: 'contain' }}
+                      onError={e => {
+                        const wrap = (e.currentTarget as HTMLImageElement).parentElement!
+                        wrap.style.display = 'none'
+                        const fb = wrap.nextSibling as HTMLElement
+                        if (fb) fb.style.display = 'flex'
+                      }}
+                    />
+                  </div>
                 ) : null}
-                <span style={{ display: h.logo ? 'none' : 'block', fontSize: 28 }}>{h.emoji}</span>
+                <span style={{ display: 'none', width: 56, height: 56, borderRadius: 12, background: 'rgba(255,255,255,.1)', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>{h.emoji}</span>
               </div>
               <div className="ob-hotel-logo">{h.name}</div>
               <div className="ob-hotel-tiers">{h.tiers}</div>
