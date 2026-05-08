@@ -216,7 +216,8 @@ export default function LandingPage() {
   const [selectedISOs,   setSelectedISOs]  = useState<string[]>([])
   const [selectedCities, setSelectedCities] = useState<string[]>([])
   const [placesByLocation, setPlacesByLocation] = useState<{ location: string; places: Place[] }[]>([])
-  const [selPlaces,        setSelPlaces]        = useState<string[]>([])
+  // keyed as "City::PlaceName" to avoid cross-city selection bleed
+  const [selPlaceKeys,     setSelPlaceKeys]     = useState<string[]>([])
   const [selHotels,        setSelHotels]        = useState<string[]>([])
   const [loadingPlaces,    setLoadingPlaces]    = useState(false)
 
@@ -230,6 +231,7 @@ export default function LandingPage() {
         : [continent]
 
     setLoadingPlaces(true)
+    setSelPlaceKeys([])
     setScreen('places')
 
     Promise.all(
@@ -260,11 +262,24 @@ export default function LandingPage() {
   }
 
   const saveAndRedirect = (action: 'signup' | 'skip') => {
+    // Reconstruct placesByCity from keyed selection
+    const placesByCity: Record<string, string[]> = {}
+    for (const key of selPlaceKeys) {
+      const sep = key.indexOf('::')
+      if (sep === -1) continue
+      const loc = key.slice(0, sep)
+      const name = key.slice(sep + 2)
+      if (!placesByCity[loc]) placesByCity[loc] = []
+      placesByCity[loc].push(name)
+    }
+    const allPlaceNames = selPlaceKeys.map(k => k.slice(k.indexOf('::') + 2))
+
     const data = {
       continent,
       countries: selectedISOs.map(iso => ISO_NAME[iso] || iso),
       cities: selectedCities,
-      places: selPlaces,
+      places: allPlaceNames,
+      placesByCity,
       hotels: selHotels,
       destination: selectedCities.length > 0
         ? selectedCities[0]
@@ -469,38 +484,42 @@ export default function LandingPage() {
                   </div>
                 )}
                 <div className="ob-places-grid">
-                  {places.map((p) => (
-                    <div
-                      key={`${location}-${p.name}`}
-                      className={`ob-place-card${selPlaces.includes(p.name) ? ' selected' : ''}`}
-                      onClick={() => setSelPlaces(prev =>
-                        prev.includes(p.name) ? prev.filter(n => n !== p.name) : [...prev, p.name]
-                      )}
-                    >
-                      <img
-                        className="ob-place-img"
-                        src={p.image}
-                        alt={p.name}
-                        loading="lazy"
-                        onError={(e) => { (e.target as HTMLImageElement).src = `https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80` }}
-                      />
-                      <div className="ob-place-gradient" />
-                      <div className="ob-place-rank">#{p.rank} Top Rated</div>
-                      <div className="ob-place-check">{selPlaces.includes(p.name) ? '✓' : ''}</div>
-                      <div style={{ position: 'absolute', bottom: 10, left: 12, right: 12 }}>
-                        <div className="ob-place-name">{p.name}</div>
-                        <div className="ob-place-type">{p.type}</div>
+                  {places.map((p) => {
+                    const key = `${location}::${p.name}`
+                    const selected = selPlaceKeys.includes(key)
+                    return (
+                      <div
+                        key={key}
+                        className={`ob-place-card${selected ? ' selected' : ''}`}
+                        onClick={() => setSelPlaceKeys(prev =>
+                          selected ? prev.filter(k => k !== key) : [...prev, key]
+                        )}
+                      >
+                        <img
+                          className="ob-place-img"
+                          src={p.image}
+                          alt={p.name}
+                          loading="lazy"
+                          onError={(e) => { (e.target as HTMLImageElement).src = `https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80` }}
+                        />
+                        <div className="ob-place-gradient" />
+                        <div className="ob-place-rank">#{p.rank} Top Rated</div>
+                        <div className="ob-place-check">{selected ? '✓' : ''}</div>
+                        <div style={{ position: 'absolute', bottom: 10, left: 12, right: 12 }}>
+                          <div className="ob-place-name">{p.name}</div>
+                          <div className="ob-place-type">{p.type}</div>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </div>
             ))
           )}
 
-          {selPlaces.length > 0 && (
+          {selPlaceKeys.length > 0 && (
             <div style={{ marginTop: 20, fontFamily: "'Space Mono', monospace", fontSize: 10, letterSpacing: 2, color: 'var(--accent)', textTransform: 'uppercase' }}>
-              {selPlaces.length} place{selPlaces.length > 1 ? 's' : ''} selected · Will be added to your itinerary
+              {selPlaceKeys.length} place{selPlaceKeys.length > 1 ? 's' : ''} selected · Will be added to your itinerary
             </div>
           )}
         </div>
@@ -519,7 +538,7 @@ export default function LandingPage() {
             className="ob-step-next"
             onClick={() => setScreen('hotels')}
           >
-            {selPlaces.length > 0 ? 'NEXT →' : 'SKIP →'}
+            {selPlaceKeys.length > 0 ? 'NEXT →' : 'SKIP →'}
           </button>
         </div>
       </div>
@@ -620,7 +639,7 @@ export default function LandingPage() {
         <div className="ob-auth-summary">
           <div>Countries: <span>{selectedISOs.map(i => ISO_NAME[i] || i).join(', ')}</span></div>
           {selectedCities.length > 0 && <div>Cities: <span>{selectedCities.join(', ')}</span></div>}
-          {selPlaces.length > 0 && <div>Places: <span>{selPlaces.length} selected</span></div>}
+          {selPlaceKeys.length > 0 && <div>Places: <span>{selPlaceKeys.length} selected</span></div>}
           {selHotels.length > 0 && <div>Loyalty: <span>{selHotels.map(h => HOTEL_PROGRAMS.find(p => p.id === h)?.name).join(', ')}</span></div>}
         </div>
       </div>
