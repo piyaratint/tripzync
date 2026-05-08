@@ -106,7 +106,7 @@ body {
 /* ── PAGE LAYOUT ── */
 .page { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 0 32px 80px; }
 .page-inner { display: grid; grid-template-columns: 340px 1fr; gap: 32px; align-items: start; }
-.sidebar { position: sticky; top: 32px; display: flex; flex-direction: column; gap: 14px; }
+.sidebar { position: sticky; top: 32px; display: flex; flex-direction: column; gap: 14px; max-height: calc(100vh - 64px); overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: var(--border2) transparent; padding-bottom: 24px; }
 .main-col { display: flex; flex-direction: column; gap: 0; min-width: 0; padding-top: 40px; }
 .sidebar .hero { padding: 40px 0 24px; margin-bottom: 0; border-bottom: none; }
 .sidebar .weather-full { grid-column: auto; }
