@@ -192,12 +192,12 @@ const COUNTRY_CITIES: Record<string, string[]> = {
 }
 
 const HOTEL_PROGRAMS = [
-  { id: 'marriott', name: 'Marriott Bonvoy', tiers: 'Gold · Platinum · Titanium', emoji: '🏨' },
-  { id: 'hilton',   name: 'Hilton Honors',   tiers: 'Gold · Diamond',             emoji: '🏩' },
-  { id: 'ihg',      name: 'IHG One Rewards', tiers: 'Diamond · Royal Ambassador', emoji: '🏪' },
-  { id: 'hyatt',    name: 'World of Hyatt',  tiers: 'Globalist',                  emoji: '🏛️' },
-  { id: 'accor',    name: 'Accor ALL',        tiers: 'Platinum · Diamond',         emoji: '🏠' },
-  { id: 'none',     name: 'No Membership',   tiers: 'Best available deals',       emoji: '🌐' },
+  { id: 'marriott', name: 'Marriott Bonvoy', tiers: 'Gold · Platinum · Titanium', emoji: '🏨', logo: 'https://logo.clearbit.com/marriott.com' },
+  { id: 'hilton',   name: 'Hilton Honors',   tiers: 'Gold · Diamond',             emoji: '🏩', logo: 'https://logo.clearbit.com/hilton.com' },
+  { id: 'ihg',      name: 'IHG One Rewards', tiers: 'Diamond · Royal Ambassador', emoji: '🏪', logo: 'https://logo.clearbit.com/ihg.com' },
+  { id: 'hyatt',    name: 'World of Hyatt',  tiers: 'Globalist',                  emoji: '🏛️', logo: 'https://logo.clearbit.com/hyatt.com' },
+  { id: 'accor',    name: 'Accor ALL',        tiers: 'Platinum · Diamond',         emoji: '🏠', logo: 'https://logo.clearbit.com/accor.com' },
+  { id: 'none',     name: 'No Membership',   tiers: 'Best available deals',       emoji: '🌐', logo: '' },
 ]
 
 const PARTICLES = Array.from({ length: 20 }, (_, i) => ({
@@ -568,7 +568,17 @@ export default function LandingPage() {
                 prev.includes(h.id) ? prev.filter(i => i !== h.id) : [...prev, h.id]
               )}
             >
-              <div style={{ fontSize: 28, marginBottom: 4 }}>{h.emoji}</div>
+              <div style={{ height: 52, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+                {h.logo ? (
+                  <img
+                    src={h.logo}
+                    alt={h.name}
+                    style={{ maxWidth: 110, maxHeight: 44, objectFit: 'contain', filter: 'brightness(0) invert(1)' }}
+                    onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement).style.display = 'block' }}
+                  />
+                ) : null}
+                <span style={{ display: h.logo ? 'none' : 'block', fontSize: 28 }}>{h.emoji}</span>
+              </div>
               <div className="ob-hotel-logo">{h.name}</div>
               <div className="ob-hotel-tiers">{h.tiers}</div>
               <div className="ob-hotel-check">✓</div>

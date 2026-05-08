@@ -87,6 +87,13 @@ const HOTEL_DB: HotelDB = {
 const BRAND_ACCENT: Record<string, string> = {
   marriott:'#B5924C', hilton:'#003087', hyatt:'#7B2D8B', ihg:'#003F87', accor:'#C8102E',
 }
+const BRAND_LOGOS: Record<string, string> = {
+  marriott: 'https://logo.clearbit.com/marriott.com',
+  hilton:   'https://logo.clearbit.com/hilton.com',
+  ihg:      'https://logo.clearbit.com/ihg.com',
+  hyatt:    'https://logo.clearbit.com/hyatt.com',
+  accor:    'https://logo.clearbit.com/accor.com',
+}
 function getHotelSuggestions(brands: string[], cities: string[]): { brand: string; city: string; hotels: HotelSuggestion[] }[] {
   const results: { brand: string; city: string; hotels: HotelSuggestion[] }[] = []
   for (const brand of brands) {
@@ -364,13 +371,22 @@ export default function GuestHomePage() {
           </div>
 
           {/* Hotel loyalty */}
-          {hotelNames.length > 0 && (
+          {hotelBrands.length > 0 && (
             <div className="hotel-chip" style={{ marginBottom:16, cursor:'default' }}>
-              <div className="meta-label">Hotel Loyalty</div>
-              <div className="meta-val" style={{ fontSize:13, lineHeight:1.5 }}>
-                {hotelNames.join(', ')}
+              <div className="meta-label" style={{ marginBottom: 8 }}>Hotel Loyalty</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'flex-end' }}>
+                {hotelBrands.map(brand => (
+                  <div key={brand} style={{ display: 'flex', alignItems: 'center', gap: 6, background: `${BRAND_ACCENT[brand] || 'var(--accent)'}18`, border: `1px solid ${BRAND_ACCENT[brand] || 'var(--accent)'}44`, borderRadius: 8, padding: '5px 10px' }}>
+                    {BRAND_LOGOS[brand] ? (
+                      <img src={BRAND_LOGOS[brand]} alt={HOTEL_NAMES[brand]} style={{ height: 16, maxWidth: 60, objectFit: 'contain', filter: 'brightness(0) invert(1)' }}
+                        onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
+                    ) : null}
+                    <span style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', color: '#fff' }}>
+                      {HOTEL_NAMES[brand]}
+                    </span>
+                  </div>
+                ))}
               </div>
-              <div className="edit-hint">from your preferences</div>
             </div>
           )}
 
@@ -394,12 +410,19 @@ export default function GuestHomePage() {
                   <div key={`${brand}-${city}`} style={{ background:'var(--card)', border:`1px solid ${accent}33`, borderRadius:12, overflow:'hidden' }}>
                     {/* Brand header */}
                     <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 14px', background:`${accent}18`, borderBottom:`1px solid ${accent}33` }}>
-                      <div>
-                        <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:13, fontWeight:900, letterSpacing:3, textTransform:'uppercase', color: accent }}>
-                          {HOTEL_NAMES[brand]}
-                        </div>
-                        <div style={{ fontFamily:"'Space Mono',monospace", fontSize:9, letterSpacing:2, textTransform:'uppercase', color:'#fff', opacity:.6, marginTop:1 }}>
-                          {city}
+                      <div style={{ display:'flex', alignItems:'center', gap: 10 }}>
+                        {BRAND_LOGOS[brand] && (
+                          <img src={BRAND_LOGOS[brand]} alt={HOTEL_NAMES[brand]}
+                            style={{ height: 22, maxWidth: 80, objectFit: 'contain', filter: 'brightness(0) invert(1)', flexShrink: 0 }}
+                            onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
+                        )}
+                        <div>
+                          <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:13, fontWeight:900, letterSpacing:3, textTransform:'uppercase', color: accent }}>
+                            {HOTEL_NAMES[brand]}
+                          </div>
+                          <div style={{ fontFamily:"'Space Mono',monospace", fontSize:9, letterSpacing:2, textTransform:'uppercase', color:'#fff', opacity:.6, marginTop:1 }}>
+                            {city}
+                          </div>
                         </div>
                       </div>
                       <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, letterSpacing:2, textTransform:'uppercase', color: accent, background:`${accent}22`, border:`1px solid ${accent}44`, borderRadius:20, padding:'3px 8px' }}>
