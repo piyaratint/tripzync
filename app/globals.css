@@ -870,6 +870,7 @@ body {
 }
 .ob-country-chip:hover { border-color: var(--border2); color: var(--text); }
 .ob-country-chip.selected { border-color: var(--accent); background: rgba(0,212,255,.08); color: var(--accent); }
+.ob-country-chip.selected.city { border-color: var(--hi); background: rgba(255,201,71,.08); color: var(--hi); }
 .ob-country-panel {
   position: absolute; top: 0; right: 0; bottom: 0;
   width: 280px; background: rgba(11,13,24,.96);

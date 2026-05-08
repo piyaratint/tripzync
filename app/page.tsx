@@ -120,6 +120,77 @@ const CONTINENT_EMOJI: Record<string, string> = {
   Oceania:     '🏝️',
 }
 
+// Country → top cities
+const COUNTRY_CITIES: Record<string, string[]> = {
+  // Asia
+  JPN: ['Tokyo','Osaka','Kyoto','Sapporo','Fukuoka','Hiroshima','Nara','Yokohama'],
+  CHN: ['Beijing','Shanghai','Hong Kong','Chengdu','Xi\'an','Shenzhen','Guilin','Hangzhou'],
+  IND: ['Mumbai','Delhi','Jaipur','Agra','Bangalore','Goa','Varanasi','Kolkata'],
+  THA: ['Bangkok','Chiang Mai','Phuket','Pattaya','Krabi','Koh Samui','Hua Hin','Ayutthaya'],
+  IDN: ['Bali','Jakarta','Yogyakarta','Lombok','Komodo','Raja Ampat'],
+  KOR: ['Seoul','Busan','Jeju','Gyeongju','Incheon'],
+  VNM: ['Hanoi','Ho Chi Minh City','Hoi An','Da Nang','Halong Bay','Hue','Sapa'],
+  MYS: ['Kuala Lumpur','Penang','Langkawi','Kota Kinabalu','Malacca'],
+  SGP: ['Singapore'],
+  PHL: ['Manila','Cebu','Palawan','Boracay','Siargao','Davao'],
+  KHM: ['Phnom Penh','Siem Reap','Sihanoukville','Kampot'],
+  LKA: ['Colombo','Kandy','Galle','Sigiriya','Ella'],
+  NPL: ['Kathmandu','Pokhara','Chitwan','Lumbini'],
+  MDV: ['Malé','Maafushi','Baa Atoll'],
+  // Europe
+  GBR: ['London','Edinburgh','Manchester','Liverpool','Bath','Oxford','Cambridge','York'],
+  FRA: ['Paris','Nice','Lyon','Marseille','Bordeaux','Strasbourg','Cannes','Annecy'],
+  DEU: ['Berlin','Munich','Hamburg','Cologne','Frankfurt','Dresden','Heidelberg'],
+  ITA: ['Rome','Venice','Florence','Milan','Naples','Amalfi','Cinque Terre','Bologna','Sicily'],
+  ESP: ['Barcelona','Madrid','Seville','Granada','Valencia','Malaga','San Sebastian','Ibiza'],
+  NLD: ['Amsterdam','Rotterdam','The Hague','Utrecht','Delft'],
+  CHE: ['Zurich','Geneva','Interlaken','Lucerne','Bern','Zermatt'],
+  AUT: ['Vienna','Salzburg','Innsbruck','Hallstatt','Graz'],
+  PRT: ['Lisbon','Porto','Algarve','Sintra','Madeira','Azores'],
+  GRC: ['Athens','Santorini','Mykonos','Crete','Rhodes','Corfu'],
+  NOR: ['Oslo','Bergen','Tromsø','Flåm','Stavanger'],
+  SWE: ['Stockholm','Gothenburg','Malmö','Kiruna'],
+  DNK: ['Copenhagen','Aarhus','Odense'],
+  POL: ['Warsaw','Krakow','Gdansk','Wroclaw'],
+  CZE: ['Prague','Cesky Krumlov','Brno'],
+  IRL: ['Dublin','Galway','Cork','Killarney'],
+  HUN: ['Budapest','Eger','Pécs'],
+  ISL: ['Reykjavik','Akureyri','Vik'],
+  // Americas
+  USA: ['New York','Los Angeles','Las Vegas','Miami','Chicago','San Francisco','Hawaii','New Orleans','Washington DC','Seattle'],
+  CAN: ['Toronto','Vancouver','Montreal','Quebec City','Banff','Calgary'],
+  MEX: ['Mexico City','Cancun','Playa del Carmen','Guadalajara','Oaxaca','Tulum','Los Cabos'],
+  BRA: ['Rio de Janeiro','São Paulo','Salvador','Manaus','Florianópolis','Iguazu Falls'],
+  ARG: ['Buenos Aires','Patagonia','Mendoza','Bariloche','Salta'],
+  COL: ['Bogotá','Cartagena','Medellín','Santa Marta'],
+  CHL: ['Santiago','Patagonia','Atacama','Valparaíso','Easter Island'],
+  PER: ['Lima','Cusco','Machu Picchu','Arequipa','Lake Titicaca'],
+  CRI: ['San José','Manuel Antonio','Arenal','Monteverde'],
+  CUB: ['Havana','Varadero','Trinidad','Cienfuegos'],
+  // Africa
+  ZAF: ['Cape Town','Johannesburg','Durban','Kruger','Garden Route','Stellenbosch'],
+  EGY: ['Cairo','Luxor','Aswan','Sharm el-Sheikh','Alexandria','Hurghada'],
+  MAR: ['Marrakech','Fez','Casablanca','Chefchaouen','Essaouira'],
+  KEN: ['Nairobi','Maasai Mara','Amboseli','Mombasa','Diani'],
+  TZA: ['Zanzibar','Serengeti','Kilimanjaro','Dar es Salaam','Arusha'],
+  MUS: ['Port Louis','Grand Baie','Black River'],
+  RWA: ['Kigali','Volcanoes NP'],
+  GHA: ['Accra','Cape Coast','Kumasi'],
+  // Middle East
+  ARE: ['Dubai','Abu Dhabi','Sharjah'],
+  SAU: ['Riyadh','Jeddah','AlUla'],
+  TUR: ['Istanbul','Cappadocia','Antalya','Bodrum','Ephesus'],
+  JOR: ['Amman','Petra','Wadi Rum','Aqaba','Dead Sea'],
+  QAT: ['Doha'],
+  ISR: ['Tel Aviv','Jerusalem','Haifa','Eilat'],
+  OMN: ['Muscat','Salalah','Nizwa'],
+  GEO: ['Tbilisi','Batumi','Kazbegi','Sighnaghi'],
+  // Oceania
+  AUS: ['Sydney','Melbourne','Brisbane','Perth','Cairns','Gold Coast','Adelaide','Uluru'],
+  NZL: ['Auckland','Queenstown','Christchurch','Wellington','Rotorua','Milford Sound'],
+  FJI: ['Nadi','Suva','Yasawa Islands','Coral Coast'],
+}
+
 const HOTEL_PROGRAMS = [
   { id: 'marriott', name: 'Marriott Bonvoy', tiers: 'Gold · Platinum · Titanium', emoji: '🏨' },
   { id: 'hilton',   name: 'Hilton Honors',   tiers: 'Gold · Diamond',             emoji: '🏩' },
@@ -140,13 +211,14 @@ const PARTICLES = Array.from({ length: 20 }, (_, i) => ({
 
 // ── COMPONENT ─────────────────────────────────────────────────────────────────
 export default function LandingPage() {
-  const [screen,        setScreen]        = useState<Screen>('hero')
-  const [continent,     setContinent]     = useState('')
-  const [selectedISOs,  setSelectedISOs]  = useState<string[]>([])
-  const [places,        setPlaces]        = useState<Place[]>([])
-  const [selPlaces,     setSelPlaces]     = useState<string[]>([])
-  const [selHotels,     setSelHotels]     = useState<string[]>([])
-  const [loadingPlaces, setLoadingPlaces] = useState(false)
+  const [screen,         setScreen]        = useState<Screen>('hero')
+  const [continent,      setContinent]     = useState('')
+  const [selectedISOs,   setSelectedISOs]  = useState<string[]>([])
+  const [selectedCities, setSelectedCities] = useState<string[]>([])
+  const [places,         setPlaces]        = useState<Place[]>([])
+  const [selPlaces,      setSelPlaces]     = useState<string[]>([])
+  const [selHotels,      setSelHotels]     = useState<string[]>([])
+  const [loadingPlaces,  setLoadingPlaces] = useState(false)
 
 
   // ── PLACES FETCH ──────────────────────────────────────────────────────────
@@ -165,24 +237,34 @@ export default function LandingPage() {
 
   // ── NAVIGATION ────────────────────────────────────────────────────────────
   const goToPlaces = () => {
-    const country = selectedISOs.length > 0 ? (ISO_NAME[selectedISOs[0]] || selectedISOs[0]) : continent
-    fetchPlaces(country)
+    const location = selectedCities.length > 0
+      ? selectedCities[0]
+      : selectedISOs.length > 0 ? (ISO_NAME[selectedISOs[0]] || selectedISOs[0]) : continent
+    fetchPlaces(location)
     setScreen('places')
   }
 
   const handleCountryToggle = (iso: string) => {
-    setSelectedISOs(prev =>
-      prev.includes(iso) ? prev.filter(i => i !== iso) : [...prev, iso]
-    )
+    setSelectedISOs(prev => {
+      if (prev.includes(iso)) {
+        const citiesToRemove = COUNTRY_CITIES[iso] || []
+        setSelectedCities(c => c.filter(city => !citiesToRemove.includes(city)))
+        return prev.filter(i => i !== iso)
+      }
+      return [...prev, iso]
+    })
   }
 
   const saveAndRedirect = (action: 'signup' | 'skip') => {
     const data = {
       continent,
       countries: selectedISOs.map(iso => ISO_NAME[iso] || iso),
+      cities: selectedCities,
       places: selPlaces,
       hotels: selHotels,
-      destination: selectedISOs.length > 0 ? ISO_NAME[selectedISOs[0]] : continent,
+      destination: selectedCities.length > 0
+        ? selectedCities[0]
+        : selectedISOs.length > 0 ? ISO_NAME[selectedISOs[0]] : continent,
     }
     if (typeof window !== 'undefined') {
       localStorage.setItem('tripzync_onboarding', JSON.stringify(data))
@@ -243,7 +325,7 @@ export default function LandingPage() {
       <div className="ob-screen-content">
         <div className="ob-step-num">STEP 01 / 03</div>
         <h2 className="ob-screen-title">WHERE ARE YOU HEADED?</h2>
-        <p className="ob-screen-sub">Choose a region, then select your countries</p>
+        <p className="ob-screen-sub">Choose a region → select countries → pick cities</p>
 
         {/* Continent selection */}
         <div className="ob-region-label">Select a region</div>
@@ -259,6 +341,7 @@ export default function LandingPage() {
               onClick={() => {
                 setContinent(cont)
                 setSelectedISOs([])
+                setSelectedCities([])
               }}
             >
               <div className="ob-continent-emoji">{CONTINENT_EMOJI[cont]}</div>
@@ -288,9 +371,39 @@ export default function LandingPage() {
           </>
         )}
 
+        {/* City chips — per selected country */}
+        {selectedISOs.filter(iso => (COUNTRY_CITIES[iso]?.length ?? 0) > 0).map(iso => (
+          <div key={iso} style={{ marginTop: 20 }}>
+            <div className="ob-region-label">
+              {ISO_NAME[iso] || iso} — pick cities
+            </div>
+            <div className="ob-country-chips">
+              {COUNTRY_CITIES[iso].map(city => (
+                <button
+                  key={city}
+                  className={`ob-country-chip${selectedCities.includes(city) ? ' selected city' : ''}`}
+                  onClick={() => setSelectedCities(prev =>
+                    prev.includes(city) ? prev.filter(c => c !== city) : [...prev, city]
+                  )}
+                >
+                  {selectedCities.includes(city) ? '✓ ' : ''}{city}
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
+
+        {/* Summary line */}
         {selectedISOs.length > 0 && (
-          <div style={{ marginTop: 16, fontFamily: "'Space Mono', monospace", fontSize: 10, letterSpacing: 2, color: 'var(--accent)', textTransform: 'uppercase' }}>
-            Selected: {selectedISOs.map(i => ISO_NAME[i] || i).join(' · ')}
+          <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <div style={{ fontFamily: "'Space Mono', monospace", fontSize: 10, letterSpacing: 2, color: 'var(--accent)', textTransform: 'uppercase' }}>
+              Countries: {selectedISOs.map(i => ISO_NAME[i] || i).join(' · ')}
+            </div>
+            {selectedCities.length > 0 && (
+              <div style={{ fontFamily: "'Space Mono', monospace", fontSize: 10, letterSpacing: 2, color: 'var(--hi)', textTransform: 'uppercase' }}>
+                Cities: {selectedCities.join(' · ')}
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -444,7 +557,9 @@ export default function LandingPage() {
   )
 
   // ── RENDER: AUTH CHOICE ───────────────────────────────────────────────────
-  const destName = selectedISOs.length > 0 ? ISO_NAME[selectedISOs[0]] : continent
+  const destName = selectedCities.length > 0
+    ? selectedCities[0]
+    : selectedISOs.length > 0 ? ISO_NAME[selectedISOs[0]] : continent
   return (
     <div className="ob-screen">
       <div className="ob-grid-bg" />
@@ -484,7 +599,8 @@ export default function LandingPage() {
         </button>
 
         <div className="ob-auth-summary">
-          <div>Destination: <span>{selectedISOs.map(i => ISO_NAME[i] || i).join(', ')}</span></div>
+          <div>Countries: <span>{selectedISOs.map(i => ISO_NAME[i] || i).join(', ')}</span></div>
+          {selectedCities.length > 0 && <div>Cities: <span>{selectedCities.join(', ')}</span></div>}
           {selPlaces.length > 0 && <div>Places: <span>{selPlaces.length} selected</span></div>}
           {selHotels.length > 0 && <div>Loyalty: <span>{selHotels.map(h => HOTEL_PROGRAMS.find(p => p.id === h)?.name).join(', ')}</span></div>}
         </div>
