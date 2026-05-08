@@ -2,12 +2,35 @@ import type { Metadata, Viewport } from 'next'
 import { SessionProvider } from 'next-auth/react'
 import { QueryProvider } from '@/components/ui/QueryProvider'
 import { ToastProvider } from '@/components/ui/Toaster'
+import SiteFooter from '@/components/SiteFooter'
 import './globals.css'
 
+const BASE_URL = 'https://tripzync.vercel.app'
+
 export const metadata: Metadata = {
-  title: 'TripZync®',
-  description: 'Your personal travel logbook',
+  metadataBase: new URL(BASE_URL),
+  title: { default: 'TripZync® — Plan Smarter, Travel Further', template: '%s | TripZync®' },
+  description: 'TripZync is your personal AI-powered travel planner. Build custom itineraries, track expenses, and sync with your hotel loyalty program — all in one place.',
+  keywords: ['travel planner', 'trip itinerary', 'travel app', 'hotel loyalty', 'travel organizer', 'travel logbook'],
+  authors: [{ name: 'TripZync' }],
+  creator: 'TripZync',
+  publisher: 'TripZync',
   icons: { icon: '/favicon.svg' },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: BASE_URL,
+    siteName: 'TripZync®',
+    title: 'TripZync® — Plan Smarter, Travel Further',
+    description: 'Build custom itineraries, track expenses, and sync hotel loyalty rewards — your personal AI travel companion.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'TripZync® — Plan Smarter, Travel Further',
+    description: 'Build custom itineraries, track expenses, and sync hotel loyalty rewards.',
+  },
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
+  alternates: { canonical: BASE_URL },
 }
 
 export const viewport: Viewport = {
@@ -31,10 +54,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
         />
       </head>
-      <body>
+      <body style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
         <SessionProvider>
           <QueryProvider>
-            <ToastProvider>{children}</ToastProvider>
+            <ToastProvider>
+              <div style={{ flex: 1 }}>{children}</div>
+              <SiteFooter />
+            </ToastProvider>
           </QueryProvider>
         </SessionProvider>
       </body>
