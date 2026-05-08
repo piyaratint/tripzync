@@ -331,7 +331,7 @@ export default function GuestHomePage() {
               <div className="hero-title"><em className="em">{destWords.slice(1).join(' ') || String(year)}</em></div>
             </div>
 
-            <div style={{ display:'inline-block', fontFamily:"'Space Mono',monospace", fontSize:9, letterSpacing:3, color:'var(--accent)', textTransform:'uppercase', background:'rgba(0,191,255,.08)', border:'1px solid rgba(0,191,255,.2)', borderRadius:6, padding:'4px 10px', marginBottom:14 }}>
+            <div style={{ display:'inline-block', fontFamily:"'Space Mono',monospace", fontSize:9, letterSpacing:3, color:'var(--accent)', textTransform:'uppercase', background:'rgba(64,224,208,.08)', border:'1px solid rgba(64,224,208,.2)', borderRadius:6, padding:'4px 10px', marginBottom:14 }}>
               Guest Mode · Draft
             </div>
 
@@ -403,7 +403,7 @@ export default function GuestHomePage() {
           )}
 
           {/* Sign-up CTA */}
-          <div style={{ background:'linear-gradient(135deg,rgba(0,191,255,.08),rgba(0,191,255,.03))', border:'1px solid rgba(0,191,255,.2)', borderRadius:12, padding:'18px 20px' }}>
+          <div style={{ background:'linear-gradient(135deg,rgba(64,224,208,.08),rgba(64,224,208,.03))', border:'1px solid rgba(64,224,208,.2)', borderRadius:12, padding:'18px 20px' }}>
             <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:18, fontWeight:700, letterSpacing:3, textTransform:'uppercase', marginBottom:6 }}>Save Your Plan</div>
             <p style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, marginBottom:14 }}>
               Create a free account to keep this itinerary and access it anywhere.
@@ -551,7 +551,7 @@ export default function GuestHomePage() {
                     <div
                       key={day.dayNumber}
                       ref={el => { dayRefs.current[day.dayNumber] = el }}
-                      style={{ padding:'14px 18px', borderBottom:'1px solid var(--border)', background: activeDay === day.dayNumber ? 'rgba(0,191,255,.04)' : 'transparent', transition:'background .2s' }}
+                      style={{ padding:'14px 18px', borderBottom:'1px solid var(--border)', background: activeDay === day.dayNumber ? 'rgba(64,224,208,.04)' : 'transparent', transition:'background .2s' }}
                     >
                       {/* Day label row */}
                       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10 }}>

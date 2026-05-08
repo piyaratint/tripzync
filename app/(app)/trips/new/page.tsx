@@ -150,8 +150,8 @@ export default function NewTripPage() {
 
         {/* Onboarding places preview */}
         {onboardingPlaces.length > 0 && (
-          <div style={{ background: 'rgba(0,191,255,.05)', border: '1px solid rgba(0,191,255,.2)', borderRadius: 10, padding: '12px 16px' }}>
-            <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 10, letterSpacing: '.16em', textTransform: 'uppercase', color: 'rgba(0,191,255,.8)', marginBottom: 8 }}>
+          <div style={{ background: 'rgba(64,224,208,.05)', border: '1px solid rgba(64,224,208,.2)', borderRadius: 10, padding: '12px 16px' }}>
+            <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 10, letterSpacing: '.16em', textTransform: 'uppercase', color: 'rgba(64,224,208,.8)', marginBottom: 8 }}>
               ✓ {onboardingPlaces.length} places from your plan will be added to your itinerary
             </div>
             <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, color: '#fff', lineHeight: 1.6 }}>
