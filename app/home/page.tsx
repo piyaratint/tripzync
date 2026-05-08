@@ -26,6 +26,83 @@ const HOTEL_NAMES: Record<string,string> = {
   hyatt:'World of Hyatt', accor:'Accor ALL', none:'No membership',
 }
 
+interface HotelSuggestion { name: string; tier: string; price: string; stars: number }
+type HotelDB = Record<string, Record<string, HotelSuggestion[]>>
+
+const HOTEL_DB: HotelDB = {
+  marriott: {
+    Tokyo:         [{ name:'JW Marriott Hotel Tokyo',       tier:'Luxury',    price:'$380+/n', stars:5 },{ name:'The Ritz-Carlton Tokyo',         tier:'Luxury',    price:'$520+/n', stars:5 },{ name:'Sheraton Grande Tokyo Bay',      tier:'Classic',   price:'$180+/n', stars:4 }],
+    Kyoto:         [{ name:'JW Marriott Nijo Castle Kyoto', tier:'Luxury',    price:'$420+/n', stars:5 },{ name:'Four Points by Sheraton Kyoto',  tier:'Select',    price:'$140+/n', stars:4 },{ name:'Kyoto Marriott Hotel',           tier:'Classic',   price:'$200+/n', stars:4 }],
+    Osaka:         [{ name:'W Osaka',                       tier:'W Hotels',  price:'$340+/n', stars:5 },{ name:'Sheraton Miyako Hotel Osaka',    tier:'Classic',   price:'$160+/n', stars:4 },{ name:'Courtyard Osaka Natural Hot Spa',tier:'Select',    price:'$120+/n', stars:3 }],
+    Bangkok:       [{ name:'JW Marriott Bangkok',           tier:'Luxury',    price:'$200+/n', stars:5 },{ name:'W Bangkok',                      tier:'W Hotels',  price:'$220+/n', stars:5 },{ name:'Marriott Marquis Bangkok',       tier:'Premium',   price:'$180+/n', stars:5 }],
+    'Chiang Mai':  [{ name:'Le Méridien Chiang Mai',        tier:'Premium',   price:'$90+/n',  stars:5 },{ name:'Renaissance Chiang Mai',         tier:'Premium',   price:'$110+/n', stars:5 },{ name:'Courtyard Chiang Mai',           tier:'Select',    price:'$65+/n',  stars:4 }],
+    Seoul:         [{ name:'JW Marriott Seoul',             tier:'Luxury',    price:'$280+/n', stars:5 },{ name:'W Seoul',                        tier:'W Hotels',  price:'$300+/n', stars:5 },{ name:'The Westin Chosun Seoul',        tier:'Premium',   price:'$240+/n', stars:5 }],
+    Bali:          [{ name:'The St. Regis Bali Resort',     tier:'Luxury',    price:'$380+/n', stars:5 },{ name:'W Bali – Seminyak',              tier:'W Hotels',  price:'$260+/n', stars:5 },{ name:'Courtyard Bali Seminyak',        tier:'Select',    price:'$120+/n', stars:4 }],
+    Paris:         [{ name:'Le Meurice (Dorchester)',       tier:'Luxury',    price:'$800+/n', stars:5 },{ name:'W Paris – Opéra',                tier:'W Hotels',  price:'$480+/n', stars:5 },{ name:'Marriott Paris Champs-Élysées',  tier:'Classic',   price:'$320+/n', stars:5 }],
+    London:        [{ name:'W London',                      tier:'W Hotels',  price:'$440+/n', stars:5 },{ name:'The Westin London City',         tier:'Premium',   price:'$320+/n', stars:5 },{ name:'Sheraton Grand London Park Lane',tier:'Classic',   price:'$360+/n', stars:5 }],
+    Dubai:         [{ name:'JW Marriott Marquis Dubai',     tier:'Luxury',    price:'$260+/n', stars:5 },{ name:'W Dubai – The Palm',             tier:'W Hotels',  price:'$300+/n', stars:5 },{ name:'Sheraton Grand Hotel Dubai',     tier:'Classic',   price:'$180+/n', stars:5 }],
+    'New York':    [{ name:'W New York – Times Square',     tier:'W Hotels',  price:'$380+/n', stars:4 },{ name:'New York Marriott Marquis',      tier:'Classic',   price:'$300+/n', stars:4 },{ name:'The St. Regis New York',         tier:'Luxury',    price:'$820+/n', stars:5 }],
+  },
+  hilton: {
+    Tokyo:         [{ name:'Conrad Tokyo',                  tier:'Luxury',    price:'$360+/n', stars:5 },{ name:'Hilton Tokyo',                   tier:'Classic',   price:'$220+/n', stars:5 },{ name:'DoubleTree by Hilton Tokyo',     tier:'Upper Mid', price:'$140+/n', stars:4 }],
+    Kyoto:         [{ name:'DoubleTree by Hilton Kyoto',    tier:'Upper Mid', price:'$130+/n', stars:4 },{ name:'Hilton Kyoto',                   tier:'Classic',   price:'$190+/n', stars:5 },{ name:'Hampton by Hilton Kyoto',        tier:'Midscale',  price:'$80+/n',  stars:3 }],
+    Osaka:         [{ name:'Conrad Osaka',                  tier:'Luxury',    price:'$340+/n', stars:5 },{ name:'Hilton Osaka',                   tier:'Classic',   price:'$180+/n', stars:5 },{ name:'DoubleTree Osaka',               tier:'Upper Mid', price:'$130+/n', stars:4 }],
+    Bangkok:       [{ name:'Conrad Bangkok',                tier:'Luxury',    price:'$190+/n', stars:5 },{ name:'Hilton Bangkok Grand Asoke',     tier:'Classic',   price:'$160+/n', stars:5 },{ name:'DoubleTree Bangkok',             tier:'Upper Mid', price:'$100+/n', stars:4 }],
+    Seoul:         [{ name:'Conrad Seoul',                  tier:'Luxury',    price:'$280+/n', stars:5 },{ name:'Hilton Seoul',                   tier:'Classic',   price:'$220+/n', stars:5 },{ name:'DoubleTree Seoul',               tier:'Upper Mid', price:'$140+/n', stars:4 }],
+    Bali:          [{ name:'Conrad Bali',                   tier:'Luxury',    price:'$260+/n', stars:5 },{ name:'Hilton Bali Resort',             tier:'Classic',   price:'$180+/n', stars:5 },{ name:'DoubleTree Bali – Legian Beach', tier:'Upper Mid', price:'$120+/n', stars:4 }],
+    Dubai:         [{ name:'Waldorf Astoria Dubai DIFC',    tier:'Luxury',    price:'$380+/n', stars:5 },{ name:'Conrad Dubai',                   tier:'Luxury',    price:'$280+/n', stars:5 },{ name:'Hilton Dubai Al Habtoor City',   tier:'Classic',   price:'$200+/n', stars:5 }],
+    Paris:         [{ name:'Waldorf Astoria Paris',         tier:'Luxury',    price:'$900+/n', stars:5 },{ name:'Conrad Paris',                   tier:'Luxury',    price:'$600+/n', stars:5 },{ name:'Hilton Paris Opéra',             tier:'Classic',   price:'$350+/n', stars:4 }],
+    London:        [{ name:'Waldorf Astoria London Aldwych',tier:'Luxury',    price:'$700+/n', stars:5 },{ name:'Conrad London St. James',        tier:'Luxury',    price:'$500+/n', stars:5 },{ name:'Hilton London Bankside',         tier:'Classic',   price:'$280+/n', stars:4 }],
+    'New York':    [{ name:'Waldorf Astoria New York',      tier:'Luxury',    price:'$900+/n', stars:5 },{ name:'Conrad New York Downtown',       tier:'Luxury',    price:'$500+/n', stars:4 },{ name:'Hilton New York Midtown',        tier:'Classic',   price:'$280+/n', stars:4 }],
+  },
+  hyatt: {
+    Tokyo:         [{ name:'Park Hyatt Tokyo',              tier:'Park Hyatt',price:'$520+/n', stars:5 },{ name:'Grand Hyatt Tokyo',              tier:'Grand Hyatt',price:'$380+/n',stars:5 },{ name:'Hyatt Centric Ginza Tokyo',     tier:'Centric',   price:'$200+/n', stars:4 }],
+    Kyoto:         [{ name:'Park Hyatt Kyoto',              tier:'Park Hyatt',price:'$600+/n', stars:5 },{ name:'Andaz Kyoto Higashiyama',        tier:'Andaz',     price:'$420+/n', stars:5 },{ name:'Hyatt Regency Kyoto',           tier:'Regency',   price:'$220+/n', stars:5 }],
+    Bangkok:       [{ name:'Park Hyatt Bangkok',            tier:'Park Hyatt',price:'$260+/n', stars:5 },{ name:'Andaz Bangkok',                  tier:'Andaz',     price:'$200+/n', stars:5 },{ name:'Grand Hyatt Erawan Bangkok',    tier:'Grand Hyatt',price:'$240+/n',stars:5 }],
+    Bali:          [{ name:'Andaz Bali',                    tier:'Andaz',     price:'$280+/n', stars:5 },{ name:'Grand Hyatt Bali',               tier:'Grand Hyatt',price:'$220+/n',stars:5 },{ name:'Hyatt Regency Bali',            tier:'Regency',   price:'$160+/n', stars:5 }],
+    Seoul:         [{ name:'Grand Hyatt Seoul',             tier:'Grand Hyatt',price:'$260+/n',stars:5 },{ name:'Andaz Seoul Gangnam',            tier:'Andaz',     price:'$240+/n', stars:5 },{ name:'Hyatt Regency Seoul',           tier:'Regency',   price:'$190+/n', stars:5 }],
+    Dubai:         [{ name:'Park Hyatt Dubai',              tier:'Park Hyatt',price:'$300+/n', stars:5 },{ name:'Grand Hyatt Dubai',              tier:'Grand Hyatt',price:'$220+/n',stars:5 },{ name:'Andaz Dubai The Palm',          tier:'Andaz',     price:'$260+/n', stars:5 }],
+    Paris:         [{ name:'Park Hyatt Paris-Vendôme',      tier:'Park Hyatt',price:'$950+/n', stars:5 },{ name:'Hyatt Regency Paris Étoile',    tier:'Regency',   price:'$320+/n', stars:4 },{ name:'Andaz Paris – Pigalle',         tier:'Andaz',     price:'$380+/n', stars:5 }],
+    London:        [{ name:'Hyatt Regency London – The Churchill', tier:'Regency',   price:'$360+/n', stars:5 },{ name:'Andaz London Liverpool Street', tier:'Andaz',     price:'$280+/n', stars:5 },{ name:'Hyatt Place London City East',  tier:'Place',     price:'$160+/n', stars:3 }],
+    'New York':    [{ name:'Park Hyatt New York',           tier:'Park Hyatt',price:'$740+/n', stars:5 },{ name:'Grand Hyatt New York',           tier:'Grand Hyatt',price:'$280+/n',stars:4 },{ name:'Andaz 5th Avenue',              tier:'Andaz',     price:'$420+/n', stars:5 }],
+  },
+  ihg: {
+    Tokyo:         [{ name:'InterContinental Tokyo Bay',    tier:'InterCont.',price:'$280+/n', stars:5 },{ name:'ANA InterContinental Tokyo',     tier:'InterCont.',price:'$300+/n', stars:5 },{ name:'Kimpton Shinjuku',               tier:'Kimpton',   price:'$160+/n', stars:4 }],
+    Bangkok:       [{ name:'InterContinental Bangkok',      tier:'InterCont.',price:'$180+/n', stars:5 },{ name:'Holiday Inn Bangkok Silom',      tier:'Holiday Inn',price:'$80+/n', stars:4 },{ name:'Crowne Plaza Bangkok Lumpini',   tier:'Crowne',    price:'$120+/n', stars:5 }],
+    Seoul:         [{ name:'InterContinental Seoul COEX',   tier:'InterCont.',price:'$240+/n', stars:5 },{ name:'Kimpton Seoul',                  tier:'Kimpton',   price:'$200+/n', stars:5 },{ name:'Crowne Plaza Seoul',             tier:'Crowne',    price:'$160+/n', stars:5 }],
+    Dubai:         [{ name:'InterContinental Dubai Festival City',tier:'InterCont.',price:'$240+/n',stars:5},{ name:'Crowne Plaza Dubai Marina',    tier:'Crowne',    price:'$160+/n', stars:5 },{ name:'Holiday Inn Dubai Al Barsha',    tier:'Holiday Inn',price:'$90+/n', stars:4 }],
+    London:        [{ name:'InterContinental London Park Lane',tier:'InterCont.',price:'$480+/n',stars:5},{ name:'Kimpton Fitzroy London',         tier:'Kimpton',   price:'$360+/n', stars:5 },{ name:'Crowne Plaza London – Battersea',tier:'Crowne',    price:'$240+/n', stars:4 }],
+    'New York':    [{ name:'InterContinental New York Times Square',tier:'InterCont.',price:'$320+/n',stars:4},{ name:'Kimpton Hotel Theta',        tier:'Kimpton',   price:'$280+/n', stars:4 },{ name:'Crowne Plaza New York Midtown', tier:'Crowne',    price:'$240+/n', stars:4 }],
+  },
+  accor: {
+    Tokyo:         [{ name:'Sofitel Tokyo Daiba',           tier:'Sofitel',   price:'$220+/n', stars:5 },{ name:'Pullman Tokyo Tamachi',          tier:'Pullman',   price:'$180+/n', stars:5 },{ name:'Novotel Tokyo Shinjuku',         tier:'Novotel',   price:'$120+/n', stars:4 }],
+    Bangkok:       [{ name:'Sofitel Bangkok Sukhumvit',     tier:'Sofitel',   price:'$160+/n', stars:5 },{ name:'Pullman Bangkok King Power',     tier:'Pullman',   price:'$130+/n', stars:5 },{ name:'Novotel Bangkok Fenix Silom',    tier:'Novotel',   price:'$70+/n',  stars:4 }],
+    'Chiang Mai':  [{ name:'Pullman Chiang Mai Raja Orchid',tier:'Pullman',   price:'$80+/n',  stars:5 },{ name:'Novotel Chiang Mai Nimman',     tier:'Novotel',   price:'$60+/n',  stars:4 },{ name:'ibis Chiang Mai Nimmanhaemin',   tier:'ibis',      price:'$35+/n',  stars:3 }],
+    Bali:          [{ name:'Sofitel Bali Nusa Dua',         tier:'Sofitel',   price:'$220+/n', stars:5 },{ name:'Pullman Bali Legian Beach',      tier:'Pullman',   price:'$140+/n', stars:5 },{ name:'Novotel Bali Nusa Dua',          tier:'Novotel',   price:'$90+/n',  stars:5 }],
+    Paris:         [{ name:'Sofitel Paris Le Faubourg',     tier:'Sofitel',   price:'$600+/n', stars:5 },{ name:'Pullman Paris Montparnasse',     tier:'Pullman',   price:'$280+/n', stars:4 },{ name:'Novotel Paris Tour Eiffel',      tier:'Novotel',   price:'$220+/n', stars:4 }],
+    Dubai:         [{ name:'Sofitel Dubai Jumeirah Beach',  tier:'Sofitel',   price:'$200+/n', stars:5 },{ name:'Pullman Dubai Creek City',       tier:'Pullman',   price:'$140+/n', stars:5 },{ name:'Novotel Dubai Al Barsha',        tier:'Novotel',   price:'$80+/n',  stars:4 }],
+  },
+}
+
+const BRAND_ACCENT: Record<string, string> = {
+  marriott:'#B5924C', hilton:'#003087', hyatt:'#7B2D8B', ihg:'#003F87', accor:'#C8102E',
+}
+function getHotelSuggestions(brands: string[], cities: string[]): { brand: string; city: string; hotels: HotelSuggestion[] }[] {
+  const results: { brand: string; city: string; hotels: HotelSuggestion[] }[] = []
+  for (const brand of brands) {
+    const db = HOTEL_DB[brand]
+    if (!db) continue
+    for (const city of cities) {
+      const exact = db[city]
+      if (exact?.length) { results.push({ brand, city, hotels: exact.slice(0, 3) }); continue }
+      // fuzzy: first city key that includes the search city or vice versa
+      const key = Object.keys(db).find(k => k.toLowerCase().includes(city.toLowerCase()) || city.toLowerCase().includes(k.toLowerCase()))
+      if (key) results.push({ brand, city, hotels: db[key].slice(0, 3) })
+    }
+  }
+  return results
+}
+
 function computeTotalDays(s?: string, e?: string) {
   if (!s || !e) return 7
   return Math.max(1, Math.round((new Date(e).getTime() - new Date(s).getTime()) / 86400000) + 1)
@@ -208,7 +285,11 @@ export default function GuestHomePage() {
   const totalDays   = computeTotalDays(data?.pendingTrip?.startDate, data?.pendingTrip?.endDate)
   const year        = data?.pendingTrip?.startDate ? new Date(data.pendingTrip.startDate).getFullYear() : new Date().getFullYear()
   const allDays     = itinerary.flatMap(s => s.days)
-  const hotelNames  = (data?.hotels || []).filter(h => h && h !== 'none').map(h => HOTEL_NAMES[h] || h)
+  const hotelNames      = (data?.hotels || []).filter(h => h && h !== 'none').map(h => HOTEL_NAMES[h] || h)
+  const hotelBrands     = (data?.hotels || []).filter(h => h && h !== 'none')
+  const tripCities      = Object.keys(data?.placesByCity || {}).filter(c => (data?.placesByCity?.[c]?.length ?? 0) > 0)
+  const suggestCities   = tripCities.length > 0 ? tripCities : (data?.cities || [data?.destination || '']).filter(Boolean)
+  const hotelSuggestions = getHotelSuggestions(hotelBrands, suggestCities)
 
   // city for weather — first city or first selected country
   const weatherCity = data?.cities?.[0] || data?.countries?.[0] || destination
@@ -303,6 +384,68 @@ export default function GuestHomePage() {
               Sign Up Free →
             </a>
           </div>
+
+          {/* Hotel suggestions */}
+          {hotelSuggestions.length > 0 && (
+            <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+              {hotelSuggestions.map(({ brand, city, hotels }) => {
+                const accent = BRAND_ACCENT[brand] || 'var(--accent)'
+                return (
+                  <div key={`${brand}-${city}`} style={{ background:'var(--card)', border:`1px solid ${accent}33`, borderRadius:12, overflow:'hidden' }}>
+                    {/* Brand header */}
+                    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'10px 14px', background:`${accent}18`, borderBottom:`1px solid ${accent}33` }}>
+                      <div>
+                        <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:13, fontWeight:900, letterSpacing:3, textTransform:'uppercase', color: accent }}>
+                          {HOTEL_NAMES[brand]}
+                        </div>
+                        <div style={{ fontFamily:"'Space Mono',monospace", fontSize:9, letterSpacing:2, textTransform:'uppercase', color:'#fff', opacity:.6, marginTop:1 }}>
+                          {city}
+                        </div>
+                      </div>
+                      <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, letterSpacing:2, textTransform:'uppercase', color: accent, background:`${accent}22`, border:`1px solid ${accent}44`, borderRadius:20, padding:'3px 8px' }}>
+                        Recommended
+                      </div>
+                    </div>
+
+                    {/* Hotel list */}
+                    <div style={{ display:'flex', flexDirection:'column' }}>
+                      {hotels.map((h, i) => (
+                        <div key={h.name} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 14px', borderBottom: i < hotels.length - 1 ? '1px solid var(--border)' : 'none' }}>
+                          {/* Star icon */}
+                          <div style={{ width:32, height:32, borderRadius:8, background:`${accent}22`, border:`1px solid ${accent}33`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, fontSize:14 }}>
+                            {'★'.repeat(Math.min(h.stars, 3))}
+                          </div>
+                          <div style={{ flex:1, minWidth:0 }}>
+                            <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, fontWeight:700, lineHeight:1.2, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                              {h.name}
+                            </div>
+                            <div style={{ display:'flex', gap:6, marginTop:3, alignItems:'center' }}>
+                              <span style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, letterSpacing:2, textTransform:'uppercase', color: accent, background:`${accent}18`, border:`1px solid ${accent}33`, borderRadius:20, padding:'1px 6px' }}>
+                                {h.tier}
+                              </span>
+                              <span style={{ fontFamily:"'Space Mono',monospace", fontSize:9, color: h.stars === 5 ? '#f5a623' : h.stars === 4 ? '#f0c040' : '#aaa', letterSpacing:1 }}>
+                                {'★'.repeat(h.stars)}
+                              </span>
+                            </div>
+                          </div>
+                          <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:12, fontWeight:700, letterSpacing:1, color:'#fff', textAlign:'right', flexShrink:0 }}>
+                            {h.price}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Footer nudge */}
+                    <div style={{ padding:'8px 14px', borderTop:'1px solid var(--border)', background:'rgba(255,255,255,.02)', textAlign:'center' }}>
+                      <span style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, letterSpacing:2, textTransform:'uppercase', color:'rgba(255,255,255,.4)' }}>
+                        Points eligible · Sign in to book
+                      </span>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </aside>
 
         {/* ── MAIN COLUMN ─────────────────────────────────────────────────── */}
