@@ -215,33 +215,37 @@ export default function LandingPage() {
   const [continent,      setContinent]     = useState('')
   const [selectedISOs,   setSelectedISOs]  = useState<string[]>([])
   const [selectedCities, setSelectedCities] = useState<string[]>([])
-  const [places,         setPlaces]        = useState<Place[]>([])
-  const [selPlaces,      setSelPlaces]     = useState<string[]>([])
-  const [selHotels,      setSelHotels]     = useState<string[]>([])
-  const [loadingPlaces,  setLoadingPlaces] = useState(false)
-
-
-  // ── PLACES FETCH ──────────────────────────────────────────────────────────
-  const fetchPlaces = async (country: string) => {
-    setLoadingPlaces(true)
-    try {
-      const res = await fetch(`/api/places?country=${encodeURIComponent(country)}`)
-      const data = await res.json()
-      setPlaces(data.places || [])
-    } catch {
-      setPlaces([])
-    } finally {
-      setLoadingPlaces(false)
-    }
-  }
+  const [placesByLocation, setPlacesByLocation] = useState<{ location: string; places: Place[] }[]>([])
+  const [selPlaces,        setSelPlaces]        = useState<string[]>([])
+  const [selHotels,        setSelHotels]        = useState<string[]>([])
+  const [loadingPlaces,    setLoadingPlaces]    = useState(false)
 
   // ── NAVIGATION ────────────────────────────────────────────────────────────
   const goToPlaces = () => {
-    const location = selectedCities.length > 0
-      ? selectedCities[0]
-      : selectedISOs.length > 0 ? (ISO_NAME[selectedISOs[0]] || selectedISOs[0]) : continent
-    fetchPlaces(location)
+    // Determine which locations to fetch — cities first, fall back to countries, then continent
+    const locations = selectedCities.length > 0
+      ? selectedCities
+      : selectedISOs.length > 0
+        ? selectedISOs.map(iso => ISO_NAME[iso] || iso)
+        : [continent]
+
+    setLoadingPlaces(true)
     setScreen('places')
+
+    Promise.all(
+      locations.map(async loc => {
+        try {
+          const res = await fetch(`/api/places?country=${encodeURIComponent(loc)}`)
+          const data = await res.json()
+          return { location: loc, places: (data.places || []) as Place[] }
+        } catch {
+          return { location: loc, places: [] as Place[] }
+        }
+      })
+    ).then(results => {
+      setPlacesByLocation(results)
+      setLoadingPlaces(false)
+    })
   }
 
   const handleCountryToggle = (iso: string) => {
@@ -431,7 +435,7 @@ export default function LandingPage() {
 
   // ── RENDER: PLACES ────────────────────────────────────────────────────────
   if (screen === 'places') {
-    const displayCountry = selectedISOs.length > 0 ? (ISO_NAME[selectedISOs[0]] || selectedISOs[0]) : continent
+    const locationCount = placesByLocation.length
     return (
       <div className="ob-screen" style={{ justifyContent: 'flex-start' }}>
         <div className="ob-grid-bg" />
@@ -442,7 +446,11 @@ export default function LandingPage() {
 
         <div className="ob-screen-content">
           <div className="ob-step-num">STEP 02 / 03</div>
-          <h2 className="ob-screen-title">TOP PLACES IN {displayCountry.toUpperCase()}</h2>
+          <h2 className="ob-screen-title">
+            {locationCount === 1
+              ? `TOP PLACES IN ${placesByLocation[0]?.location.toUpperCase()}`
+              : 'TOP PLACES BY CITY'}
+          </h2>
           <p className="ob-screen-sub">Select the highlights you want to visit — tap to add to your itinerary</p>
 
           {loadingPlaces ? (
@@ -451,32 +459,43 @@ export default function LandingPage() {
               Finding top attractions…
             </div>
           ) : (
-            <div className="ob-places-grid">
-              {places.map((p) => (
-                <div
-                  key={p.name}
-                  className={`ob-place-card${selPlaces.includes(p.name) ? ' selected' : ''}`}
-                  onClick={() => setSelPlaces(prev =>
-                    prev.includes(p.name) ? prev.filter(n => n !== p.name) : [...prev, p.name]
-                  )}
-                >
-                  <img
-                    className="ob-place-img"
-                    src={p.image}
-                    alt={p.name}
-                    loading="lazy"
-                    onError={(e) => { (e.target as HTMLImageElement).src = `https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80` }}
-                  />
-                  <div className="ob-place-gradient" />
-                  <div className="ob-place-rank">#{p.rank} Top Rated</div>
-                  <div className="ob-place-check">{selPlaces.includes(p.name) ? '✓' : ''}</div>
-                  <div style={{ position: 'absolute', bottom: 10, left: 12, right: 12 }}>
-                    <div className="ob-place-name">{p.name}</div>
-                    <div className="ob-place-type">{p.type}</div>
+            placesByLocation.map(({ location, places }) => (
+              <div key={location} className="ob-places-section">
+                {locationCount > 1 && (
+                  <div className="ob-places-section-head">
+                    <div className="ob-places-section-line" />
+                    <span className="ob-places-section-label">{location}</span>
+                    <div className="ob-places-section-line" />
                   </div>
+                )}
+                <div className="ob-places-grid">
+                  {places.map((p) => (
+                    <div
+                      key={`${location}-${p.name}`}
+                      className={`ob-place-card${selPlaces.includes(p.name) ? ' selected' : ''}`}
+                      onClick={() => setSelPlaces(prev =>
+                        prev.includes(p.name) ? prev.filter(n => n !== p.name) : [...prev, p.name]
+                      )}
+                    >
+                      <img
+                        className="ob-place-img"
+                        src={p.image}
+                        alt={p.name}
+                        loading="lazy"
+                        onError={(e) => { (e.target as HTMLImageElement).src = `https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80` }}
+                      />
+                      <div className="ob-place-gradient" />
+                      <div className="ob-place-rank">#{p.rank} Top Rated</div>
+                      <div className="ob-place-check">{selPlaces.includes(p.name) ? '✓' : ''}</div>
+                      <div style={{ position: 'absolute', bottom: 10, left: 12, right: 12 }}>
+                        <div className="ob-place-name">{p.name}</div>
+                        <div className="ob-place-type">{p.type}</div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
+            ))
           )}
 
           {selPlaces.length > 0 && (

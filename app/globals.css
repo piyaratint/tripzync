@@ -900,6 +900,17 @@ body {
 .ob-country-btn.selected { border-color: var(--accent); background: rgba(0,212,255,.08); color: var(--accent); }
 
 /* ── PLACES GRID ── */
+.ob-places-section { margin-bottom: 32px; }
+.ob-places-section-head {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 16px; margin-top: 8px;
+}
+.ob-places-section-line { flex: 1; height: 1px; background: var(--border2); }
+.ob-places-section-label {
+  font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif;
+  font-size: 18px; letter-spacing: 4px; text-transform: uppercase;
+  color: var(--accent); white-space: nowrap;
+}
 .ob-places-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
 .ob-place-card {
   position: relative; aspect-ratio: 4/3; border-radius: 12px; overflow: hidden;
