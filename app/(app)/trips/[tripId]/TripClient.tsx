@@ -161,14 +161,14 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
                   fontFamily: "'Barlow Condensed'", fontSize: 10,
                   letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer',
                 }}>🖨 Print / PDF</button>
-                <button onClick={togglePetals} title={showPetals ? 'Hide petals' : 'Show petals'} style={{
-                  background: showPetals ? 'rgba(244,167,192,.12)' : 'none',
-                  border: `1px solid ${showPetals ? 'rgba(244,167,192,.35)' : 'rgba(255,255,255,.15)'}`,
+                <button onClick={togglePetals} title={showPetals ? 'Hide particles' : 'Show particles'} style={{
+                  background: showPetals ? 'rgba(0,212,255,.1)' : 'none',
+                  border: `1px solid ${showPetals ? 'rgba(0,212,255,.35)' : 'rgba(255,255,255,.15)'}`,
                   borderRadius: 6, padding: '4px 10px',
-                  color: showPetals ? 'rgba(244,167,192,.9)' : 'rgba(255,255,255,.4)',
+                  color: showPetals ? 'rgba(0,212,255,.9)' : 'rgba(255,255,255,.4)',
                   fontFamily: "'Barlow Condensed'", fontSize: 10,
                   letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer',
-                }}>🌸 Petals</button>
+                }}>✦ Particles</button>
                 {!isOwner && (
                   <span style={{
                     display: 'inline-block', border: '1px solid rgba(168,85,247,.25)',
@@ -760,7 +760,7 @@ function SakuraPetals() {
     if (saved === 'false') { c.style.display = 'none'; return }
     const ctx = c.getContext('2d')!
     let W: number, H: number
-    const COLS = ['#f4a7c0','#e8839f','#fde8f0','#f2b4ca','#eba3b8']
+    const COLS = ['#00D4FF','#FFC947','rgba(255,255,255,.5)','#0099BB','#FFD470']
     const resize = () => { W = c.width = window.innerWidth; H = c.height = window.innerHeight }
     window.addEventListener('resize', resize); resize()
 
