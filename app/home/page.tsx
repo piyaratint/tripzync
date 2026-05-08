@@ -225,6 +225,7 @@ export default function GuestHomePage() {
         </div>
       </nav>
 
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px' }}>
       <div className="page-inner" style={{ paddingTop: 64 }}>
 
         {/* ── SIDEBAR ─────────────────────────────────────────────────────── */}
@@ -317,15 +318,18 @@ export default function GuestHomePage() {
             <div className="section-line" />
           </div>
 
-          {/* Day tabs */}
-          <div className="tabs-row" style={{ marginBottom:16 }}>
-            {allDays.map(day => (
-              <button key={day.dayNumber}
-                className={`tab-btn${activeDay === day.dayNumber ? ' active' : ''}`}
-                onClick={() => scrollToDay(day.dayNumber)}>
-                {day.date}
-              </button>
-            ))}
+          {/* Day tabs — show ~7 at a time, scroll for the rest */}
+          <div style={{ overflowX: 'auto', maxWidth: 660, marginBottom: 16, scrollbarWidth: 'thin', scrollbarColor: 'var(--border2) transparent', WebkitOverflowScrolling: 'touch' } as React.CSSProperties}>
+            <div className="tabs-row" style={{ marginBottom: 0, width: 'max-content', maxWidth: 'none' }}>
+              {allDays.map(day => (
+                <button key={day.dayNumber}
+                  className={`tab-btn${activeDay === day.dayNumber ? ' active' : ''}`}
+                  style={{ minWidth: 88 }}
+                  onClick={() => scrollToDay(day.dayNumber)}>
+                  {day.date}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* ── Bounded scrollable itinerary ─────────────────────────────── */}
@@ -445,6 +449,7 @@ export default function GuestHomePage() {
             </div>
           )}
         </main>
+      </div>
       </div>
 
       {/* Photo tooltip flash card */}
