@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
+import { saveTrip } from '@/app/actions/trips'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 interface OnboardingData {
@@ -776,29 +777,84 @@ export default function GuestHomePage() {
   const [activeDay,   setActiveDay]   = useState(1)
   const dayRefs = useRef<Record<number, HTMLDivElement | null>>({})
 
-  useEffect(() => {
-    const raw = localStorage.getItem('tripzync_onboarding')
-    if (!raw) return
-    try {
-      const parsed = JSON.parse(raw) as OnboardingData
-      setData(parsed)
-      const it = buildItinerary(parsed)
-      setItinerary(it)
-      if (it.length > 0) setActiveDay(it[0].days[0]?.dayNumber ?? 1)
+  // Auth + DB state
+  const [isLoggedIn,  setIsLoggedIn]  = useState(false)
+  const [userName,    setUserName]    = useState<string | null>(null)
+  const [tripId,      setTripId]      = useState<string | null>(null)
+  const [saving,      setSaving]      = useState(false)
+  const [saveStatus,  setSaveStatus]  = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
 
-      const cities = Object.keys(parsed.placesByCity || {})
-      if (!cities.length && parsed.destination) cities.push(parsed.destination)
-      Promise.all(cities.map(city =>
-        fetch(`/api/places?country=${encodeURIComponent(city)}`)
-          .then(r => r.json()).then(d => (d.places || []) as {name:string;image:string}[])
-          .catch(() => [] as {name:string;image:string}[])
-      )).then(results => {
-        const map: Record<string, string> = {}
-        results.flat().forEach(p => { if (p.name && p.image) map[p.name] = p.image })
-        setPhotoMap(map)
-      })
-    } catch { /* ignore */ }
+  // Load photos helper
+  const loadPhotos = useCallback((od: OnboardingData) => {
+    const cities = Object.keys(od.placesByCity || {})
+    if (!cities.length && od.destination) cities.push(od.destination)
+    Promise.all(cities.map(city =>
+      fetch(`/api/places?country=${encodeURIComponent(city)}`)
+        .then(r => r.json()).then(d => (d.places || []) as {name:string;image:string}[])
+        .catch(() => [] as {name:string;image:string}[])
+    )).then(results => {
+      const map: Record<string, string> = {}
+      results.flat().forEach(p => { if (p.name && p.image) map[p.name] = p.image })
+      setPhotoMap(map)
+    })
   }, [])
+
+  useEffect(() => {
+    async function init() {
+      // ── 1. Check auth status and latest trip from DB ──────────────────────
+      try {
+        const res = await fetch('/api/me/trip')
+        const json = await res.json() as {
+          loggedIn: boolean
+          trip: null | {
+            id: string; destination: string; startDate: string; endDate: string;
+            tripMeta: OnboardingData | null
+          }
+          userName: string | null
+        }
+
+        if (json.loggedIn) {
+          setIsLoggedIn(true)
+          setUserName(json.userName)
+
+          if (!json.trip) {
+            // Logged in but no trips → start onboarding
+            window.location.href = '/plan'
+            return
+          }
+
+          // Logged in with a saved trip → load from DB
+          setTripId(json.trip.id)
+          const meta = json.trip.tripMeta ?? {}
+          const enriched: OnboardingData = {
+            ...meta,
+            startDate:   json.trip.startDate,
+            endDate:     json.trip.endDate,
+            destination: json.trip.destination,
+          }
+          setData(enriched)
+          const it = buildItinerary(enriched)
+          setItinerary(it)
+          if (it.length > 0) setActiveDay(it[0].days[0]?.dayNumber ?? 1)
+          loadPhotos(enriched)
+          return
+        }
+      } catch { /* not logged in or network error — fall through to localStorage */ }
+
+      // ── 2. Guest mode — read from localStorage ────────────────────────────
+      const raw = localStorage.getItem('tripzync_onboarding')
+      if (!raw) return
+      try {
+        const parsed = JSON.parse(raw) as OnboardingData
+        setData(parsed)
+        const it = buildItinerary(parsed)
+        setItinerary(it)
+        if (it.length > 0) setActiveDay(it[0].days[0]?.dayNumber ?? 1)
+        loadPhotos(parsed)
+      } catch { /* ignore */ }
+    }
+    init()
+  }, [loadPhotos])
 
   // ── Edit helpers ────────────────────────────────────────────────────────────
   const removePlace = (si: number, di: number, place: string) =>
@@ -841,6 +897,31 @@ export default function GuestHomePage() {
     setTimeout(() => {
       dayRefs.current[dayNum]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
     }, 50)
+  }
+
+  // ── Save trip to DB ─────────────────────────────────────────────────────────
+  const handleSaveTrip = async () => {
+    if (!data || saving) return
+    setSaving(true)
+    setSaveStatus('saving')
+    try {
+      // Reconstruct placesByCity from the current (possibly edited) itinerary
+      const currentPlacesByCity: Record<string, string[]> = {}
+      for (const sec of itinerary) {
+        currentPlacesByCity[sec.city] = sec.days.flatMap(d => d.places)
+      }
+      const metaToSave: OnboardingData = { ...data, placesByCity: currentPlacesByCity }
+      const result = await saveTrip(tripId, metaToSave, itinerary)
+      setTripId(result.tripId)
+      setSaveStatus('saved')
+      setTimeout(() => setSaveStatus('idle'), 3000)
+    } catch (e) {
+      console.error('Save trip failed:', e)
+      setSaveStatus('error')
+      setTimeout(() => setSaveStatus('idle'), 3000)
+    } finally {
+      setSaving(false)
+    }
   }
 
   // ── Derived values ──────────────────────────────────────────────────────────
@@ -886,9 +967,20 @@ export default function GuestHomePage() {
       {/* Nav */}
       <nav className="ob-nav">
         <a href="/" className="ob-nav-logo" style={{ textDecoration: 'none' }}>TRIPZYNC</a>
-        <div style={{ display: 'flex', gap: 10 }}>
-          <a href="/plan" className="ob-nav-link">← Back</a>
-          <a href="/login" className="ob-nav-link" style={{ borderColor: 'var(--accent)', color: 'var(--accent)' }}>Sign In</a>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          {isLoggedIn ? (
+            <>
+              <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 11, letterSpacing: '.14em', color: 'rgba(255,255,255,.5)', textTransform: 'uppercase' }}>
+                {userName ?? 'Account'}
+              </span>
+              <a href="/dashboard" className="ob-nav-link">Dashboard</a>
+            </>
+          ) : (
+            <>
+              <a href="/plan" className="ob-nav-link">← Back</a>
+              <a href="/login" className="ob-nav-link" style={{ borderColor: 'var(--accent)', color: 'var(--accent)' }}>Sign In</a>
+            </>
+          )}
         </div>
       </nav>
 
@@ -903,8 +995,8 @@ export default function GuestHomePage() {
               <div className="hero-title"><em className="em">{destWords.slice(1).join(' ') || String(year)}</em></div>
             </div>
 
-            <div style={{ display:'inline-block', fontFamily:"'Space Mono',monospace", fontSize:9, letterSpacing:3, color:'var(--accent)', textTransform:'uppercase', background:'rgba(64,224,208,.08)', border:'1px solid rgba(64,224,208,.2)', borderRadius:6, padding:'4px 10px', marginBottom:14 }}>
-              Guest Mode · Draft
+            <div style={{ display:'inline-block', fontFamily:"'Space Mono',monospace", fontSize:9, letterSpacing:3, color: isLoggedIn ? '#3ecf78' : 'var(--accent)', textTransform:'uppercase', background: isLoggedIn ? 'rgba(62,207,120,.08)' : 'rgba(64,224,208,.08)', border: `1px solid ${isLoggedIn ? 'rgba(62,207,120,.25)' : 'rgba(64,224,208,.2)'}`, borderRadius:6, padding:'4px 10px', marginBottom:14 }}>
+              {isLoggedIn ? (tripId ? '✓ Saved to Dashboard' : 'Logged In · Unsaved') : 'Guest Mode · Draft'}
             </div>
 
             <div className="hero-meta">
@@ -949,16 +1041,28 @@ export default function GuestHomePage() {
             ))}
           </div>
 
-          {/* Sign-up CTA */}
-          <div style={{ background:'linear-gradient(135deg,rgba(64,224,208,.08),rgba(64,224,208,.03))', border:'1px solid rgba(64,224,208,.2)', borderRadius:12, padding:'18px 20px' }}>
-            <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:18, fontWeight:700, letterSpacing:3, textTransform:'uppercase', color:'#fff', marginBottom:6 }}>Save Your Plan</div>
-            <p style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, color:'rgba(255,255,255,.7)', marginBottom:14 }}>
-              Create a free account to keep this itinerary and access it anywhere.
-            </p>
-            <a href="/login" style={{ display:'block', textAlign:'center', fontFamily:"'Barlow Condensed',sans-serif", fontSize:13, fontWeight:700, letterSpacing:3, textTransform:'uppercase', padding:'10px', background:'var(--accent)', color:'var(--bg)', borderRadius:8, textDecoration:'none' }}>
-              Sign Up Free →
-            </a>
-          </div>
+          {/* Sign-up CTA / Dashboard link */}
+          {isLoggedIn ? (
+            <div style={{ background:'linear-gradient(135deg,rgba(62,207,120,.08),rgba(62,207,120,.03))', border:'1px solid rgba(62,207,120,.2)', borderRadius:12, padding:'18px 20px' }}>
+              <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:18, fontWeight:700, letterSpacing:3, textTransform:'uppercase', color:'#fff', marginBottom:6 }}>Your Trips</div>
+              <p style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, color:'rgba(255,255,255,.7)', marginBottom:14 }}>
+                View all your saved trips and plans in the dashboard.
+              </p>
+              <a href="/dashboard" style={{ display:'block', textAlign:'center', fontFamily:"'Barlow Condensed',sans-serif", fontSize:13, fontWeight:700, letterSpacing:3, textTransform:'uppercase', padding:'10px', background:'#3ecf78', color:'#0d0d0d', borderRadius:8, textDecoration:'none' }}>
+                Go to Dashboard →
+              </a>
+            </div>
+          ) : (
+            <div style={{ background:'linear-gradient(135deg,rgba(64,224,208,.08),rgba(64,224,208,.03))', border:'1px solid rgba(64,224,208,.2)', borderRadius:12, padding:'18px 20px' }}>
+              <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:18, fontWeight:700, letterSpacing:3, textTransform:'uppercase', color:'#fff', marginBottom:6 }}>Save Your Plan</div>
+              <p style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, color:'rgba(255,255,255,.7)', marginBottom:14 }}>
+                Create a free account to keep this itinerary and access it anywhere.
+              </p>
+              <a href="/login" style={{ display:'block', textAlign:'center', fontFamily:"'Barlow Condensed',sans-serif", fontSize:13, fontWeight:700, letterSpacing:3, textTransform:'uppercase', padding:'10px', background:'var(--accent)', color:'var(--bg)', borderRadius:8, textDecoration:'none' }}>
+                Sign Up Free →
+              </a>
+            </div>
+          )}
 
           {/* ── HOTEL RECOMMENDATIONS (sidebar, under Save Your Plan) ──────── */}
           {(rawHotelSuggestions.length > 0 || budgetHotels.length > 0) && (() => {
@@ -1083,11 +1187,35 @@ export default function GuestHomePage() {
           {/* Weather */}
           <WeatherWidget city={weatherCity} />
 
-          {/* Section header */}
+          {/* Section header + Save Trip button */}
           <div className="section-head" style={{ marginTop:0 }}>
             <div className="section-line" />
             <span className="section-label">Trip Schedule</span>
             <div className="section-line" />
+            {isLoggedIn && (
+              <button
+                onClick={handleSaveTrip}
+                disabled={saving}
+                style={{
+                  flexShrink: 0,
+                  background: saveStatus === 'saved' ? 'rgba(62,207,120,.15)' : saveStatus === 'error' ? 'rgba(247,110,110,.15)' : 'var(--red)',
+                  border: saveStatus === 'saved' ? '1px solid rgba(62,207,120,.4)' : saveStatus === 'error' ? '1px solid rgba(247,110,110,.4)' : 'none',
+                  borderRadius: 8,
+                  padding: '6px 16px',
+                  color: saveStatus === 'saved' ? '#3ecf78' : saveStatus === 'error' ? '#f76e6e' : '#fff',
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: '.12em',
+                  textTransform: 'uppercase',
+                  cursor: saving ? 'not-allowed' : 'pointer',
+                  opacity: saving ? 0.7 : 1,
+                  transition: 'all .2s',
+                }}
+              >
+                {saveStatus === 'saving' ? 'Saving…' : saveStatus === 'saved' ? '✓ Saved' : saveStatus === 'error' ? 'Error — retry' : tripId ? 'Update Trip' : 'Save Trip'}
+              </button>
+            )}
           </div>
 
           {/* Day tabs — show ~7 at a time, scroll for the rest */}

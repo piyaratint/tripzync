@@ -26,6 +26,18 @@ export const trips = pgTable('trips', {
   endDate:     text('end_date').notNull(),
   currency:    text('currency').default('JPY'),
   bgColor:     text('bg_color').default('#0d0d0d'),
+  tripMeta:    jsonb('trip_meta').$type<{
+    continent?: string
+    countries?: string[]
+    cities?: string[]
+    places?: string[]
+    placesByCity?: Record<string, string[]>
+    hotels?: string[]
+    destination?: string
+    startDate?: string
+    endDate?: string
+    pendingTrip?: { destination?: string; startDate?: string; endDate?: string }
+  }>(),
   createdAt:   timestamp('created_at').defaultNow().notNull(),
   updatedAt:   timestamp('updated_at').defaultNow().notNull(),
   deletedAt:   timestamp('deleted_at'),   // null = active; set = soft-deleted (purge after 90 days)

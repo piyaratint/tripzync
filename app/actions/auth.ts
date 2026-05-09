@@ -17,7 +17,7 @@ export async function googleSignIn() {
     // Ignore — if the ping fails we still try to sign in
   }
 
-  await signIn('google', { redirectTo: '/dashboard' })
+  await signIn('google', { redirectTo: '/home' })
 }
 
 export async function googleSignOut() {
