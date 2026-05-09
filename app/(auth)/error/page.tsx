@@ -23,7 +23,8 @@ export default async function AuthErrorPage({
         <div style={{ color: '#e8001d', fontSize: 11, letterSpacing: '.2em', textTransform: 'uppercase', marginBottom: 12 }}>Auth Error</div>
         <div style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>Error code: <span style={{ color: '#e8001d' }}>{error}</span></div>
         <div style={{ fontSize: 13, color: '#fff', marginBottom: 24 }}>{messages[error] ?? messages.Default}</div>
-        <a href="/login" style={{ color: '#fff', background: '#e8001d', padding: '10px 24px', borderRadius: 8, textDecoration: 'none', fontSize: 12, letterSpacing: '.1em', textTransform: 'uppercase' }}>
+        {/* /api/auth/clear wipes all stale auth cookies before returning to /login */}
+        <a href="/api/auth/clear" style={{ color: '#fff', background: '#e8001d', padding: '10px 24px', borderRadius: 8, textDecoration: 'none', fontSize: 12, letterSpacing: '.1em', textTransform: 'uppercase' }}>
           Try again
         </a>
       </div>
