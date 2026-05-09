@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 // ── TYPES ────────────────────────────────────────────────────────────────────
-type Screen = 'hero' | 'map' | 'places' | 'hotels' | 'auth-choice'
+type Screen = 'hero' | 'mode-select' | 'map' | 'places' | 'hotels' | 'duration'
 
 interface Place {
   name: string
@@ -220,6 +220,16 @@ export default function LandingPage() {
   const [selPlaceKeys,     setSelPlaceKeys]     = useState<string[]>([])
   const [selHotels,        setSelHotels]        = useState<string[]>([])
   const [loadingPlaces,    setLoadingPlaces]    = useState(false)
+  const [startDate, setStartDate] = useState('')
+  const [endDate,   setEndDate]   = useState('')
+  const [showGuestModal, setShowGuestModal] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const p = new URLSearchParams(window.location.search)
+    const s = p.get('screen')
+    if (s && (['map','places','hotels','duration'] as string[]).includes(s)) setScreen(s as Screen)
+  }, [])
 
   // ── NAVIGATION ────────────────────────────────────────────────────────────
   const goToPlaces = () => {
@@ -261,8 +271,7 @@ export default function LandingPage() {
     })
   }
 
-  const saveAndRedirect = (action: 'signup' | 'skip') => {
-    // Reconstruct placesByCity from keyed selection
+  const finishOnboarding = () => {
     const placesByCity: Record<string, string[]> = {}
     for (const key of selPlaceKeys) {
       const sep = key.indexOf('::')
@@ -273,7 +282,6 @@ export default function LandingPage() {
       placesByCity[loc].push(name)
     }
     const allPlaceNames = selPlaceKeys.map(k => k.slice(k.indexOf('::') + 2))
-
     const data = {
       continent,
       countries: selectedISOs.map(iso => ISO_NAME[iso] || iso),
@@ -284,11 +292,13 @@ export default function LandingPage() {
       destination: selectedCities.length > 0
         ? selectedCities[0]
         : selectedISOs.length > 0 ? ISO_NAME[selectedISOs[0]] : continent,
+      startDate,
+      endDate,
     }
     if (typeof window !== 'undefined') {
       localStorage.setItem('tripzync_onboarding', JSON.stringify(data))
     }
-    window.location.href = action === 'signup' ? '/login?callbackUrl=%2Fhome' : '/plan'
+    window.location.href = '/home'
   }
 
   const mapNextDisabled = selectedISOs.length === 0
@@ -325,9 +335,91 @@ export default function LandingPage() {
           TO DISCOVER
         </h1>
         <p className="ob-subtext">Plan smarter · Travel deeper · Live the route</p>
-        <button className="ob-cta-btn" onClick={() => setScreen('map')}>
+        <button className="ob-cta-btn" onClick={() => setScreen('mode-select')}>
           START PLANNING →
         </button>
+      </div>
+    </div>
+  )
+
+  // ── RENDER: MODE SELECT ───────────────────────────────────────────────────
+  if (screen === 'mode-select') return (
+    <div className="ob-screen">
+      <div className="ob-grid-bg" />
+      <div className="ob-particles" style={{ opacity:.4 }}>
+        {PARTICLES.slice(0, 10).map(p => (
+          <div key={p.id} className="ob-particle" style={{ width:p.size, height:p.size, left:`${p.left}%`, background:p.color, animationDuration:`${p.dur}s`, animationDelay:`${p.delay}s` }} />
+        ))}
+      </div>
+
+      {/* Guest warning modal */}
+      {showGuestModal && (
+        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,.82)', zIndex:200, display:'flex', alignItems:'center', justifyContent:'center', padding:24 }}>
+          <div className="ob-auth-card" style={{ maxWidth:440, margin:0 }}>
+            <div style={{ fontSize:44, marginBottom:14 }}>⚠️</div>
+            <div className="ob-auth-title" style={{ marginBottom:8, color:'#fff' }}>GUEST MODE</div>
+            <p className="ob-auth-sub" style={{ marginBottom:20 }}>
+              Create a free account to save your trip and access it from any device.
+              As a guest, your plan stays on this browser only and will be lost if you clear your data.
+            </p>
+            <button className="ob-auth-signup" style={{ marginBottom:12, width:'100%' }}
+              onClick={() => { setShowGuestModal(false); setScreen('map') }}>
+              CONTINUE AS GUEST →
+            </button>
+            <button className="ob-auth-skip" onClick={() => setShowGuestModal(false)}>
+              ← Go back and sign up
+            </button>
+          </div>
+        </div>
+      )}
+
+      <nav className="ob-nav">
+        <span className="ob-nav-logo">TRIPZYNC</span>
+        <button className="ob-nav-link" style={{ background:'none', border:'none', cursor:'pointer' }} onClick={() => setScreen('hero')}>← Back</button>
+      </nav>
+
+      <div className="ob-hero-content" style={{ alignItems:'center', textAlign:'center' }}>
+        <div className="ob-badge"><span className="ob-badge-dot" />Choose how to get started</div>
+        <h2 className="ob-headline" style={{ fontSize:'clamp(28px,6vw,52px)', marginBottom:8 }}>
+          HOW DO YOU<br />WANT TO <span className="ob-em">PLAN?</span>
+        </h2>
+        <p className="ob-subtext" style={{ marginBottom:32 }}>Sign up for the full experience or explore as a guest</p>
+
+        <div style={{ display:'flex', gap:20, flexWrap:'wrap', justifyContent:'center' }}>
+
+          {/* Sign up card */}
+          <div style={{ background:'rgba(64,224,208,.07)', border:'2px solid var(--accent)', borderRadius:18, padding:'32px 28px', width:230, cursor:'pointer', textAlign:'left', transition:'transform .15s' }}
+            onClick={() => { window.location.href = '/login?callbackUrl=%2F%3Fscreen%3Dmap' }}>
+            <div style={{ fontSize:40, marginBottom:14 }}>🔐</div>
+            <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:24, fontWeight:900, textTransform:'uppercase', color:'#fff', marginBottom:8 }}>Sign Up</div>
+            <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, color:'rgba(255,255,255,.7)', lineHeight:1.5 }}>
+              Save your trip, access from any device, personalised recommendations.
+            </div>
+            <div style={{ marginTop:18, fontFamily:"'Barlow Condensed',sans-serif", fontSize:11, fontWeight:700, letterSpacing:2, textTransform:'uppercase', color:'var(--accent)', display:'flex', alignItems:'center', gap:8 }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" style={{ flexShrink:0 }}>
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+              </svg>
+              GOOGLE SIGN IN →
+            </div>
+          </div>
+
+          {/* Guest card */}
+          <div style={{ background:'rgba(255,255,255,.03)', border:'1px solid rgba(255,255,255,.14)', borderRadius:18, padding:'32px 28px', width:230, cursor:'pointer', textAlign:'left', transition:'transform .15s' }}
+            onClick={() => setShowGuestModal(true)}>
+            <div style={{ fontSize:40, marginBottom:14 }}>👤</div>
+            <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:24, fontWeight:900, textTransform:'uppercase', color:'#fff', marginBottom:8 }}>Guest Mode</div>
+            <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, color:'rgba(255,255,255,.7)', lineHeight:1.5 }}>
+              Plan without signing up. Your trip stays on this device only.
+            </div>
+            <div style={{ marginTop:18, fontFamily:"'Barlow Condensed',sans-serif", fontSize:11, fontWeight:700, letterSpacing:2, textTransform:'uppercase', color:'rgba(255,255,255,.45)' }}>
+              CONTINUE AS GUEST →
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
   )
@@ -342,7 +434,7 @@ export default function LandingPage() {
       </nav>
 
       <div className="ob-screen-content">
-        <div className="ob-step-num">STEP 01 / 03</div>
+        <div className="ob-step-num">STEP 01 / 04</div>
         <h2 className="ob-screen-title">WHERE ARE YOU HEADED?</h2>
         <p className="ob-screen-sub">Choose a region → select countries → pick cities</p>
 
@@ -428,11 +520,12 @@ export default function LandingPage() {
       </div>
 
       <div className="ob-progress">
-        <button className="ob-step-back" onClick={() => setScreen('hero')}>← Back</button>
+        <button className="ob-step-back" onClick={() => setScreen('mode-select')}>← Back</button>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <div className="ob-steps">
             <div className="ob-step-dot done" />
             <div className="ob-step-dot active" />
+            <div className="ob-step-dot" />
             <div className="ob-step-dot" />
           </div>
           <span className="ob-step-label">Choose destination</span>
@@ -460,7 +553,7 @@ export default function LandingPage() {
         </nav>
 
         <div className="ob-screen-content">
-          <div className="ob-step-num">STEP 02 / 03</div>
+          <div className="ob-step-num">STEP 02 / 04</div>
           <h2 className="ob-screen-title">
             {locationCount === 1
               ? `TOP PLACES IN ${placesByLocation[0]?.location.toUpperCase()}`
@@ -531,6 +624,7 @@ export default function LandingPage() {
               <div className="ob-step-dot done" />
               <div className="ob-step-dot done" />
               <div className="ob-step-dot active" />
+              <div className="ob-step-dot" />
             </div>
             <span className="ob-step-label">Pick highlights</span>
           </div>
@@ -555,7 +649,7 @@ export default function LandingPage() {
       </nav>
 
       <div className="ob-screen-content">
-        <div className="ob-step-num">STEP 03 / 03</div>
+        <div className="ob-step-num">STEP 03 / 04</div>
         <h2 className="ob-screen-title">YOUR HOTEL LOYALTY</h2>
         <p className="ob-screen-sub">We'll prioritise hotels that match your programmes — multi-select</p>
 
@@ -601,65 +695,94 @@ export default function LandingPage() {
             <div className="ob-step-dot done" />
             <div className="ob-step-dot done" />
             <div className="ob-step-dot done" />
+            <div className="ob-step-dot" />
           </div>
           <span className="ob-step-label">Loyalty programmes</span>
         </div>
-        <button className="ob-step-next" onClick={() => setScreen('auth-choice')}>
-          FINISH →
+        <button className="ob-step-next" onClick={() => setScreen('duration')}>
+          NEXT →
         </button>
       </div>
     </div>
   )
 
-  // ── RENDER: AUTH CHOICE ───────────────────────────────────────────────────
-  const destName = selectedCities.length > 0
-    ? selectedCities[0]
-    : selectedISOs.length > 0 ? ISO_NAME[selectedISOs[0]] : continent
-  return (
-    <div className="ob-screen">
-      <div className="ob-grid-bg" />
-      <div className="ob-particles" style={{ opacity: .4 }}>
-        {PARTICLES.slice(0, 10).map(p => (
-          <div key={p.id} className="ob-particle" style={{
-            width: p.size, height: p.size, left: `${p.left}%`,
-            background: p.color, animationDuration: `${p.dur}s`, animationDelay: `${p.delay}s`,
-          }} />
-        ))}
-      </div>
+  // ── RENDER: DURATION ─────────────────────────────────────────────────────
+  if (screen === 'duration') {
+    const todayStr = new Date().toISOString().split('T')[0]
+    const durationDays = startDate && endDate
+      ? Math.max(1, Math.round((new Date(endDate).getTime() - new Date(startDate).getTime()) / 86400000) + 1)
+      : null
 
-      <div className="ob-auth-card">
-        <div style={{ fontSize: 40, marginBottom: 16 }}>🌍</div>
-        <div className="ob-auth-title">READY TO GO!</div>
-        <p className="ob-auth-sub">
-          Your trip to <strong style={{ color: 'var(--accent)' }}>{destName}</strong> is planned.<br />
-          Save your itinerary to access it anywhere.
-        </p>
+    return (
+      <div className="ob-screen" style={{ justifyContent:'flex-start' }}>
+        <div className="ob-grid-bg" />
+        <nav className="ob-nav">
+          <span className="ob-nav-logo">TRIPZYNC</span>
+        </nav>
 
-        <div className="ob-guest-warning">
-          ⚠️ <strong>Guest mode:</strong> If you skip sign-up, all your preferences and selected places will not be stored after you leave. Create a free account to save your plan.
+        <div className="ob-screen-content">
+          <div className="ob-step-num">STEP 04 / 04</div>
+          <h2 className="ob-screen-title">WHEN ARE YOU GOING?</h2>
+          <p className="ob-screen-sub">Set your trip dates to build a day-by-day itinerary</p>
+
+          <div style={{ display:'flex', flexDirection:'column', gap:20, maxWidth:420 }}>
+            <div>
+              <label style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, letterSpacing:'.16em', textTransform:'uppercase' as const, color:'#fff', marginBottom:6, display:'block' }}>
+                Start Date
+              </label>
+              <input
+                type="date"
+                style={{ width:'100%', background:'rgba(255,255,255,.05)', border:'1px solid rgba(255,255,255,.15)', borderRadius:10, padding:'12px 16px', color:'#fff', fontFamily:'inherit', fontSize:15, outline:'none', boxSizing:'border-box' as const, colorScheme:'dark' }}
+                value={startDate}
+                min={todayStr}
+                onChange={e => setStartDate(e.target.value)}
+              />
+            </div>
+            <div>
+              <label style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, letterSpacing:'.16em', textTransform:'uppercase' as const, color:'#fff', marginBottom:6, display:'block' }}>
+                End Date
+              </label>
+              <input
+                type="date"
+                style={{ width:'100%', background:'rgba(255,255,255,.05)', border:'1px solid rgba(255,255,255,.15)', borderRadius:10, padding:'12px 16px', color:'#fff', fontFamily:'inherit', fontSize:15, outline:'none', boxSizing:'border-box' as const, colorScheme:'dark' }}
+                value={endDate}
+                min={startDate || todayStr}
+                onChange={e => setEndDate(e.target.value)}
+              />
+            </div>
+
+            {durationDays && (
+              <div style={{ display:'flex', alignItems:'center', gap:12, background:'rgba(64,224,208,.07)', border:'1px solid rgba(64,224,208,.2)', borderRadius:10, padding:'12px 16px' }}>
+                <span style={{ fontSize:24 }}>📅</span>
+                <div>
+                  <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:22, fontWeight:900, color:'var(--accent)' }}>
+                    {durationDays} {durationDays === 1 ? 'Day' : 'Days'}
+                  </div>
+                  <div style={{ fontFamily:"'Space Mono',monospace", fontSize:9, letterSpacing:2, color:'rgba(255,255,255,.5)', textTransform:'uppercase', marginTop:2 }}>
+                    Trip duration planned
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
-        <button className="ob-auth-signup" onClick={() => saveAndRedirect('signup')}>
-          <svg width="20" height="20" viewBox="0 0 24 24">
-            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-          </svg>
-          SIGN UP WITH GOOGLE
-        </button>
-
-        <button className="ob-auth-skip" onClick={() => saveAndRedirect('skip')}>
-          Skip for now — continue as guest
-        </button>
-
-        <div className="ob-auth-summary">
-          <div>Countries: <span>{selectedISOs.map(i => ISO_NAME[i] || i).join(', ')}</span></div>
-          {selectedCities.length > 0 && <div>Cities: <span>{selectedCities.join(', ')}</span></div>}
-          {selPlaceKeys.length > 0 && <div>Places: <span>{selPlaceKeys.length} selected</span></div>}
-          {selHotels.length > 0 && <div>Loyalty: <span>{selHotels.map(h => HOTEL_PROGRAMS.find(p => p.id === h)?.name).join(', ')}</span></div>}
+        <div className="ob-progress">
+          <button className="ob-step-back" onClick={() => setScreen('hotels')}>← Back</button>
+          <div style={{ display:'flex', alignItems:'center', gap:16 }}>
+            <div className="ob-steps">
+              <div className="ob-step-dot done" />
+              <div className="ob-step-dot done" />
+              <div className="ob-step-dot done" />
+              <div className="ob-step-dot active" />
+            </div>
+            <span className="ob-step-label">Trip duration</span>
+          </div>
+          <button className="ob-step-next" onClick={finishOnboarding}>
+            SEE MY TRIP →
+          </button>
         </div>
       </div>
-    </div>
-  )
+    )
+  }
 }

@@ -11,6 +11,8 @@ interface OnboardingData {
   placesByCity?: Record<string, string[]>
   hotels?: string[]
   destination?: string
+  startDate?: string   // ADD THIS
+  endDate?: string     // ADD THIS
   pendingTrip?: { destination?: string; startDate?: string; endDate?: string }
 }
 interface DayBlock  { dayNumber: number; date: string; places: string[] }
@@ -240,6 +242,197 @@ const HOTEL_DB: HotelDB = {
   },
 }
 
+// ── City center coordinates [lat, lng] ────────────────────────────────────────
+const CITY_COORDS: Record<string, [number, number]> = {
+  Tokyo:[35.6762,139.6503], Osaka:[34.6937,135.5023], Kyoto:[35.0116,135.7681],
+  Sapporo:[43.0621,141.3544], Fukuoka:[33.5902,130.4017], Hiroshima:[34.3853,132.4553],
+  Nara:[34.6851,135.8048], Yokohama:[35.4437,139.6380],
+  Bangkok:[13.7563,100.5018], 'Chiang Mai':[18.7883,98.9853], Phuket:[7.8804,98.3923],
+  Pattaya:[12.9236,100.8825], Krabi:[8.0863,98.9063], 'Koh Samui':[9.5120,100.0136],
+  Seoul:[37.5665,126.9780], Busan:[35.1796,129.0756], Jeju:[33.4996,126.5312],
+  Bali:[-8.4095,115.1889], Jakarta:[-6.2088,106.8456], Singapore:[1.3521,103.8198],
+  'Kuala Lumpur':[3.1390,101.6869], Penang:[5.4141,100.3288], Langkawi:[6.3500,99.8000],
+  Hanoi:[21.0285,105.8542], 'Ho Chi Minh City':[10.8231,106.6297],
+  'Hoi An':[15.8800,108.3380], 'Da Nang':[16.0544,108.2022], 'Halong Bay':[20.9101,107.1839],
+  Mumbai:[19.0760,72.8777], Delhi:[28.6139,77.2090], Goa:[15.2993,74.1240], Jaipur:[26.9124,75.7873],
+  Agra:[27.1767,78.0081], Varanasi:[25.3176,82.9739], Bangalore:[12.9716,77.5946],
+  'Baa Atoll':[5.0000,73.0000],
+  Dubai:[25.2048,55.2708], 'Abu Dhabi':[24.4539,54.3773], Istanbul:[41.0082,28.9784],
+  Cappadocia:[38.6431,34.8277], Petra:[30.3285,35.4444], Doha:[25.2854,51.5310],
+  Paris:[48.8566,2.3522], London:[51.5074,-0.1278], Rome:[41.9028,12.4964],
+  Florence:[43.7696,11.2558], Venice:[45.4408,12.3155], Milan:[45.4654,9.1859],
+  Barcelona:[41.3851,2.1734], Madrid:[40.4168,-3.7038], Lisbon:[38.7223,-9.1393],
+  Athens:[37.9838,23.7275], Amsterdam:[52.3676,4.9041], Prague:[50.0755,14.4378],
+  Vienna:[48.2082,16.3738], Budapest:[47.4979,19.0402], Santorini:[36.3932,25.4615],
+  Berlin:[52.5200,13.4050], Munich:[48.1351,11.5820], Zurich:[47.3769,8.5417],
+  Geneva:[46.2044,6.1432], Copenhagen:[55.6761,12.5683], Stockholm:[59.3293,18.0686],
+  Edinburgh:[55.9533,-3.1883],
+  Sydney:[-33.8688,151.2093], Melbourne:[-37.8136,144.9631], Brisbane:[-27.4698,153.0251],
+  Cairns:[-16.9186,145.7781], 'Gold Coast':[-28.0167,153.4000],
+  Auckland:[-36.8509,174.7645], Queenstown:[-45.0312,168.6626],
+  Cairo:[30.0444,31.2357], Marrakech:[31.6295,-7.9811], 'Cape Town':[-33.9249,18.4241],
+  Nairobi:[-1.2921,36.8219], Zanzibar:[-6.1630,39.2026],
+  'New York':[40.7128,-74.0060], 'Los Angeles':[34.0522,-118.2437],
+  Miami:[25.7617,-80.1918], 'Las Vegas':[36.1699,-115.1398],
+  Chicago:[41.8781,-87.6298], 'San Francisco':[37.7749,-122.4194],
+  'Mexico City':[19.4326,-99.1332], Cancun:[21.1619,-86.8515],
+  'Rio de Janeiro':[-22.9068,-43.1729], 'Buenos Aires':[-34.6037,-58.3816],
+  Lima:[-12.0464,-77.0428], Cusco:[-13.5319,-71.9675],
+  Beijing:[39.9042,116.4074], Shanghai:[31.2304,121.4737], 'Hong Kong':[22.3193,114.1694],
+  Chengdu:[30.5728,104.0668],
+}
+
+// ── Famous attraction coordinates [lat, lng] ──────────────────────────────────
+const PLACE_COORDS: Record<string, [number, number]> = {
+  // Tokyo
+  'Senso-ji Temple':[35.7148,139.7967], 'Tokyo Tower':[35.6586,139.7454],
+  'Shibuya Crossing':[35.6595,139.7004], 'Meiji Shrine':[35.6763,139.6993],
+  'Tokyo Skytree':[35.7101,139.8107], 'Shinjuku Gyoen':[35.6851,139.7100],
+  'Akihabara':[35.7023,139.7746], 'Harajuku':[35.6702,139.7027],
+  'Ueno Park':[35.7145,139.7739], 'teamLab Borderless':[35.6221,139.7791],
+  // Kyoto
+  'Fushimi Inari Shrine':[34.9671,135.7727], 'Kinkaku-ji':[35.0394,135.7292],
+  'Arashiyama Bamboo Grove':[35.0117,135.6761], 'Gion District':[35.0038,135.7752],
+  "Philosopher's Path":[35.0194,135.7861], 'Nishiki Market':[35.0052,135.7657],
+  'Nijo Castle':[35.0142,135.7480], 'Kiyomizu-dera':[34.9948,135.7851],
+  // Osaka
+  'Osaka Castle':[34.6873,135.5259], 'Dotonbori':[34.6687,135.5013],
+  'Universal Studios Japan':[34.6654,135.4323], 'Namba':[34.6686,135.5013],
+  // Bangkok
+  'Grand Palace':[13.7500,100.4913], 'Wat Pho':[13.7465,100.4930],
+  'Wat Arun':[13.7437,100.4888], 'Chatuchak Market':[13.7999,100.5508],
+  'Lumphini Park':[13.7313,100.5418], 'Khao San Road':[13.7587,100.4984],
+  // Chiang Mai
+  'Doi Suthep Temple':[18.8048,98.9214], 'Nimman Road':[18.7969,98.9664],
+  'Night Bazaar Chiang Mai':[18.7885,98.9929], 'Old City Chiang Mai':[18.7884,98.9874],
+  // Phuket
+  'Patong Beach':[7.8966,98.2965], 'Phi Phi Islands':[7.7407,98.7784],
+  'Big Buddha Phuket':[7.8276,98.3090], 'Old Town Phuket':[7.8861,98.3920],
+  // Krabi
+  'Railay Beach':[8.0115,98.8342], 'Krabi Town':[8.0863,98.9063],
+  'James Bond Island':[8.2738,98.5003], 'Tiger Cave Temple':[8.1296,98.9547],
+  // Seoul
+  'Gyeongbokgung Palace':[37.5796,126.9770], 'Namsan Seoul Tower':[37.5512,126.9882],
+  'Bukchon Hanok Village':[37.5824,126.9845], 'Hongdae':[37.5563,126.9238],
+  'Insadong':[37.5744,126.9844], 'Myeongdong':[37.5636,126.9830],
+  // Bali
+  'Tanah Lot':[-8.6215,115.0869], 'Ubud Monkey Forest':[-8.5188,115.2589],
+  'Kuta Beach':[-8.7215,115.1685], 'Seminyak':[-8.6912,115.1606],
+  'Uluwatu Temple':[-8.8291,115.0849], 'Tegallalang Rice Terraces':[-8.4345,115.2788],
+  'Nusa Penida':[-8.7275,115.5444], 'Ubud':[-8.5069,115.2625],
+  // Singapore
+  'Marina Bay Sands':[1.2834,103.8607], 'Gardens by the Bay':[1.2816,103.8636],
+  'Sentosa Island':[1.2494,103.8303], 'Chinatown Singapore':[1.2814,103.8444],
+  'Universal Studios Singapore':[1.2540,103.8238], 'Orchard Road':[1.3048,103.8318],
+  'Clarke Quay':[1.2904,103.8465], 'Little India Singapore':[1.3066,103.8519],
+  // India
+  'Gateway of India':[18.9220,72.8347], 'Marine Drive':[18.9437,72.8233],
+  'Elephanta Caves':[18.9635,72.9315], 'Taj Mahal':[27.1751,78.0421],
+  'India Gate':[28.6129,77.2295], 'Qutub Minar':[28.5245,77.1855],
+  'Amber Fort':[26.9855,75.8513], 'City Palace Jaipur':[26.9258,75.8237],
+  'Hawa Mahal':[26.9239,75.8267],
+  // Dubai & Middle East
+  'Burj Khalifa':[25.1972,55.2744], 'Dubai Mall':[25.1984,55.2795],
+  'Palm Jumeirah':[25.1124,55.1390], 'Dubai Creek':[25.2631,55.3007],
+  'Gold Souk Dubai':[25.2697,55.3046], 'Sheikh Zayed Mosque':[24.4120,54.4750],
+  'Louvre Abu Dhabi':[24.5338,54.3978], 'Yas Island':[24.4972,54.6086],
+  'Hagia Sophia':[41.0086,28.9802], 'Grand Bazaar Istanbul':[41.0106,28.9682],
+  'Blue Mosque':[41.0054,28.9769], 'Topkapi Palace':[41.0115,28.9833],
+  'Galata Tower':[41.0256,28.9740], 'Bosphorus':[41.0741,29.0457],
+  // Paris
+  'Eiffel Tower':[48.8584,2.2945], 'Louvre Museum':[48.8606,2.3376],
+  'Arc de Triomphe':[48.8738,2.2950], 'Notre-Dame Cathedral':[48.8530,2.3499],
+  'Sacré-Cœur':[48.8867,2.3431], 'Palace of Versailles':[48.8049,2.1204],
+  'Champs-Élysées':[48.8698,2.3078], 'Musée d\'Orsay':[48.8600,2.3266],
+  // London
+  'Tower of London':[51.5081,-0.0759], 'Buckingham Palace':[51.5014,-0.1419],
+  'Big Ben':[51.5007,-0.1246], 'London Eye':[51.5033,-0.1196],
+  'British Museum':[51.5194,-0.1270], "St Paul's Cathedral":[51.5138,-0.0984],
+  'Hyde Park':[51.5073,-0.1657], 'Tate Modern':[51.5076,-0.0994],
+  // Rome
+  'Colosseum':[41.8902,12.4922], 'Vatican City':[41.9029,12.4534],
+  'Trevi Fountain':[41.9009,12.4833], 'Roman Forum':[41.8925,12.4853],
+  'Spanish Steps Rome':[41.9059,12.4822], 'Pantheon Rome':[41.8986,12.4769],
+  'Borghese Gallery':[41.9141,12.4924],
+  // Florence
+  'Uffizi Gallery':[43.7677,11.2554], 'Florence Cathedral':[43.7731,11.2560],
+  'Ponte Vecchio':[43.7681,11.2531], 'Piazzale Michelangelo':[43.7629,11.2645],
+  'David Statue':[43.7767,11.2599], 'Boboli Gardens':[43.7647,11.2500],
+  // Venice
+  'Grand Canal Venice':[45.4388,12.3186], "St Mark's Basilica":[45.4347,12.3389],
+  "Doge's Palace":[45.4338,12.3400], 'Rialto Bridge':[45.4380,12.3358],
+  // Barcelona
+  'Sagrada Familia':[41.4036,2.1744], 'Park Güell':[41.4145,2.1527],
+  'Las Ramblas':[41.3808,2.1732], 'Gothic Quarter Barcelona':[41.3833,2.1777],
+  'Camp Nou':[41.3809,2.1228], 'Casa Batlló':[41.3916,2.1649],
+  // Amsterdam
+  'Anne Frank House':[52.3752,4.8840], 'Rijksmuseum':[52.3600,4.8852],
+  'Van Gogh Museum':[52.3584,4.8811], 'Amsterdam Canals':[52.3676,4.9041],
+  'Keukenhof Gardens':[52.2697,4.5462],
+  // Athens
+  'Acropolis':[37.9715,23.7267], 'Parthenon':[37.9715,23.7267],
+  'Plaka Athens':[37.9742,23.7294], 'Syntagma Square':[37.9754,23.7358],
+  // Sydney
+  'Sydney Opera House':[-33.8568,151.2153], 'Sydney Harbour Bridge':[-33.8523,151.2108],
+  'Bondi Beach':[-33.8915,151.2767], 'Taronga Zoo':[-33.8434,151.2413],
+  'Blue Mountains':[-33.7036,150.3024], 'Manly Beach':[-33.7969,151.2869],
+  // Melbourne
+  'Federation Square Melbourne':[-37.8180,144.9693], 'Great Ocean Road':[-38.6853,143.3905],
+  'Queen Victoria Market Melbourne':[-37.8073,144.9568],
+  // Cairo
+  'Pyramids of Giza':[29.9792,31.1342], 'Sphinx of Giza':[29.9753,31.1376],
+  'Egyptian Museum':[30.0478,31.2336], 'Khan el-Khalili':[30.0484,31.2624],
+  // Marrakech
+  'Djemaa el-Fna':[31.6258,-7.9891], 'Majorelle Garden':[31.6413,-8.0030],
+  'Medina of Marrakech':[31.6310,-7.9888], 'Bahia Palace':[31.6214,-7.9836],
+  // Cape Town
+  'Table Mountain':[-33.9628,18.4098], 'V&A Waterfront':[-33.9066,18.4203],
+  'Cape of Good Hope':[-34.3568,18.4734], 'Robben Island':[-33.8069,18.3671],
+  // New York
+  'Statue of Liberty':[40.6892,-74.0445], 'Central Park':[40.7851,-73.9683],
+  'Times Square':[40.7580,-73.9855], 'Brooklyn Bridge':[40.7061,-73.9969],
+  'Empire State Building':[40.7484,-73.9967], 'Metropolitan Museum':[40.7794,-73.9632],
+  'High Line':[40.7480,-74.0048],
+  // Los Angeles
+  'Hollywood Sign':[34.1341,-118.3215], 'Santa Monica Pier':[34.0100,-118.4961],
+  'Venice Beach':[33.9850,-118.4695], 'Griffith Observatory':[34.1184,-118.3004],
+  'Getty Center':[34.0780,-118.4741],
+  // Miami
+  'South Beach Miami':[25.7825,-80.1300], 'Art Deco District Miami':[25.7776,-80.1311],
+  'Wynwood Walls':[25.8009,-80.1996],
+  // Las Vegas
+  'Las Vegas Strip':[36.1147,-115.1729], 'Grand Canyon':[36.0544,-112.2401],
+  'Hoover Dam':[36.0161,-114.7377], 'Fremont Street':[36.1705,-115.1443],
+  // Chicago
+  'Millennium Park Chicago':[41.8827,-87.6233], 'Navy Pier Chicago':[41.8917,-87.6086],
+  'Art Institute Chicago':[41.8796,-87.6237], 'Willis Tower':[41.8789,-87.6359],
+  // San Francisco
+  'Golden Gate Bridge':[37.8199,-122.4783], 'Alcatraz Island':[37.8270,-122.4230],
+  "Fisherman's Wharf":[37.8080,-122.4177], 'Lombard Street SF':[37.8021,-122.4187],
+  // Mexico & Central America
+  'Chichen Itza':[20.6843,-88.5678], 'Tulum Ruins':[20.2120,-87.4286],
+  'Teotihuacan':[19.6925,-98.8438],
+}
+
+// Haversine distance in km
+function haversineKm(a: [number, number], b: [number, number]): number {
+  const R = 6371
+  const dLat = (b[0] - a[0]) * Math.PI / 180
+  const dLon = (b[1] - a[1]) * Math.PI / 180
+  const lat1 = a[0] * Math.PI / 180
+  const lat2 = b[0] * Math.PI / 180
+  const h = Math.sin(dLat/2)**2 + Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLon/2)**2
+  return R * 2 * Math.asin(Math.sqrt(h))
+}
+
+function centroid(coords: [number, number][]): [number, number] {
+  if (!coords.length) return [0, 0]
+  return [
+    coords.reduce((s, c) => s + c[0], 0) / coords.length,
+    coords.reduce((s, c) => s + c[1], 0) / coords.length,
+  ]
+}
+
 const BRAND_ACCENT: Record<string, string> = {
   marriott:'#B5924C', hilton:'#003087', hyatt:'#7B2D8B', ihg:'#003F87', accor:'#C8102E',
 }
@@ -287,6 +480,23 @@ function getHotelSuggestions(brands: string[], cities: string[]): { brand: strin
   return results
 }
 
+function getBudgetHotels(cities: string[]): { city: string; hotels: HotelSuggestion[] }[] {
+  return cities.flatMap(rawCity => {
+    const found: HotelSuggestion[] = []
+    const normalise = (s: string) => s.toLowerCase().split(',')[0].trim()
+    const nc = normalise(rawCity)
+    for (const brand of Object.keys(HOTEL_DB)) {
+      const db = HOTEL_DB[brand]
+      const dbKey = Object.keys(db).find(k => {
+        const nk = normalise(k)
+        return nk === nc || nk.includes(nc) || nc.includes(nk)
+      })
+      if (dbKey) found.push(...db[dbKey].filter(h => h.stars <= 3).slice(0, 1))
+    }
+    return found.length ? [{ city: rawCity, hotels: found.slice(0, 3) }] : []
+  })
+}
+
 function computeTotalDays(s?: string, e?: string) {
   if (!s || !e) return 7
   return Math.max(1, Math.round((new Date(e).getTime() - new Date(s).getTime()) / 86400000) + 1)
@@ -303,37 +513,142 @@ function fmtDateLabel(s?: string) {
 function buildItinerary(data: OnboardingData): CitySection[] {
   const placesByCity = data.placesByCity || {}
   const cities = Object.keys(placesByCity).filter(c => placesByCity[c]?.length > 0)
-  const totalDays = computeTotalDays(data.pendingTrip?.startDate, data.pendingTrip?.endDate)
-  const startDate = data.pendingTrip?.startDate || ''
+  const startDate = data.startDate || data.pendingTrip?.startDate || ''
+  const endDate   = data.endDate   || data.pendingTrip?.endDate   || ''
+  const totalDays = computeTotalDays(startDate, endDate)
 
   if (cities.length === 0) {
-    const dest = data.destination || data.cities?.[0] || data.countries?.[0] || 'Your Destination'
-    const all = data.places || []
+    const dest = data.destination || data.cities?.[0] || 'Your Destination'
+    const all  = data.places || []
     return [{ city: dest, startDay: 1, days: Array.from({ length: totalDays }, (_, d) => ({
       dayNumber: d + 1, date: startDate ? shiftDate(startDate, d) : `Day ${d+1}`,
       places: all.slice(d * 2, d * 2 + 2),
     }))}]
   }
 
-  const totalPlaces = cities.reduce((s, c) => s + placesByCity[c].length, 0)
-  const rawDays = cities.map(c => (placesByCity[c].length / totalPlaces) * totalDays)
-  const floorDays = rawDays.map(d => Math.max(1, Math.floor(d)))
-  const rem = totalDays - floorDays.reduce((s, d) => s + d, 0)
-  rawDays.map((d, i) => ({ i, frac: d - Math.floor(d) }))
-    .sort((a, b) => b.frac - a.frac).slice(0, rem).forEach(({ i }) => floorDays[i]++)
-
   const sections: CitySection[] = []
-  let gDay = 1, gOff = 0
-  cities.forEach((city, idx) => {
-    const n = floorDays[idx]
-    const cp = placesByCity[city]
-    sections.push({ city, startDay: gDay, days: Array.from({ length: n }, (_, d) => ({
-      dayNumber: gDay + d, date: startDate ? shiftDate(startDate, gOff + d) : `Day ${gDay+d}`,
-      places: cp.slice(d * 2, d * 2 + 2),
-    }))})
-    gDay += n; gOff += n
-  })
+  let globalDay = 1
+  let globalOffset = 0
+
+  for (const city of cities) {
+    const cityPlaces = placesByCity[city]
+    const cityCenter: [number, number] = CITY_COORDS[city] || [0, 0]
+
+    // Attach coords to each place
+    const withCoords = cityPlaces.map(name => ({
+      name,
+      coords: (PLACE_COORDS[name] || cityCenter) as [number, number],
+    }))
+
+    // Nearest-neighbour sort from city center
+    const ordered: typeof withCoords = []
+    const remaining = new Set(withCoords.map((_, i) => i))
+    let current: [number, number] = cityCenter
+    while (remaining.size > 0) {
+      let nearest = -1, nearestDist = Infinity
+      for (const i of remaining) {
+        const d = haversineKm(current, withCoords[i].coords)
+        if (d < nearestDist) { nearestDist = d; nearest = i }
+      }
+      if (nearest < 0) break
+      ordered.push(withCoords[nearest])
+      current = withCoords[nearest].coords
+      remaining.delete(nearest)
+    }
+
+    // Cluster into days: max 2 places per day, ≤ 30 km between stops
+    const days: DayBlock[] = []
+    let i = 0
+    while (i < ordered.length) {
+      const dayPlaces = [ordered[i]]; let prev = ordered[i].coords; i++
+      if (i < ordered.length && dayPlaces.length < 2) {
+        if (haversineKm(prev, ordered[i].coords) <= 30) { dayPlaces.push(ordered[i]); i++ }
+      }
+      days.push({
+        dayNumber: globalDay,
+        date: startDate ? shiftDate(startDate, globalOffset) : `Day ${globalDay}`,
+        places: dayPlaces.map(p => p.name),
+      })
+      globalDay++; globalOffset++
+    }
+
+    sections.push({ city, startDay: days[0]?.dayNumber ?? globalDay, days })
+  }
+
   return sections
+}
+
+// ── MapView — Leaflet pins via CDN ────────────────────────────────────────────
+function MapView({ placesByCity }: { placesByCity: Record<string, string[]> }) {
+  const mapRef = useRef<HTMLDivElement>(null)
+  const mapInstance = useRef<any>(null)
+  const stableKey = Object.values(placesByCity).flat().join(',')
+
+  useEffect(() => {
+    if (!mapRef.current || mapInstance.current) return
+
+    const pins: { name: string; coords: [number, number]; city: string }[] = []
+    for (const [city, places] of Object.entries(placesByCity)) {
+      const cityCenter: [number, number] = CITY_COORDS[city] || [0, 0]
+      for (const place of places) {
+        pins.push({ name: place, coords: (PLACE_COORDS[place] || cityCenter) as [number, number], city })
+      }
+    }
+    if (!pins.length) return
+
+    const avgLat = pins.reduce((s, p) => s + p.coords[0], 0) / pins.length
+    const avgLng = pins.reduce((s, p) => s + p.coords[1], 0) / pins.length
+
+    if (!document.getElementById('leaflet-css')) {
+      const link = document.createElement('link')
+      link.id = 'leaflet-css'; link.rel = 'stylesheet'
+      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'
+      document.head.appendChild(link)
+    }
+
+    function initMap(L: any) {
+      if (!mapRef.current || mapInstance.current) return
+      const map = L.map(mapRef.current, { zoomControl: true }).setView([avgLat, avgLng], 12)
+      mapInstance.current = map
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      }).addTo(map)
+
+      const icon = L.divIcon({
+        html: `<div style="width:14px;height:14px;background:#40E0D0;border-radius:50%;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.6)"></div>`,
+        className: '', iconSize: [14, 14], iconAnchor: [7, 7],
+      })
+
+      pins.forEach(pin => {
+        L.marker(pin.coords, { icon }).addTo(map)
+          .bindPopup(`<strong style="font-size:13px">${pin.name}</strong><br><span style="color:#888;font-size:11px">📍 ${pin.city}</span>`)
+      })
+
+      if (pins.length > 1) {
+        map.fitBounds(L.latLngBounds(pins.map(p => p.coords)), { padding: [36, 36] })
+      }
+    }
+
+    if ((window as any).L) {
+      initMap((window as any).L)
+    } else {
+      const script = document.createElement('script')
+      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
+      script.onload = () => initMap((window as any).L)
+      document.head.appendChild(script)
+    }
+
+    return () => {
+      if (mapInstance.current) { mapInstance.current.remove(); mapInstance.current = null }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stableKey])
+
+  return (
+    <div style={{ borderRadius:14, overflow:'hidden', border:'1px solid var(--border)', height:380, position:'relative' }}>
+      <div ref={mapRef} style={{ height:'100%', width:'100%' }} />
+    </div>
+  )
 }
 
 // ── WeatherWidget (self-contained, uses DOM IDs) ──────────────────────────────
@@ -450,7 +765,7 @@ export default function GuestHomePage() {
       if (s !== si) return sec
       const last = sec.days[sec.days.length - 1]
       const num = last ? last.dayNumber + 1 : sec.startDay
-      const sd = data?.pendingTrip?.startDate || ''
+      const sd = data?.startDate || data?.pendingTrip?.startDate || ''
       const newDay: DayBlock = { dayNumber: num, date: sd ? shiftDate(sd, num - 1) : `Day ${num}`, places: [] }
       return { ...sec, days: [...sec.days, newDay] }
     }))
@@ -466,17 +781,36 @@ export default function GuestHomePage() {
   // ── Derived values ──────────────────────────────────────────────────────────
   const destination = data?.destination || data?.cities?.[0] || data?.countries?.[0] || 'Your Trip'
   const destWords   = destination.toUpperCase().split(' ')
-  const totalDays   = computeTotalDays(data?.pendingTrip?.startDate, data?.pendingTrip?.endDate)
-  const year        = data?.pendingTrip?.startDate ? new Date(data.pendingTrip.startDate).getFullYear() : new Date().getFullYear()
+  const startDateStr = data?.startDate || data?.pendingTrip?.startDate
+  const endDateStr   = data?.endDate   || data?.pendingTrip?.endDate
+  const totalDays   = computeTotalDays(startDateStr, endDateStr)
+  const year        = startDateStr ? new Date(startDateStr).getFullYear() : new Date().getFullYear()
   const allDays     = itinerary.flatMap(s => s.days)
   const hotelNames      = (data?.hotels || []).filter(h => h && h !== 'none').map(h => HOTEL_NAMES[h] || h)
   const hotelBrands     = (data?.hotels || []).filter(h => h && h !== 'none')
+  const noMembership    = hotelBrands.length === 0
   const tripCities      = Object.keys(data?.placesByCity || {}).filter(c => (data?.placesByCity?.[c]?.length ?? 0) > 0)
   const suggestCities   = tripCities.length > 0 ? tripCities : (data?.cities || [data?.destination || '']).filter(Boolean)
-  // If user selected loyalty brands, show those — otherwise show all 5 brands as a discovery panel
-  const allBrands       = ['marriott', 'hilton', 'hyatt', 'ihg', 'accor']
-  const brandsToShow    = hotelBrands.length > 0 ? hotelBrands : allBrands
-  const hotelSuggestions = getHotelSuggestions(brandsToShow, suggestCities)
+
+  // Calculate centroid of selected places for proximity ranking
+  const allPlaceCoords = tripCities.flatMap(city =>
+    (data?.placesByCity?.[city] || []).map(p =>
+      (PLACE_COORDS[p] || CITY_COORDS[city] || [0, 0]) as [number, number]
+    )
+  )
+  const tripCentroid = centroid(allPlaceCoords)
+
+  // Hotel suggestions — sorted by proximity to trip centroid
+  const rawHotelSuggestions = noMembership
+    ? [] // will use budget instead
+    : getHotelSuggestions(hotelBrands, suggestCities)
+        .sort((a, b) => {
+          const ca = CITY_COORDS[a.city] || [0,0] as [number,number]
+          const cb = CITY_COORDS[b.city] || [0,0] as [number,number]
+          return haversineKm(tripCentroid, ca) - haversineKm(tripCentroid, cb)
+        })
+
+  const budgetHotels = noMembership ? getBudgetHotels(suggestCities) : []
 
   // city for weather — first city or first selected country
   const weatherCity = data?.cities?.[0] || data?.countries?.[0] || destination
@@ -517,10 +851,10 @@ export default function GuestHomePage() {
                 <span className="meta-label">Duration</span>
                 <span className="meta-val">{totalDays} Days</span>
               </div>
-              {data?.pendingTrip?.startDate && data?.pendingTrip?.endDate && (
+              {startDateStr && endDateStr && (
                 <div className="meta-item">
                   <span className="meta-label">Dates</span>
-                  <span className="meta-val">{fmtDateLabel(data.pendingTrip.startDate)} – {fmtDateLabel(data.pendingTrip.endDate)}</span>
+                  <span className="meta-val">{fmtDateLabel(startDateStr)} – {fmtDateLabel(endDateStr)}</span>
                 </div>
               )}
             </div>
@@ -562,84 +896,91 @@ export default function GuestHomePage() {
           </div>
 
           {/* ── HOTEL RECOMMENDATIONS (sidebar, under Save Your Plan) ──────── */}
-          {hotelSuggestions.length > 0 && (() => {
+          {(rawHotelSuggestions.length > 0 || budgetHotels.length > 0) && (() => {
+            if (noMembership) {
+              // 3-star budget fallback
+              return (
+                <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+                  <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, fontWeight:700, letterSpacing:3, textTransform:'uppercase', color:'rgba(255,255,255,.45)' }}>
+                    3-Star Picks Near Your Route
+                  </div>
+                  {budgetHotels.map(({ city, hotels }) => (
+                    <div key={city} style={{ background:'var(--card)', border:'1px solid var(--border)', borderRadius:12, overflow:'hidden' }}>
+                      <div style={{ padding:'8px 14px', borderBottom:'1px solid var(--border)', fontFamily:"'Barlow Condensed',sans-serif", fontSize:12, fontWeight:700, letterSpacing:2, textTransform:'uppercase', color:'rgba(255,255,255,.6)' }}>
+                        📍 {city}
+                      </div>
+                      {hotels.map(h => (
+                        <div key={h.name} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 14px', borderTop:'1px solid var(--border)' }}>
+                          <div style={{ width:36, height:36, borderRadius:8, background:'rgba(255,201,71,.08)', border:'1px solid rgba(255,201,71,.25)', display:'flex', flexWrap:'wrap', alignItems:'center', justifyContent:'center', flexShrink:0, overflow:'hidden', padding:2 }}>
+                            {Array.from({ length: h.stars }).map((_, i) => (
+                              <span key={i} style={{ fontSize:9, lineHeight:1, color:'#FFC947' }}>★</span>
+                            ))}
+                          </div>
+                          <div style={{ flex:1, minWidth:0 }}>
+                            <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, fontWeight:700, color:'#fff', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', lineHeight:1.2 }}>{h.name}</div>
+                            <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, letterSpacing:1, textTransform:'uppercase', color:'rgba(255,255,255,.5)', marginTop:3 }}>{h.tier}</div>
+                          </div>
+                          <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:12, fontWeight:700, color:'#fff', flexShrink:0 }}>{h.price}</div>
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              )
+            }
+            // Loyalty brand hotels (keep existing render but use rawHotelSuggestions)
             const byBrand: Record<string, { city: string; hotels: HotelSuggestion[] }[]> = {}
-            hotelSuggestions.forEach(({ brand, city, hotels }) => {
+            rawHotelSuggestions.forEach(({ brand, city, hotels }) => {
               if (!byBrand[brand]) byBrand[brand] = []
               byBrand[brand].push({ city, hotels })
             })
             return (
               <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-                {/* Section label */}
                 <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, fontWeight:700, letterSpacing:3, textTransform:'uppercase', color:'rgba(255,255,255,.45)' }}>
-                  {hotelBrands.length > 0 ? 'Your Loyalty Hotels' : 'Recommended Hotels'}
+                  Your Loyalty Hotels · Nearest First
                 </div>
-
                 {Object.entries(byBrand).map(([brand, cityGroups]) => (
                   <div key={brand} style={{ background:'var(--card)', border:'1px solid var(--border)', borderRadius:12, overflow:'hidden' }}>
-
-                    {/* Brand header */}
                     <div style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 14px', borderBottom:'1px solid var(--border)' }}>
                       <div style={{ width:36, height:36, borderRadius:8, background:'#fff', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, overflow:'hidden' }}>
                         <img src={BRAND_LOGOS[brand] || ''} alt={HOTEL_NAMES[brand]}
                           style={{ width:28, height:28, objectFit:'contain' }}
                           onError={e => {
-                            (e.currentTarget as HTMLImageElement).style.display = 'none'
+                            (e.currentTarget as HTMLImageElement).style.display='none'
                             const fb = e.currentTarget.nextSibling as HTMLElement
-                            if (fb) fb.style.display = 'flex'
+                            if (fb) fb.style.display='flex'
                           }} />
                         <span style={{ display:'none', width:28, height:28, alignItems:'center', justifyContent:'center', fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, fontWeight:900, color:'#555', letterSpacing:1 }}>
                           {BRAND_INITIALS[brand] || brand[0].toUpperCase()}
                         </span>
                       </div>
                       <div style={{ flex:1, minWidth:0 }}>
-                        <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:14, fontWeight:900, letterSpacing:2, textTransform:'uppercase', color:'#fff', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                          {HOTEL_NAMES[brand]}
-                        </div>
-                        <div style={{ fontFamily:"'Space Mono',monospace", fontSize:8, letterSpacing:1, color:'rgba(255,255,255,.4)', marginTop:2 }}>
-                          {cityGroups.reduce((s, g) => s + g.hotels.length, 0)} properties
-                        </div>
+                        <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:14, fontWeight:900, letterSpacing:2, textTransform:'uppercase', color:'#fff', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{HOTEL_NAMES[brand]}</div>
+                        <div style={{ fontFamily:"'Space Mono',monospace", fontSize:8, letterSpacing:1, color:'rgba(255,255,255,.4)', marginTop:2 }}>{cityGroups.reduce((s,g)=>s+g.hotels.length,0)} properties</div>
                       </div>
-                      {hotelBrands.includes(brand) && (
-                        <span style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:8, letterSpacing:2, textTransform:'uppercase', color:'#FFC947', background:'rgba(255,201,71,.12)', border:'1px solid rgba(255,201,71,.3)', borderRadius:20, padding:'2px 8px', flexShrink:0 }}>
-                          ★ Loyalty
-                        </span>
-                      )}
+                      <span style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:8, letterSpacing:2, textTransform:'uppercase', color:'#FFC947', background:'rgba(255,201,71,.12)', border:'1px solid rgba(255,201,71,.3)', borderRadius:20, padding:'2px 8px', flexShrink:0 }}>★ Loyalty</span>
                     </div>
-
-                    {/* Hotels per city */}
                     {cityGroups.map(({ city, hotels }) => (
                       <div key={city}>
                         {cityGroups.length > 1 && (
-                          <div style={{ padding:'6px 14px 0', fontFamily:"'Space Mono',monospace", fontSize:8, letterSpacing:2, textTransform:'uppercase', color:'rgba(255,255,255,.4)' }}>
-                            {city}
-                          </div>
+                          <div style={{ padding:'6px 14px 0', fontFamily:"'Space Mono',monospace", fontSize:8, letterSpacing:2, textTransform:'uppercase', color:'rgba(255,255,255,.4)' }}>{city}</div>
                         )}
-                        {hotels.map((h) => (
+                        {hotels.map(h => (
                           <div key={h.name} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 14px', borderTop:'1px solid var(--border)' }}>
-                            {/* Stars square — fixed 36×36, stars wrap inside */}
                             <div style={{ width:36, height:36, borderRadius:8, background:'rgba(255,201,71,.08)', border:'1px solid rgba(255,201,71,.25)', display:'flex', flexWrap:'wrap', alignItems:'center', justifyContent:'center', flexShrink:0, overflow:'hidden', padding:2 }}>
                               {Array.from({ length: h.stars }).map((_, i) => (
                                 <span key={i} style={{ fontSize:9, lineHeight:1, color:'#FFC947' }}>★</span>
                               ))}
                             </div>
                             <div style={{ flex:1, minWidth:0 }}>
-                              <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, fontWeight:700, color:'#fff', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', lineHeight:1.2 }}>
-                                {h.name}
-                              </div>
-                              <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, letterSpacing:1, textTransform:'uppercase', color:'rgba(255,255,255,.5)', marginTop:3 }}>
-                                {h.tier}
-                              </div>
+                              <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, fontWeight:700, color:'#fff', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', lineHeight:1.2 }}>{h.name}</div>
+                              <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, letterSpacing:1, textTransform:'uppercase', color:'rgba(255,255,255,.5)', marginTop:3 }}>{h.tier}</div>
                             </div>
-                            <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:12, fontWeight:700, color:'#fff', flexShrink:0, textAlign:'right' }}>
-                              {h.price}
-                            </div>
+                            <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:12, fontWeight:700, color:'#fff', flexShrink:0 }}>{h.price}</div>
                           </div>
                         ))}
                       </div>
                     ))}
-
-                    {/* CTA button */}
                     <div style={{ padding:'10px 14px', borderTop:'1px solid var(--border)' }}>
                       <a href="/login" style={{ display:'block', textAlign:'center', fontFamily:"'Barlow Condensed',sans-serif", fontSize:11, fontWeight:700, letterSpacing:2, textTransform:'uppercase', padding:'8px', background:'var(--accent)', color:'var(--bg)', borderRadius:6, textDecoration:'none' }}>
                         Sign In to Book →
@@ -795,6 +1136,21 @@ export default function GuestHomePage() {
               No trip data.{' '}
               <a href="/" style={{ color:'var(--accent)', textDecoration:'none' }}>Start planning →</a>
             </div>
+          )}
+
+          {/* ── City Map with place pins ─────────────────────────────────────────── */}
+          {data?.placesByCity && Object.keys(data.placesByCity).length > 0 && (
+            <>
+              <div className="section-head" style={{ marginTop: 28 }}>
+                <div className="section-line" />
+                <span className="section-label">City Map</span>
+                <div className="section-line" />
+              </div>
+              <p style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, color:'rgba(255,255,255,.5)', marginBottom:14, marginTop:-6 }}>
+                Pins show your selected places — clustered by location
+              </p>
+              <MapView placesByCity={data.placesByCity} />
+            </>
           )}
 
         </main>
