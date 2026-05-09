@@ -7,6 +7,15 @@ import { authUsers, accounts, sessions, verificationTokens } from '@/lib/db/sche
 export const { handlers, auth, signIn, signOut } = NextAuth({
   secret: process.env.AUTH_SECRET,
   trustHost: true,
+  debug: true,
+  logger: {
+    error(error) {
+      console.error('[AUTH ERROR]', error.name, error.message, JSON.stringify(error.cause ?? ''))
+    },
+    warn(code) {
+      console.warn('[AUTH WARN]', code)
+    },
+  },
   adapter: DrizzleAdapter(db, {
     usersTable: authUsers,
     accountsTable: accounts,
