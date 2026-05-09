@@ -127,15 +127,6 @@ function getHotelSuggestions(brands: string[], cities: string[]): { brand: strin
         if (!seen.has(key2)) { seen.add(key2); results.push({ brand, city: dbKey, hotels: db[dbKey].slice(0, 3) }) }
       }
     }
-
-    // If no city matched this brand at all, show first DB city as fallback
-    if (!results.some(r => r.brand === brand)) {
-      const firstKey = Object.keys(db)[0]
-      if (firstKey) {
-        const key2 = `${brand}::${firstKey}`
-        if (!seen.has(key2)) { seen.add(key2); results.push({ brand, city: firstKey, hotels: db[firstKey].slice(0, 3) }) }
-      }
-    }
   }
   return results
 }
@@ -383,19 +374,19 @@ export default function GuestHomePage() {
           <div style={{ display:'flex', flexDirection:'column', gap:8, marginBottom:16 }}>
             {itinerary.map((sec, si) => (
               <div key={sec.city} style={{ background:'var(--card)', border:'1px solid var(--border)', borderRadius:10, padding:'12px 16px' }}>
-                <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:18, fontWeight:900, fontStyle:'italic', textTransform:'uppercase', color: si % 2 === 0 ? 'var(--accent)' : 'var(--hi)' }}>
+                <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:18, fontWeight:900, fontStyle:'italic', textTransform:'uppercase', color:'#fff' }}>
                   {sec.city}
                 </div>
-                <div style={{ fontFamily:"'Space Mono',monospace", fontSize:9, letterSpacing:2, textTransform:'uppercase', marginTop:2 }}>
+                <div style={{ fontFamily:"'Space Mono',monospace", fontSize:9, letterSpacing:2, textTransform:'uppercase', color:'rgba(255,255,255,.5)', marginTop:2 }}>
                   {sec.days.length} {sec.days.length === 1 ? 'day' : 'days'} · Day {sec.startDay}–{sec.startDay + sec.days.length - 1}
                 </div>
                 <div style={{ display:'flex', gap:6, marginTop:8 }}>
                   <button onClick={() => scrollToDay(sec.days[0]?.dayNumber ?? sec.startDay)}
-                    style={{ flex:1, background:'none', border:'1px solid var(--border2)', borderRadius:6, padding:'3px 8px', color:'#fff', fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, letterSpacing:2, textTransform:'uppercase', cursor:'pointer' }}>
+                    style={{ flex:1, background:'var(--accent)', border:'none', borderRadius:6, padding:'5px 8px', color:'var(--bg)', fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, fontWeight:700, letterSpacing:2, textTransform:'uppercase', cursor:'pointer' }}>
                     Go →
                   </button>
                   <button onClick={() => addDay(si)}
-                    style={{ flex:1, background:'none', border:'1px dashed var(--border2)', borderRadius:6, padding:'3px 8px', color:'#fff', fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, letterSpacing:2, textTransform:'uppercase', cursor:'pointer' }}>
+                    style={{ flex:1, background:'var(--accent)', border:'none', borderRadius:6, padding:'5px 8px', color:'var(--bg)', fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, fontWeight:700, letterSpacing:2, textTransform:'uppercase', cursor:'pointer' }}>
                     + Day
                   </button>
                 </div>
@@ -403,41 +394,106 @@ export default function GuestHomePage() {
             ))}
           </div>
 
-          {/* Hotel loyalty */}
-          {hotelBrands.length > 0 && (
-            <div className="hotel-chip" style={{ marginBottom:16, cursor:'default' }}>
-              <div className="meta-label" style={{ marginBottom: 8 }}>Hotel Loyalty</div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'flex-end' }}>
-                {hotelBrands.map(brand => (
-                  <div key={brand} style={{ display: 'flex', alignItems: 'center', gap: 6, background: `${BRAND_ACCENT[brand] || 'var(--accent)'}18`, border: `1px solid ${BRAND_ACCENT[brand] || 'var(--accent)'}44`, borderRadius: 8, padding: '5px 10px' }}>
-                    <div style={{ width:28, height:28, borderRadius:6, background:'#fff', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, overflow:'hidden' }}>
-                      {BRAND_LOGOS[brand] ? (
-                        <img src={BRAND_LOGOS[brand]} alt={HOTEL_NAMES[brand]} style={{ width:22, height:22, objectFit:'contain' }}
-                          onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; const fb = e.currentTarget.nextSibling as HTMLElement; if (fb) fb.style.display = 'flex' }} />
-                      ) : null}
-                      <span style={{ display:'none', width:22, height:22, alignItems:'center', justifyContent:'center', fontSize:9, fontWeight:900, color: BRAND_ACCENT[brand] || '#fff', fontFamily:"'Barlow Condensed',sans-serif", letterSpacing:1 }}>
-                        {BRAND_INITIALS[brand] || brand[0].toUpperCase()}
-                      </span>
-                    </div>
-                    <span style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', color: '#fff' }}>
-                      {HOTEL_NAMES[brand]}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
           {/* Sign-up CTA */}
           <div style={{ background:'linear-gradient(135deg,rgba(64,224,208,.08),rgba(64,224,208,.03))', border:'1px solid rgba(64,224,208,.2)', borderRadius:12, padding:'18px 20px' }}>
-            <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:18, fontWeight:700, letterSpacing:3, textTransform:'uppercase', marginBottom:6 }}>Save Your Plan</div>
-            <p style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, marginBottom:14 }}>
+            <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:18, fontWeight:700, letterSpacing:3, textTransform:'uppercase', color:'#fff', marginBottom:6 }}>Save Your Plan</div>
+            <p style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, color:'rgba(255,255,255,.7)', marginBottom:14 }}>
               Create a free account to keep this itinerary and access it anywhere.
             </p>
             <a href="/login" style={{ display:'block', textAlign:'center', fontFamily:"'Barlow Condensed',sans-serif", fontSize:13, fontWeight:700, letterSpacing:3, textTransform:'uppercase', padding:'10px', background:'var(--accent)', color:'var(--bg)', borderRadius:8, textDecoration:'none' }}>
               Sign Up Free →
             </a>
           </div>
+
+          {/* ── HOTEL RECOMMENDATIONS (sidebar, under Save Your Plan) ──────── */}
+          {hotelSuggestions.length > 0 && (() => {
+            const byBrand: Record<string, { city: string; hotels: HotelSuggestion[] }[]> = {}
+            hotelSuggestions.forEach(({ brand, city, hotels }) => {
+              if (!byBrand[brand]) byBrand[brand] = []
+              byBrand[brand].push({ city, hotels })
+            })
+            return (
+              <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+                {/* Section label */}
+                <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, fontWeight:700, letterSpacing:3, textTransform:'uppercase', color:'rgba(255,255,255,.45)' }}>
+                  {hotelBrands.length > 0 ? 'Your Loyalty Hotels' : 'Recommended Hotels'}
+                </div>
+
+                {Object.entries(byBrand).map(([brand, cityGroups]) => (
+                  <div key={brand} style={{ background:'var(--card)', border:'1px solid var(--border)', borderRadius:12, overflow:'hidden' }}>
+
+                    {/* Brand header */}
+                    <div style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 14px', borderBottom:'1px solid var(--border)' }}>
+                      <div style={{ width:36, height:36, borderRadius:8, background:'#fff', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, overflow:'hidden' }}>
+                        <img src={BRAND_LOGOS[brand] || ''} alt={HOTEL_NAMES[brand]}
+                          style={{ width:28, height:28, objectFit:'contain' }}
+                          onError={e => {
+                            (e.currentTarget as HTMLImageElement).style.display = 'none'
+                            const fb = e.currentTarget.nextSibling as HTMLElement
+                            if (fb) fb.style.display = 'flex'
+                          }} />
+                        <span style={{ display:'none', width:28, height:28, alignItems:'center', justifyContent:'center', fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, fontWeight:900, color:'#555', letterSpacing:1 }}>
+                          {BRAND_INITIALS[brand] || brand[0].toUpperCase()}
+                        </span>
+                      </div>
+                      <div style={{ flex:1, minWidth:0 }}>
+                        <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:14, fontWeight:900, letterSpacing:2, textTransform:'uppercase', color:'#fff', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                          {HOTEL_NAMES[brand]}
+                        </div>
+                        <div style={{ fontFamily:"'Space Mono',monospace", fontSize:8, letterSpacing:1, color:'rgba(255,255,255,.4)', marginTop:2 }}>
+                          {cityGroups.reduce((s, g) => s + g.hotels.length, 0)} properties
+                        </div>
+                      </div>
+                      {hotelBrands.includes(brand) && (
+                        <span style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:8, letterSpacing:2, textTransform:'uppercase', color:'#FFC947', background:'rgba(255,201,71,.12)', border:'1px solid rgba(255,201,71,.3)', borderRadius:20, padding:'2px 8px', flexShrink:0 }}>
+                          ★ Loyalty
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Hotels per city */}
+                    {cityGroups.map(({ city, hotels }) => (
+                      <div key={city}>
+                        {cityGroups.length > 1 && (
+                          <div style={{ padding:'6px 14px 0', fontFamily:"'Space Mono',monospace", fontSize:8, letterSpacing:2, textTransform:'uppercase', color:'rgba(255,255,255,.4)' }}>
+                            {city}
+                          </div>
+                        )}
+                        {hotels.map((h) => (
+                          <div key={h.name} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 14px', borderTop:'1px solid var(--border)' }}>
+                            {/* Stars square — fixed 36×36, stars wrap inside */}
+                            <div style={{ width:36, height:36, borderRadius:8, background:'rgba(255,201,71,.08)', border:'1px solid rgba(255,201,71,.25)', display:'flex', flexWrap:'wrap', alignItems:'center', justifyContent:'center', flexShrink:0, overflow:'hidden', padding:2 }}>
+                              {Array.from({ length: h.stars }).map((_, i) => (
+                                <span key={i} style={{ fontSize:9, lineHeight:1, color:'#FFC947' }}>★</span>
+                              ))}
+                            </div>
+                            <div style={{ flex:1, minWidth:0 }}>
+                              <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, fontWeight:700, color:'#fff', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', lineHeight:1.2 }}>
+                                {h.name}
+                              </div>
+                              <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, letterSpacing:1, textTransform:'uppercase', color:'rgba(255,255,255,.5)', marginTop:3 }}>
+                                {h.tier}
+                              </div>
+                            </div>
+                            <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:12, fontWeight:700, color:'#fff', flexShrink:0, textAlign:'right' }}>
+                              {h.price}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+
+                    {/* CTA button */}
+                    <div style={{ padding:'10px 14px', borderTop:'1px solid var(--border)' }}>
+                      <a href="/login" style={{ display:'block', textAlign:'center', fontFamily:"'Barlow Condensed',sans-serif", fontSize:11, fontWeight:700, letterSpacing:2, textTransform:'uppercase', padding:'8px', background:'var(--accent)', color:'var(--bg)', borderRadius:6, textDecoration:'none' }}>
+                        Sign In to Book →
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )
+          })()}
 
         </aside>
 
@@ -475,13 +531,13 @@ export default function GuestHomePage() {
                 <div key={sec.city}>
                   {/* City header */}
                   <div style={{ position:'sticky', top:0, zIndex:10, display:'flex', alignItems:'baseline', gap:12, padding:'12px 18px 10px', background:'var(--bg2)', borderBottom:'1px solid var(--border)' }}>
-                    <span style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:22, fontWeight:900, fontStyle:'italic', textTransform:'uppercase', color: si % 2 === 0 ? 'var(--accent)' : 'var(--hi)' }}>
+                    <span style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:22, fontWeight:900, fontStyle:'italic', textTransform:'uppercase', color:'#fff' }}>
                       {sec.city}
                     </span>
                     <span style={{ fontFamily:"'Space Mono',monospace", fontSize:9, letterSpacing:3, textTransform:'uppercase', opacity:.7 }}>
                       {sec.days.length} {sec.days.length === 1 ? 'day' : 'days'}
                     </span>
-                    <button onClick={() => addDay(si)} style={{ marginLeft:'auto', background:'none', border:'1px dashed var(--border2)', borderRadius:6, padding:'3px 10px', color:'#fff', fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, letterSpacing:2, textTransform:'uppercase', cursor:'pointer' }}>
+                    <button onClick={() => addDay(si)} style={{ marginLeft:'auto', background:'var(--accent)', border:'none', borderRadius:6, padding:'4px 12px', color:'var(--bg)', fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, fontWeight:700, letterSpacing:2, textTransform:'uppercase', cursor:'pointer' }}>
                       + Add Day
                     </button>
                   </div>
@@ -496,10 +552,10 @@ export default function GuestHomePage() {
                       {/* Day label row */}
                       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10 }}>
                         <div>
-                          <span style={{ fontFamily:"'Space Mono',monospace", fontSize:9, letterSpacing:2, color: si % 2 === 0 ? 'var(--accent)' : 'var(--hi)', textTransform:'uppercase' }}>
+                          <span style={{ fontFamily:"'Space Mono',monospace", fontSize:9, letterSpacing:2, color:'#fff', textTransform:'uppercase' }}>
                             Day {day.dayNumber}
                           </span>
-                          <span style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:12, opacity:.7, marginLeft:8 }}>
+                          <span style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:12, color:'rgba(255,255,255,.5)', marginLeft:8 }}>
                             {day.date}
                           </span>
                         </div>
@@ -543,7 +599,7 @@ export default function GuestHomePage() {
                         {/* Inline add button at end of chip row */}
                         {!(addingTo?.si === si && addingTo?.di === di) && (
                           <button onClick={() => { setAddingTo({ si, di }); setAddVal('') }}
-                            style={{ background:'transparent', border:'1px dashed var(--border2)', borderRadius:20, padding:'5px 12px', color:'rgba(255,255,255,.6)', fontFamily:"'Barlow Condensed',sans-serif", fontSize:11, letterSpacing:2, textTransform:'uppercase', cursor:'pointer' }}>
+                            style={{ background:'var(--accent)', border:'none', borderRadius:20, padding:'5px 12px', color:'var(--bg)', fontFamily:"'Barlow Condensed',sans-serif", fontSize:11, fontWeight:700, letterSpacing:2, textTransform:'uppercase', cursor:'pointer' }}>
                             + Add
                           </button>
                         )}
@@ -585,132 +641,6 @@ export default function GuestHomePage() {
             </div>
           )}
 
-          {/* ── HOTEL RECOMMENDATIONS ────────────────────────────────────── */}
-          {hotelSuggestions.length > 0 && (() => {
-            // Group by brand so each brand gets one full-width card with all cities
-            const byBrand: Record<string, { city: string; hotels: HotelSuggestion[] }[]> = {}
-            hotelSuggestions.forEach(({ brand, city, hotels }) => {
-              if (!byBrand[brand]) byBrand[brand] = []
-              byBrand[brand].push({ city, hotels })
-            })
-            return (
-              <div style={{ marginTop: 32 }}>
-                {/* Section header */}
-                <div className="section-head" style={{ marginBottom: 18 }}>
-                  <div className="section-line" />
-                  <span className="section-label">
-                    {hotelBrands.length > 0 ? 'Recommended Hotels' : 'Top Hotels For Your Trip'}
-                  </span>
-                  <div className="section-line" />
-                </div>
-
-                {hotelBrands.length === 0 && (
-                  <div style={{ textAlign:'center', marginBottom:16 }}>
-                    <a href="/" style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, letterSpacing:3, textTransform:'uppercase', color:'var(--accent)', textDecoration:'none', border:'1px solid rgba(64,224,208,.3)', borderRadius:20, padding:'4px 14px' }}>
-                      + Add Loyalty Programme ↗
-                    </a>
-                  </div>
-                )}
-
-                <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
-                  {Object.entries(byBrand).map(([brand, cityGroups]) => {
-                    const accent = BRAND_ACCENT[brand] || 'var(--accent)'
-                    return (
-                      <div key={brand} style={{ background:'var(--card)', border:`1px solid ${accent}44`, borderRadius:16, overflow:'hidden' }}>
-
-                        {/* Brand header row */}
-                        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 20px', background:`${accent}15`, borderBottom:`1px solid ${accent}33` }}>
-                          <div style={{ display:'flex', alignItems:'center', gap:14 }}>
-                            {/* Logo */}
-                            <div style={{ width:48, height:48, borderRadius:10, background:'#fff', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, overflow:'hidden', boxShadow:`0 0 0 1px ${accent}33` }}>
-                              <img
-                                src={BRAND_LOGOS[brand] || ''}
-                                alt={HOTEL_NAMES[brand]}
-                                style={{ width:38, height:38, objectFit:'contain' }}
-                                onError={e => {
-                                  (e.currentTarget as HTMLImageElement).style.display = 'none';
-                                  const fb = e.currentTarget.nextSibling as HTMLElement
-                                  if (fb) fb.style.display = 'flex'
-                                }}
-                              />
-                              <span style={{ display:'none', width:38, height:38, alignItems:'center', justifyContent:'center', fontFamily:"'Barlow Condensed',sans-serif", fontSize:13, fontWeight:900, color: accent, letterSpacing:1 }}>
-                                {BRAND_INITIALS[brand] || brand[0].toUpperCase()}
-                              </span>
-                            </div>
-                            <div>
-                              <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:20, fontWeight:900, letterSpacing:3, textTransform:'uppercase', color: accent, lineHeight:1 }}>
-                                {HOTEL_NAMES[brand]}
-                              </div>
-                              <div style={{ fontFamily:"'Space Mono',monospace", fontSize:9, letterSpacing:2, textTransform:'uppercase', color:'rgba(255,255,255,.5)', marginTop:3 }}>
-                                {cityGroups.length} {cityGroups.length === 1 ? 'city' : 'cities'} · {cityGroups.reduce((s, g) => s + g.hotels.length, 0)} properties
-                              </div>
-                            </div>
-                          </div>
-                          <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, letterSpacing:2, textTransform:'uppercase', color: accent, background:`${accent}20`, border:`1px solid ${accent}44`, borderRadius:20, padding:'4px 12px' }}>
-                            {hotelBrands.includes(brand) ? '★ Your Loyalty' : 'Recommended'}
-                          </div>
-                        </div>
-
-                        {/* Cities + hotels */}
-                        {cityGroups.map(({ city, hotels }, gi) => (
-                          <div key={city} style={{ borderBottom: gi < cityGroups.length - 1 ? `1px solid ${accent}22` : 'none' }}>
-                            {/* City sub-header */}
-                            <div style={{ display:'flex', alignItems:'center', gap:8, padding:'10px 20px 6px', background:'rgba(255,255,255,.02)' }}>
-                              <div style={{ width:6, height:6, borderRadius:'50%', background: accent, flexShrink:0 }} />
-                              <span style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:13, fontWeight:700, letterSpacing:3, textTransform:'uppercase', color:'rgba(255,255,255,.7)' }}>
-                                {city}
-                              </span>
-                            </div>
-
-                            {/* Hotel rows */}
-                            <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(240px, 1fr))', gap:1, padding:'0 0 0 0' }}>
-                              {hotels.map((h, hi) => (
-                                <div key={h.name} style={{ display:'flex', alignItems:'center', gap:12, padding:'12px 20px', borderTop:`1px solid var(--border)`, background: hi % 2 === 0 ? 'rgba(255,255,255,.015)' : 'transparent' }}>
-                                  {/* Stars badge */}
-                                  <div style={{ width:40, height:40, borderRadius:10, background:`${accent}18`, border:`1px solid ${accent}33`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, flexDirection:'column', gap:1 }}>
-                                    <span style={{ fontSize:10, lineHeight:1, color: accent }}>{'★'.repeat(Math.min(h.stars, 5))}</span>
-                                    <span style={{ fontFamily:"'Space Mono',monospace", fontSize:7, color:'rgba(255,255,255,.4)', letterSpacing:1 }}>{h.stars}★</span>
-                                  </div>
-                                  <div style={{ flex:1, minWidth:0 }}>
-                                    <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:14, fontWeight:700, lineHeight:1.2, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                                      {h.name}
-                                    </div>
-                                    <div style={{ marginTop:4 }}>
-                                      <span style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, letterSpacing:2, textTransform:'uppercase', color: accent, background:`${accent}18`, border:`1px solid ${accent}30`, borderRadius:20, padding:'2px 7px' }}>
-                                        {h.tier}
-                                      </span>
-                                    </div>
-                                  </div>
-                                  <div style={{ textAlign:'right', flexShrink:0 }}>
-                                    <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:14, fontWeight:700, letterSpacing:1, color:'#fff' }}>
-                                      {h.price}
-                                    </div>
-                                    <div style={{ fontFamily:"'Space Mono',monospace", fontSize:7, letterSpacing:1, color:'rgba(255,255,255,.35)', marginTop:2 }}>
-                                      per night
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        ))}
-
-                        {/* Footer */}
-                        <div style={{ padding:'10px 20px', background:'rgba(255,255,255,.02)', borderTop:`1px solid ${accent}22`, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-                          <span style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, letterSpacing:2, textTransform:'uppercase', color:'rgba(255,255,255,.35)' }}>
-                            Points eligible · Loyalty rates available
-                          </span>
-                          <a href="/login" style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, letterSpacing:2, textTransform:'uppercase', color: accent, textDecoration:'none' }}>
-                            Sign in to book →
-                          </a>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            )
-          })()}
         </main>
       </div>
       </div>
