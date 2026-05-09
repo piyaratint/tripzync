@@ -1,6 +1,13 @@
 import { signIn } from '@/lib/auth'
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ callbackUrl?: string }>
+}) {
+  const { callbackUrl } = await searchParams
+  const redirectTo = callbackUrl || '/dashboard'
+
   return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)' }}>
       <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24 }}>
@@ -13,10 +20,12 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <form action={async () => {
+        <form action={async (formData: FormData) => {
           'use server'
-          await signIn('google', { redirectTo: '/dashboard' })
+          const to = (formData.get('redirectTo') as string) || '/dashboard'
+          await signIn('google', { redirectTo: to })
         }}>
+          <input type="hidden" name="redirectTo" value={redirectTo} />
           <button type="submit" style={{ background: '#fff', color: '#111', border: 'none', borderRadius: 12, padding: '13px 28px', fontFamily: "'Barlow Condensed'", fontSize: 13, fontWeight: 700, letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10 }}>
             <svg width="18" height="18" viewBox="0 0 24 24">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>

@@ -288,7 +288,7 @@ export default function LandingPage() {
     if (typeof window !== 'undefined') {
       localStorage.setItem('tripzync_onboarding', JSON.stringify(data))
     }
-    window.location.href = action === 'signup' ? '/login' : '/plan'
+    window.location.href = action === 'signup' ? '/login?callbackUrl=%2Fhome' : '/plan'
   }
 
   const mapNextDisabled = selectedISOs.length === 0
