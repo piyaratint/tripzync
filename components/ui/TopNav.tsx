@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { signOut } from 'next-auth/react'
+import { googleSignOut } from '@/app/actions/auth'
 import { useEffect } from 'react'
 
 interface Props {
@@ -47,12 +47,11 @@ export function TopNav({ name, email, image }: Props) {
         >
           Settings
         </Link>
-        <button
-          className="top-nav-signout"
-          onClick={() => signOut({ callbackUrl: '/' })}
-        >
-          Sign out
-        </button>
+        <form action={googleSignOut} style={{ display: 'inline' }}>
+          <button type="submit" className="top-nav-signout">
+            Sign out
+          </button>
+        </form>
       </div>
     </nav>
   )
