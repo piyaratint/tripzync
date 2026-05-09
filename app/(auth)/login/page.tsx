@@ -1,4 +1,5 @@
 import { googleSignIn } from '@/app/actions/auth'
+import { TripZyncLogo } from '@/components/TripZyncLogo'
 
 export default function LoginPage() {
   return (
@@ -18,15 +19,8 @@ export default function LoginPage() {
       }}>
 
         <div>
-          <div style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontSize: 11,
-            letterSpacing: '.22em',
-            color: 'var(--muted)',
-            textTransform: 'uppercase',
-            marginBottom: 10,
-          }}>
-            TripZync®
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
+            <TripZyncLogo href="/" />
           </div>
           <div style={{
             fontFamily: "'Barlow Condensed', sans-serif",

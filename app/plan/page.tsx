@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { TripZyncLogo } from '@/components/TripZyncLogo'
 
 const todayStr = new Date().toISOString().split('T')[0]
 
@@ -66,7 +67,7 @@ export default function PlanPage() {
       <div className="ob-grid-bg" />
 
       <nav className="ob-nav">
-        <a href="/" className="ob-nav-logo" style={{ textDecoration: 'none' }}>TRIPZYNC</a>
+        <TripZyncLogo href="/" />
         <a href="/login" className="ob-nav-link">Sign in ↗</a>
       </nav>
 

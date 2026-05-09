@@ -1,3 +1,5 @@
+import { TripZyncLogo } from '@/components/TripZyncLogo'
+
 const SITE_LINKS = [
   {
     heading: 'Product',
@@ -33,7 +35,7 @@ export default function SiteFooter() {
       <div className="site-footer-inner">
         {/* Brand */}
         <div className="sf-brand">
-          <a href="/" className="sf-logo">TRIPZYNC</a>
+          <TripZyncLogo href="/" />
           <p className="sf-tagline">
             Your personal travel companion. Plan smarter, explore further, remember every moment.
           </p>

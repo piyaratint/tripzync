@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { TripZyncLogo } from '@/components/TripZyncLogo'
 
 // ── TYPES ────────────────────────────────────────────────────────────────────
 type Screen = 'hero' | 'mode-select' | 'map' | 'places' | 'hotels' | 'duration'
@@ -320,7 +321,7 @@ export default function LandingPage() {
       </div>
 
       <nav className="ob-nav">
-        <span className="ob-nav-logo">TRIPZYNC</span>
+        <TripZyncLogo href="/" />
         <a href="/plan" className="ob-nav-link">Already have a plan? Set up your trip ↗</a>
       </nav>
 
@@ -374,7 +375,7 @@ export default function LandingPage() {
       )}
 
       <nav className="ob-nav">
-        <span className="ob-nav-logo">TRIPZYNC</span>
+        <TripZyncLogo href="/" />
         <button className="ob-nav-link" style={{ background:'none', border:'none', cursor:'pointer' }} onClick={() => setScreen('hero')}>← Back</button>
       </nav>
 
@@ -429,7 +430,7 @@ export default function LandingPage() {
     <div className="ob-screen" style={{ justifyContent: 'flex-start' }}>
       <div className="ob-grid-bg" />
       <nav className="ob-nav">
-        <span className="ob-nav-logo">TRIPZYNC</span>
+        <TripZyncLogo href="/" />
         <a href="/plan" className="ob-nav-link">Already have a plan? Set up your trip ↗</a>
       </nav>
 
@@ -548,7 +549,7 @@ export default function LandingPage() {
       <div className="ob-screen" style={{ justifyContent: 'flex-start' }}>
         <div className="ob-grid-bg" />
         <nav className="ob-nav">
-          <span className="ob-nav-logo">TRIPZYNC</span>
+          <TripZyncLogo href="/" />
           <a href="/plan" className="ob-nav-link">Already have a plan? Set up your trip ↗</a>
         </nav>
 
@@ -644,7 +645,7 @@ export default function LandingPage() {
     <div className="ob-screen" style={{ justifyContent: 'flex-start' }}>
       <div className="ob-grid-bg" />
       <nav className="ob-nav">
-        <span className="ob-nav-logo">TRIPZYNC</span>
+        <TripZyncLogo href="/" />
         <a href="/plan" className="ob-nav-link">Already have a plan? Set up your trip ↗</a>
       </nav>
 
@@ -717,7 +718,7 @@ export default function LandingPage() {
       <div className="ob-screen" style={{ justifyContent:'flex-start' }}>
         <div className="ob-grid-bg" />
         <nav className="ob-nav">
-          <span className="ob-nav-logo">TRIPZYNC</span>
+          <TripZyncLogo href="/" />
         </nav>
 
         <div className="ob-screen-content">

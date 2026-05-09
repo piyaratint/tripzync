@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { saveTrip } from '@/app/actions/trips'
+import { TripZyncLogo } from '@/components/TripZyncLogo'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 interface OnboardingData {
@@ -966,7 +967,7 @@ export default function GuestHomePage() {
 
       {/* Nav */}
       <nav className="ob-nav">
-        <a href="/" className="ob-nav-logo" style={{ textDecoration: 'none' }}>TRIPZYNC</a>
+        <TripZyncLogo href="/" />
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
           {isLoggedIn ? (
             <>

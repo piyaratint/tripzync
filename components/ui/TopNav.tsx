@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { googleSignOut } from '@/app/actions/auth'
 import { useEffect } from 'react'
+import { TripZyncLogo } from '@/components/TripZyncLogo'
 
 interface Props {
   name?: string | null
@@ -22,14 +23,7 @@ export function TopNav({ name, email, image }: Props) {
 
   return (
     <nav className="top-nav">
-      <Link href="/dashboard" className="top-nav-logo">
-        <div className="eyebrow-dots">
-          <span />
-          <span className="r" />
-          <span />
-        </div>
-        <span className="eyebrow-text">TripZync® · {new Date().getFullYear()}</span>
-      </Link>
+      <TripZyncLogo href="/dashboard" />
 
       <div className="top-nav-user">
         {image ? (
