@@ -49,7 +49,7 @@ export function TopNav({ name, email, image }: Props) {
         </Link>
         <button
           className="top-nav-signout"
-          onClick={() => signOut({ callbackUrl: '/login' })}
+          onClick={() => signOut({ callbackUrl: '/' })}
         >
           Sign out
         </button>

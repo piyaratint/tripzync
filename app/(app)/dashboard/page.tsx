@@ -1,10 +1,11 @@
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { trips, tripMembers } from '@/lib/db/schema'
-import { eq, desc, inArray } from 'drizzle-orm'
+import { eq, desc, inArray, isNull, and } from 'drizzle-orm'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { fmtDate, daysBetween } from '@/lib/utils'
+import { TripCard } from './TripCard'
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -14,7 +15,7 @@ export default async function DashboardPage() {
   const ownedTrips = await db
     .select()
     .from(trips)
-    .where(eq(trips.userId, userId))
+    .where(and(eq(trips.userId, userId), isNull(trips.deletedAt)))
     .orderBy(desc(trips.createdAt))
 
   const memberships = await db
@@ -26,7 +27,10 @@ export default async function DashboardPage() {
     ? await db
         .select()
         .from(trips)
-        .where(inArray(trips.id, memberships.map(m => m.tripId)))
+        .where(and(
+          inArray(trips.id, memberships.map(m => m.tripId)),
+          isNull(trips.deletedAt),
+        ))
         .orderBy(desc(trips.createdAt))
     : []
 
@@ -55,7 +59,6 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      {/* Empty state */}
       {ownedTrips.length === 0 && (
         <div style={{ textAlign: 'center', padding: '48px 0', color: '#fff' }}>
           <div style={{ fontSize: 36, marginBottom: 12, opacity: .4 }}>🌸</div>
@@ -83,41 +86,5 @@ export default async function DashboardPage() {
         </>
       )}
     </div>
-  )
-}
-
-function TripCard({ trip, shared }: { trip: { id: string; title1: string; title2: string; destination: string; startDate: string; endDate: string }; shared?: boolean }) {
-  return (
-    <Link href={`/trips/${trip.id}`} style={{ textDecoration: 'none' }}>
-      <div style={{ background: 'rgba(255,255,255,.03)', border: `1px solid ${shared ? 'rgba(168,85,247,.25)' : 'var(--border)'}`, borderRadius: 18, padding: 20, minHeight: 160, display: 'flex', flexDirection: 'column', gap: 8, cursor: 'pointer', transition: 'border-color .2s', position: 'relative', overflow: 'hidden' }}>
-        {shared && (
-          <span style={{ position: 'absolute', top: 10, right: 12, fontSize: 9, fontFamily: "'Barlow Condensed'", letterSpacing: '.12em', textTransform: 'uppercase', color: 'rgba(168,85,247,.7)', background: 'rgba(168,85,247,.1)', border: '1px solid rgba(168,85,247,.2)', borderRadius: 20, padding: '2px 8px' }}>Shared</span>
-        )}
-        <div style={{ position: 'absolute', top: 12, right: 16, fontSize: 36, opacity: .07 }}>🌸</div>
-        <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 8, letterSpacing: '.18em', color: 'var(--sakura)', textTransform: 'uppercase' }}>
-          {trip.destination}
-        </div>
-        <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 28, fontWeight: 900, fontStyle: 'italic', textTransform: 'uppercase', lineHeight: 1, color: '#fff' }}>
-          {trip.title1}
-        </div>
-        <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 22, fontWeight: 700, fontStyle: 'italic', textTransform: 'uppercase', lineHeight: 1, color: 'var(--red)' }}>
-          {trip.title2}
-        </div>
-        <div style={{ marginTop: 'auto', display: 'flex', gap: 12 }}>
-          <div>
-            <div className="meta-label">Dates</div>
-            <div className="meta-val" style={{ fontSize: 10 }}>
-              {fmtDate(new Date(trip.startDate + 'T00:00:00'))} – {fmtDate(new Date(trip.endDate + 'T00:00:00'))}
-            </div>
-          </div>
-          <div>
-            <div className="meta-label">Duration</div>
-            <div className="meta-val" style={{ fontSize: 10 }}>
-              {daysBetween(trip.startDate, trip.endDate)} days
-            </div>
-          </div>
-        </div>
-      </div>
-    </Link>
   )
 }
