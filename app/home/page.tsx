@@ -29,6 +29,71 @@ const HOTEL_NAMES: Record<string,string> = {
 }
 
 interface HotelSuggestion { name: string; tier: string; price: string; stars: number }
+
+// ── Hotel photo lookup ────────────────────────────────────────────────────────
+// Specific Unsplash photo IDs for well-known hotels
+const HOTEL_PHOTO_MAP: Record<string, string> = {
+  // Tokyo
+  'JW Marriott Hotel Tokyo':            '1542314831-068cd1dbfeeb',
+  'The Ritz-Carlton Tokyo':             '1551882547-ff40c63fe2fa',
+  'Sheraton Grande Tokyo Bay':          '1564501049412-61c2a3083791',
+  // Kyoto
+  'JW Marriott Nijo Castle Kyoto':      '1528360983277-13d401cdc186',
+  'Kyoto Marriott Hotel':               '1580977276076-d29f0fba0be1',
+  // Osaka
+  'W Osaka':                            '1578683010236-d716f9a3f461',
+  // Bangkok
+  'JW Marriott Bangkok':                '1506665531195-3566af2b4dfa',
+  'W Bangkok':                          '1520250497591-112f2f40a3f4',
+  // Bali
+  'The St. Regis Bali Resort':          '1582719508461-905c673771fd',
+  'W Bali – Seminyak':                  '1540541338537-1ba7b176f2a7',
+  // Singapore
+  'W Singapore – Sentosa Cove':         '1596436889106-be35e843f974',
+  'JW Marriott Singapore South Beach':  '1611892440504-42a792e24d32',
+  // Dubai
+  'JW Marriott Marquis Dubai':          '1519449556851-79ab8f644e99',
+  'W Dubai – The Palm':                 '1586611292717-f828b167408c',
+  // Paris
+  'Le Meurice (Dorchester)':            '1499856871958-5b9357976b82',
+  'W Paris – Opéra':                    '1509439581779-6298f75bfd75',
+  // London
+  'W London':                           '1445019980597-93fa8acb246c',
+  'Sheraton Grand London Park Lane':    '1495365222973-f1478e0e01d3',
+  // Rome
+  'The St. Regis Rome':                 '1531572753322-ad063cecc140',
+  // New York
+  'The St. Regis New York':             '1560448204-603b3fc33ddc',
+  'W New York – Times Square':          '1590490360182-c33d57733427',
+  // Maldives
+  'St. Regis Maldives Vommuli Resort':  '1573843981267-be1480dfd2ab',
+  'W Maldives':                         '1540202404-d0f8d64e4c6e',
+  // Seoul
+  'JW Marriott Seoul':                  '1541417904-0a30ae1e9bb6',
+  // Sydney
+  'W Sydney':                           '1523482580672-f109ba8cb9be',
+  // Istanbul
+  'W Istanbul':                         '1524231757912-21f4fe3a7200',
+}
+
+// Tier-based photo pools (used when no specific photo exists)
+const TIER_PHOTOS: Record<string, string[]> = {
+  'Luxury':  ['1551882547-ff40c63fe2fa','1564501049412-61c2a3083791','1531572753322-ad063cecc140','1611892440504-42a792e24d32'],
+  'W Hotels':['1578683010236-d716f9a3f461','1520250497591-112f2f40a3f4','1596436889106-be35e843f974','1586611292717-f828b167408c'],
+  'Premium': ['1506665531195-3566af2b4dfa','1528360983277-13d401cdc186','1509439581779-6298f75bfd75','1499856871958-5b9357976b82'],
+  'Classic': ['1445019980597-93fa8acb246c','1495365222973-f1478e0e01d3','1542314831-068cd1dbfeeb','1580977276076-d29f0fba0be1'],
+  'Select':  ['1590490360182-c33d57733427','1631049307264-da0ec9d70304','1615460549969-36e36b518bc8','1540541338537-1ba7b176f2a7'],
+}
+
+function getHotelPhoto(name: string, tier: string): string {
+  if (HOTEL_PHOTO_MAP[name]) {
+    return `https://images.unsplash.com/photo-${HOTEL_PHOTO_MAP[name]}?auto=format&fit=crop&w=600&h=300&q=80`
+  }
+  // Deterministic pick from tier pool using name length as seed
+  const pool = TIER_PHOTOS[tier] ?? TIER_PHOTOS['Classic']
+  const id = pool[name.length % pool.length]
+  return `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=600&h=300&q=80`
+}
 type HotelDB = Record<string, Record<string, HotelSuggestion[]>>
 
 const HOTEL_DB: HotelDB = {
@@ -910,17 +975,26 @@ export default function GuestHomePage() {
                         📍 {city}
                       </div>
                       {hotels.map(h => (
-                        <div key={h.name} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 14px', borderTop:'1px solid var(--border)' }}>
-                          <div style={{ width:36, height:36, borderRadius:8, background:'rgba(255,201,71,.08)', border:'1px solid rgba(255,201,71,.25)', display:'flex', flexWrap:'wrap', alignItems:'center', justifyContent:'center', flexShrink:0, overflow:'hidden', padding:2 }}>
-                            {Array.from({ length: h.stars }).map((_, i) => (
-                              <span key={i} style={{ fontSize:9, lineHeight:1, color:'#FFC947' }}>★</span>
-                            ))}
+                        <div key={h.name} style={{ borderTop:'1px solid var(--border)' }}>
+                          <div style={{ position:'relative', width:'100%', height:100, overflow:'hidden' }}>
+                            <img
+                              src={getHotelPhoto(h.name, h.tier)}
+                              alt={h.name}
+                              style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}
+                              onError={e => { (e.currentTarget as HTMLImageElement).style.display='none' }}
+                            />
+                            <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(7,8,15,.85) 0%, transparent 60%)' }} />
+                            <div style={{ position:'absolute', bottom:6, right:8, color:'#FFC947', fontSize:9, letterSpacing:1 }}>
+                              {'★'.repeat(h.stars)}
+                            </div>
                           </div>
-                          <div style={{ flex:1, minWidth:0 }}>
-                            <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, fontWeight:700, color:'#fff', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', lineHeight:1.2 }}>{h.name}</div>
-                            <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, letterSpacing:1, textTransform:'uppercase', color:'rgba(255,255,255,.5)', marginTop:3 }}>{h.tier}</div>
+                          <div style={{ display:'flex', alignItems:'center', gap:10, padding:'8px 14px' }}>
+                            <div style={{ flex:1, minWidth:0 }}>
+                              <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, fontWeight:700, color:'#fff', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', lineHeight:1.2 }}>{h.name}</div>
+                              <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, letterSpacing:1, textTransform:'uppercase', color:'rgba(255,255,255,.5)', marginTop:2 }}>{h.tier}</div>
+                            </div>
+                            <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:12, fontWeight:700, color:'#fff', flexShrink:0 }}>{h.price}</div>
                           </div>
-                          <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:12, fontWeight:700, color:'#fff', flexShrink:0 }}>{h.price}</div>
                         </div>
                       ))}
                     </div>
@@ -928,7 +1002,7 @@ export default function GuestHomePage() {
                 </div>
               )
             }
-            // Loyalty brand hotels (keep existing render but use rawHotelSuggestions)
+            // Loyalty brand hotels
             const byBrand: Record<string, { city: string; hotels: HotelSuggestion[] }[]> = {}
             rawHotelSuggestions.forEach(({ brand, city, hotels }) => {
               if (!byBrand[brand]) byBrand[brand] = []
@@ -966,17 +1040,26 @@ export default function GuestHomePage() {
                           <div style={{ padding:'6px 14px 0', fontFamily:"'Space Mono',monospace", fontSize:8, letterSpacing:2, textTransform:'uppercase', color:'rgba(255,255,255,.4)' }}>{city}</div>
                         )}
                         {hotels.map(h => (
-                          <div key={h.name} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 14px', borderTop:'1px solid var(--border)' }}>
-                            <div style={{ width:36, height:36, borderRadius:8, background:'rgba(255,201,71,.08)', border:'1px solid rgba(255,201,71,.25)', display:'flex', flexWrap:'wrap', alignItems:'center', justifyContent:'center', flexShrink:0, overflow:'hidden', padding:2 }}>
-                              {Array.from({ length: h.stars }).map((_, i) => (
-                                <span key={i} style={{ fontSize:9, lineHeight:1, color:'#FFC947' }}>★</span>
-                              ))}
+                          <div key={h.name} style={{ borderTop:'1px solid var(--border)' }}>
+                            <div style={{ position:'relative', width:'100%', height:100, overflow:'hidden' }}>
+                              <img
+                                src={getHotelPhoto(h.name, h.tier)}
+                                alt={h.name}
+                                style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}
+                                onError={e => { (e.currentTarget as HTMLImageElement).style.display='none' }}
+                              />
+                              <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(7,8,15,.85) 0%, transparent 60%)' }} />
+                              <div style={{ position:'absolute', bottom:6, right:8, color:'#FFC947', fontSize:9, letterSpacing:1 }}>
+                                {'★'.repeat(h.stars)}
+                              </div>
                             </div>
-                            <div style={{ flex:1, minWidth:0 }}>
-                              <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, fontWeight:700, color:'#fff', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', lineHeight:1.2 }}>{h.name}</div>
-                              <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, letterSpacing:1, textTransform:'uppercase', color:'rgba(255,255,255,.5)', marginTop:3 }}>{h.tier}</div>
+                            <div style={{ display:'flex', alignItems:'center', gap:10, padding:'8px 14px' }}>
+                              <div style={{ flex:1, minWidth:0 }}>
+                                <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, fontWeight:700, color:'#fff', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', lineHeight:1.2 }}>{h.name}</div>
+                                <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, letterSpacing:1, textTransform:'uppercase', color:'rgba(255,255,255,.5)', marginTop:2 }}>{h.tier}</div>
+                              </div>
+                              <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:12, fontWeight:700, color:'#fff', flexShrink:0 }}>{h.price}</div>
                             </div>
-                            <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:12, fontWeight:700, color:'#fff', flexShrink:0 }}>{h.price}</div>
                           </div>
                         ))}
                       </div>
