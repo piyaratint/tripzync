@@ -161,6 +161,59 @@ export const flightsRelations = relations(flights, ({ one }) => ({
   trip: one(trips, { fields: [flights.tripId], references: [trips.id] }),
 }))
 
+// ─── HOTEL PHOTOS CACHE ──────────────────────────────────────────────────────
+// Caches Google Places photo URLs per hotel name+city.
+// TTL: 30 days (photos rarely change but aren't permanent like coords).
+export const hotelPhotos = pgTable('hotel_photos', {
+  nameKey:  text('name_key').primaryKey(),  // "{hotelName}|{city}" lowercased
+  name:     text('name').notNull(),
+  city:     text('city').notNull(),
+  photoUrl: text('photo_url').notNull(),    // full Google Places photo URL
+  placeId:  text('place_id'),
+  cachedAt: timestamp('cached_at').defaultNow().notNull(),
+})
+
+export type HotelPhoto    = typeof hotelPhotos.$inferSelect
+export type NewHotelPhoto = typeof hotelPhotos.$inferInsert
+
+// ─── PLACE COORDINATES CACHE ─────────────────────────────────────────────────
+// Permanently caches lat/lng per place name. Coordinates don't change,
+// so there is no TTL — once cached, always served from DB.
+export const placeCoords = pgTable('place_coords', {
+  nameKey:  text('name_key').primaryKey(),   // lowercased place name — lookup key
+  name:     text('name').notNull(),          // original display name
+  lat:      numeric('lat', { precision: 10, scale: 7 }).notNull(),
+  lng:      numeric('lng', { precision: 10, scale: 7 }).notNull(),
+  placeId:  text('place_id'),               // Google Place ID (for reference)
+  cachedAt: timestamp('cached_at').defaultNow().notNull(),
+})
+
+export type PlaceCoord    = typeof placeCoords.$inferSelect
+export type NewPlaceCoord = typeof placeCoords.$inferInsert
+
+// ─── POPULAR PLACES CACHE ────────────────────────────────────────────────────
+// Stores Google Places API results per city.
+// Rows are refreshed when updatedAt is older than 7 days (on-demand expiration).
+export const popularPlaces = pgTable('popular_places', {
+  id:       uuid('id').primaryKey().defaultRandom(),
+  city:     text('city').notNull(),          // normalised lowercase, e.g. "tokyo"
+  placeId:  text('place_id').notNull(),      // Google Place ID (stable identifier)
+  name:     text('name').notNull(),          // display name
+  rating:   numeric('rating', { precision: 3, scale: 1 }),
+  lat:      numeric('lat',    { precision: 10, scale: 7 }),
+  lng:      numeric('lng',    { precision: 10, scale: 7 }),
+  photoRef: text('photo_ref'),               // resource name: "places/{id}/photos/{ref}"
+  type:     text('type'),                    // primary category label
+  rank:     integer('rank').notNull(),       // 1–10 ordering from Google
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, t => ({
+  cityIdx:      index('popular_places_city_idx').on(t.city),
+  cityPlaceUnq: index('popular_places_city_place_idx').on(t.city, t.placeId),
+}))
+
+export type PopularPlace    = typeof popularPlaces.$inferSelect
+export type NewPopularPlace = typeof popularPlaces.$inferInsert
+
 // ─── TYPE EXPORTS ─────────────────────────────────────────────────────────────
 export type User     = typeof users.$inferSelect
 export type Trip     = typeof trips.$inferSelect

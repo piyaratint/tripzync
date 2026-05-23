@@ -30,7 +30,7 @@ const HOTEL_NAMES: Record<string,string> = {
   hyatt:'World of Hyatt', accor:'Accor ALL', none:'No membership',
 }
 
-interface HotelSuggestion { name: string; tier: string; price: string; stars: number }
+interface HotelSuggestion { name: string; tier: string; price: string; stars: number; travelMins?: number }
 
 // ── Hotel photo lookup ────────────────────────────────────────────────────────
 // Specific Unsplash photo IDs for well-known hotels
@@ -230,7 +230,7 @@ const HOTEL_DB: HotelDB = {
     Sydney:             [{ name:'Park Hyatt Sydney',                    tier:'Park Hyatt',price:'$560+/n', stars:5 },{ name:'Hyatt Regency Sydney',               tier:'Regency',   price:'$300+/n', stars:5 },{ name:'Hyatt Centric Sydney',               tier:'Centric',   price:'$200+/n', stars:4 }],
     // ── Americas ─────────────────────────────────────────────────────────────
     'New York':         [{ name:'Park Hyatt New York',                  tier:'Park Hyatt',price:'$740+/n', stars:5 },{ name:'Grand Hyatt New York',               tier:'Grand Hyatt',price:'$280+/n',stars:4 },{ name:'Andaz 5th Avenue',                   tier:'Andaz',     price:'$420+/n', stars:5 }],
-    'Los Angeles':      [{ name:'Andaz West Hollywood',                 tier:'Andaz',     price:'$300+/n', stars:4 },{ name:'Hyatt Regency Los Angeles International Airport', tier:'Regency', price:'$180+/n', stars:4 },{ name:'Grand Hyatt LAX',                  tier:'Grand Hyatt',price:'$200+/n',stars:4 }],
+    'Los Angeles':      [{ name:'Andaz West Hollywood',                 tier:'Andaz',     price:'$300+/n', stars:4 },{ name:'Hyatt Regency Los Angeles International Airport', tier:'Regency', price:'$180+/n', stars:4 },{ name:'Hyatt Centric Hollywood Los Angeles', tier:'Centric',   price:'$200+/n', stars:4 }],
     Miami:              [{ name:'Andaz Miami Beach',                    tier:'Andaz',     price:'$280+/n', stars:4 },{ name:'Hyatt Regency Miami',                tier:'Regency',   price:'$200+/n', stars:4 },{ name:'Hyatt Centric Midtown Miami',        tier:'Centric',   price:'$160+/n', stars:4 }],
     Chicago:            [{ name:'Hyatt Regency Chicago',                tier:'Regency',   price:'$220+/n', stars:4 },{ name:'Grand Hyatt Chicago',                tier:'Grand Hyatt',price:'$260+/n',stars:4 },{ name:'Andaz Scottsdale Resort (AZ)',        tier:'Andaz',     price:'$200+/n', stars:4 }],
   },
@@ -460,10 +460,33 @@ const PLACE_COORDS: Record<string, [number, number]> = {
   'Times Square':[40.7580,-73.9855], 'Brooklyn Bridge':[40.7061,-73.9969],
   'Empire State Building':[40.7484,-73.9967], 'Metropolitan Museum':[40.7794,-73.9632],
   'High Line':[40.7480,-74.0048],
+  'Top of The Rock':[40.7593,-73.9787], 'Top of the Rock':[40.7593,-73.9787],
+  'One World Trade Center':[40.7127,-74.0134], 'One World Observatory':[40.7127,-74.0134],
+  'The Battery':[40.7034,-74.0170], 'Battery Park':[40.7034,-74.0170],
+  'The Channel Gardens':[40.7580,-73.9782], 'Rockefeller Center':[40.7587,-73.9787],
+  'Door to Nowhere':[40.7580,-73.9855], 'Berlin Wall NYC':[40.7549,-73.9840],
+  'Chrysler Building':[40.7516,-73.9755], 'Grand Central Terminal':[40.7527,-73.9772],
+  'Fifth Avenue':[40.7549,-73.9840], 'Wall Street':[40.7069,-74.0089],
+  'DUMBO':[40.7033,-73.9894], 'Coney Island':[40.5749,-73.9859],
+  'The Vessel':[40.7536,-74.0019], 'Hudson Yards':[40.7536,-74.0019],
+  'Whitney Museum':[40.7396,-74.0089], 'MoMA':[40.7614,-73.9776],
+  'Yankee Stadium':[40.8296,-73.9262], 'Flushing Meadows':[40.7282,-73.8456],
   // Los Angeles
   'Hollywood Sign':[34.1341,-118.3215], 'Santa Monica Pier':[34.0100,-118.4961],
   'Venice Beach':[33.9850,-118.4695], 'Griffith Observatory':[34.1184,-118.3004],
-  'Getty Center':[34.0780,-118.4741],
+  'Getty Center':[34.0780,-118.4741], 'The Getty Museum':[34.0780,-118.4741], 'The Getty':[34.0780,-118.4741],
+  'Universal Studios Hollywood':[34.1381,-118.3534], 'Beverly Hills':[34.0736,-118.4004],
+  'LACMA':[34.0639,-118.3592], 'Hollywood Walk of Fame':[34.1016,-118.3267],
+  'Rodeo Drive':[34.0672,-118.3997], 'Sunset Strip':[34.0900,-118.3850],
+  'The Grove LA':[34.0720,-118.3559], 'Disneyland':[33.8121,-117.9190],
+  'Hollywood Bowl':[34.1122,-118.3390], 'Mulholland Drive':[34.1219,-118.4057],
+  'Malibu Beach':[34.0259,-118.7798], 'Runyon Canyon':[34.1070,-118.3539],
+  'Dodger Stadium':[34.0739,-118.2400], 'Little Tokyo LA':[34.0489,-118.2390],
+  'Warner Bros. Studio Tour Hollywood':[34.1488,-118.3388], 'Hollyhock House':[34.1022,-118.2890],
+  'Walt Disney Concert Hall':[34.0553,-118.2496], 'The Broad':[34.0544,-118.2504],
+  'Grand Central Market':[34.0509,-118.2490], 'Olvera Street':[34.0580,-118.2376],
+  'The Last Bookstore':[34.0493,-118.2487], 'Crypto.com Arena':[34.0430,-118.2673],
+  'SoFi Stadium':[33.9535,-118.3392], 'Exposition Park':[34.0146,-118.2884],
   // Miami
   'South Beach Miami':[25.7825,-80.1300], 'Art Deco District Miami':[25.7776,-80.1311],
   'Wynwood Walls':[25.8009,-80.1996],
@@ -514,6 +537,16 @@ const BRAND_LOGOS: Record<string, string> = {
 const BRAND_INITIALS: Record<string, string> = {
   marriott:'M', hilton:'H', ihg:'IHG', hyatt:'Hy', accor:'A',
 }
+const isAirportHotel = (name: string) => /airport|aerocity|aeroport/i.test(name)
+
+function rankHotels(hotels: HotelSuggestion[]): HotelSuggestion[] {
+  // City-center hotels first; skip airport hotels when there are 2+ alternatives
+  const city = hotels.filter(h => !isAirportHotel(h.name))
+  const airport = hotels.filter(h => isAirportHotel(h.name))
+  if (city.length >= 2) return city.slice(0, 3)
+  return [...city, ...airport].slice(0, 3)
+}
+
 function getHotelSuggestions(brands: string[], cities: string[]): { brand: string; city: string; hotels: HotelSuggestion[] }[] {
   const results: { brand: string; city: string; hotels: HotelSuggestion[] }[] = []
   const seen = new Set<string>()
@@ -524,23 +557,29 @@ function getHotelSuggestions(brands: string[], cities: string[]): { brand: strin
 
     for (const rawCity of cities) {
       if (!rawCity) continue
+      const normalise = (s: string) => s.toLowerCase().split(',')[0].trim()
+      const nc = normalise(rawCity)
+
       // Try exact match first, then fuzzy (handles "Chiang Mai, Thailand" → "Chiang Mai")
       const exact = db[rawCity]
       if (exact?.length) {
         const key2 = `${brand}::${rawCity}`
-        if (!seen.has(key2)) { seen.add(key2); results.push({ brand, city: rawCity, hotels: exact.slice(0, 3) }) }
+        if (!seen.has(key2)) { seen.add(key2); results.push({ brand, city: rawCity, hotels: rankHotels(exact) }) }
         continue
       }
-      // Fuzzy: normalise by stripping commas/country suffix and comparing
-      const normalise = (s: string) => s.toLowerCase().split(',')[0].trim()
-      const nc = normalise(rawCity)
+
+      // Fuzzy: require meaningful overlap (both strings ≥ 4 chars, full-word match preferred)
       const dbKey = Object.keys(db).find(k => {
         const nk = normalise(k)
-        return nk === nc || nk.includes(nc) || nc.includes(nk)
+        if (nk === nc) return true
+        // Only match if the shared part is substantial (≥ 4 chars) to avoid "la" matching "bali"
+        if (nc.length >= 4 && nk.includes(nc)) return true
+        if (nk.length >= 4 && nc.includes(nk)) return true
+        return false
       })
       if (dbKey) {
         const key2 = `${brand}::${dbKey}`
-        if (!seen.has(key2)) { seen.add(key2); results.push({ brand, city: dbKey, hotels: db[dbKey].slice(0, 3) }) }
+        if (!seen.has(key2)) { seen.add(key2); results.push({ brand, city: dbKey, hotels: rankHotels(db[dbKey]) }) }
       }
     }
   }
@@ -558,7 +597,7 @@ function getBudgetHotels(cities: string[]): { city: string; hotels: HotelSuggest
         const nk = normalise(k)
         return nk === nc || nk.includes(nc) || nc.includes(nk)
       })
-      if (dbKey) found.push(...db[dbKey].filter(h => h.stars <= 3).slice(0, 1))
+      if (dbKey) found.push(...rankHotels(db[dbKey].filter(h => h.stars <= 3)).slice(0, 1))
     }
     return found.length ? [{ city: rawCity, hotels: found.slice(0, 3) }] : []
   })
@@ -645,71 +684,258 @@ function buildItinerary(data: OnboardingData): CitySection[] {
   return sections
 }
 
-// ── MapView — Leaflet pins via CDN ────────────────────────────────────────────
-function MapView({ placesByCity }: { placesByCity: Record<string, string[]> }) {
+// ── MapView — Google Maps with red pins + per-brand hotel logo pins ───────────
+function MapView({ placesByCity, photoMap, hotels, brandVisibility }: {
+  placesByCity: Record<string, string[]>
+  photoMap: Record<string, string>
+  hotels: { name: string; city: string; brand: string }[]
+  brandVisibility: Record<string, boolean>
+}) {
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstance = useRef<any>(null)
-  const stableKey = Object.values(placesByCity).flat().join(',')
+  const markersRef = useRef<any[]>([])
+  const brandMarkersRef = useRef<Record<string, any[]>>({})
+  const stableKey = Object.values(placesByCity).flat().join(',') + Object.keys(photoMap).length + hotels.map(h => h.name).join(',')
 
   useEffect(() => {
-    if (!mapRef.current || mapInstance.current) return
+    if (!mapRef.current) return
 
-    const pins: { name: string; coords: [number, number]; city: string }[] = []
+    // Build place list for lookup
+    const allPlaces: { name: string; city: string }[] = []
     for (const [city, places] of Object.entries(placesByCity)) {
-      const cityCenter: [number, number] = CITY_COORDS[city] || [0, 0]
-      for (const place of places) {
-        pins.push({ name: place, coords: (PLACE_COORDS[place] || cityCenter) as [number, number], city })
-      }
+      for (const name of places) allPlaces.push({ name, city })
     }
-    if (!pins.length) return
+    if (!allPlaces.length) return
 
-    const avgLat = pins.reduce((s, p) => s + p.coords[0], 0) / pins.length
-    const avgLng = pins.reduce((s, p) => s + p.coords[1], 0) / pins.length
-
-    if (!document.getElementById('leaflet-css')) {
-      const link = document.createElement('link')
-      link.id = 'leaflet-css'; link.rel = 'stylesheet'
-      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'
-      document.head.appendChild(link)
-    }
-
-    function initMap(L: any) {
-      if (!mapRef.current || mapInstance.current) return
-      const map = L.map(mapRef.current, { zoomControl: true }).setView([avgLat, avgLng], 12)
-      mapInstance.current = map
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-      }).addTo(map)
-
-      const icon = L.divIcon({
-        html: `<div style="width:14px;height:14px;background:#40E0D0;border-radius:50%;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.6)"></div>`,
-        className: '', iconSize: [14, 14], iconAnchor: [7, 7],
+    // Fetch coords dynamically — DB cache first, Google fallback
+    fetch('/api/place-coords', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ places: allPlaces }),
+    })
+      .then(r => r.json())
+      .then(({ coords }: { coords: Record<string, { lat: number; lng: number }> }) => {
+        const pins: { name: string; coords: [number, number]; city: string }[] = []
+        for (const [city, places] of Object.entries(placesByCity)) {
+          const cityCenter: [number, number] = CITY_COORDS[city] || [0, 0]
+          for (const name of places) {
+            const c = coords[name]
+            pins.push({ name, coords: c ? [c.lat, c.lng] : cityCenter, city })
+          }
+        }
+        if (pins.length) renderMap(pins)
       })
+      .catch(() => {
+        // Fallback to static coords if API fails
+        const pins: { name: string; coords: [number, number]; city: string }[] = []
+        for (const [city, places] of Object.entries(placesByCity)) {
+          const cityCenter: [number, number] = CITY_COORDS[city] || [0, 0]
+          for (const name of places) {
+            pins.push({ name, coords: (PLACE_COORDS[name] || cityCenter) as [number, number], city })
+          }
+        }
+        if (pins.length) renderMap(pins)
+      })
+
+    function renderMap(pins: { name: string; coords: [number, number]; city: string }[]) {
+
+    function initMap(google: any) {
+      if (!mapRef.current) return
+
+      // Clear old markers
+      markersRef.current.forEach(m => m.setMap(null))
+      markersRef.current = []
+      Object.values(brandMarkersRef.current).flat().forEach((m: any) => m.setMap(null))
+      brandMarkersRef.current = {}
+
+      const avgLat = pins.reduce((s, p) => s + p.coords[0], 0) / pins.length
+      const avgLng = pins.reduce((s, p) => s + p.coords[1], 0) / pins.length
+
+      // Strip InfoWindow default chrome
+      if (!document.getElementById('gm-iw-style')) {
+        const s = document.createElement('style')
+        s.id = 'gm-iw-style'
+        s.textContent = `.gm-style-iw{padding:0!important;box-shadow:0 2px 12px rgba(0,0,0,.18)!important;border-radius:8px!important}.gm-style-iw-d{overflow:hidden!important;padding:0!important}.gm-style-iw-ch{display:none!important}.gm-ui-hover-effect{display:none!important}.gm-style-iw-tc::after{display:none!important}`
+        document.head.appendChild(s)
+      }
+
+      if (!mapInstance.current) {
+        mapInstance.current = new google.maps.Map(mapRef.current, {
+          center: { lat: avgLat, lng: avgLng },
+          zoom: 12,
+          disableDefaultUI: false,
+          zoomControl: true,
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: false,
+        })
+      } else {
+        mapInstance.current.setCenter({ lat: avgLat, lng: avgLng })
+      }
+
+      const hoverWindow = new google.maps.InfoWindow({ disableAutoPan: true })
+
+      // Draw Google Maps-style pin on canvas: red teardrop + dark red inner circle
+      const pinCanvas = document.createElement('canvas')
+      const W = 28, H = 40
+      pinCanvas.width = W; pinCanvas.height = H
+      const pc = pinCanvas.getContext('2d')!
+      const cx = W / 2, r = W / 2 - 1.5
+
+      pc.beginPath()
+      pc.arc(cx, r + 2, r, Math.PI, 0)
+      pc.bezierCurveTo(cx + r, r + 2 + r * 0.75, cx + 2.5, H - 4, cx, H - 1)
+      pc.bezierCurveTo(cx - 2.5, H - 4, cx - r, r + 2 + r * 0.75, cx - r, r + 2)
+      pc.closePath()
+      pc.fillStyle = '#E53935'
+      pc.fill()
+      pc.strokeStyle = '#fff'
+      pc.lineWidth = 1.5
+      pc.stroke()
+
+      // Dark red inner circle
+      pc.beginPath()
+      pc.arc(cx, r + 2, r * 0.44, 0, Math.PI * 2)
+      pc.fillStyle = '#9B1515'
+      pc.fill()
+
+      const pinIconUrl = pinCanvas.toDataURL()
 
       pins.forEach(pin => {
-        L.marker(pin.coords, { icon }).addTo(map)
-          .bindPopup(`<strong style="font-size:13px">${pin.name}</strong><br><span style="color:#888;font-size:11px">📍 ${pin.city}</span>`)
+        const marker = new google.maps.Marker({
+          position: { lat: pin.coords[0], lng: pin.coords[1] },
+          map: mapInstance.current,
+          title: pin.name,
+          icon: {
+            url: pinIconUrl,
+            scaledSize: new google.maps.Size(W, H),
+            anchor: new google.maps.Point(cx, H - 1),
+          },
+        })
+        marker.addListener('mouseover', () => {
+          const img = photoMap[pin.name]
+          const content = `
+            <div style="background:#fff;border-radius:8px;overflow:hidden;width:160px">
+              ${img ? `<img src="${img}" alt="" style="width:160px;height:100px;object-fit:cover;object-position:center 30%;display:block" />` : ''}
+              <div style="padding:6px 8px;font-size:12px;font-weight:700;color:#111">${pin.name}</div>
+            </div>`
+          hoverWindow.setContent(content)
+          hoverWindow.open(mapInstance.current, marker)
+        })
+        marker.addListener('mouseout', () => hoverWindow.close())
+        markersRef.current.push(marker)
       })
 
+      // Hotel markers — per brand, using brand logo icons
+      if (hotels.length > 0) {
+        const brandGroups: Record<string, typeof hotels> = {}
+        hotels.forEach(h => {
+          if (!brandGroups[h.brand]) brandGroups[h.brand] = []
+          brandGroups[h.brand].push(h)
+        })
+
+        function makeBrandIcon(brand: string): Promise<string> {
+          return new Promise(resolve => {
+            const S = 40
+            const cv = document.createElement('canvas')
+            cv.width = S; cv.height = S
+            const ctx = cv.getContext('2d')!
+            const drawCircle = () => {
+              ctx.beginPath(); ctx.arc(S/2, S/2, S/2 - 1, 0, Math.PI * 2)
+              ctx.fillStyle = '#fff'; ctx.fill()
+            }
+            const pad = 6
+            const logoPath = (BRAND_LOGOS as Record<string,string>)[brand]
+            if (logoPath) {
+              const img = new Image()
+              img.onload = () => { drawCircle(); ctx.drawImage(img, pad, pad, S - pad * 2, S - pad * 2); resolve(cv.toDataURL()) }
+              img.onerror = () => { drawCircle(); ctx.fillStyle = '#1565C0'; ctx.font = `bold ${Math.round(S * 0.38)}px sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText((BRAND_INITIALS as Record<string,string>)[brand] || brand[0].toUpperCase(), S/2, S/2); resolve(cv.toDataURL()) }
+              img.src = logoPath
+            } else {
+              drawCircle(); ctx.fillStyle = '#1565C0'; ctx.font = `bold ${Math.round(S * 0.38)}px sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(brand[0].toUpperCase(), S/2, S/2); resolve(cv.toDataURL())
+            }
+          })
+        }
+
+        Promise.all([
+          fetch('/api/place-coords', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ places: hotels.map(h => ({ name: h.name, city: h.city })) }),
+          }).then(r => r.json()),
+          Promise.all(Object.keys(brandGroups).map(b => makeBrandIcon(b).then(url => [b, url] as [string, string])))
+            .then(entries => Object.fromEntries(entries)),
+        ]).then(([{ coords }, iconMap]: [{ coords: Record<string, { lat: number; lng: number }> }, Record<string, string>]) => {
+          Object.values(brandMarkersRef.current).flat().forEach(m => m.setMap(null))
+          brandMarkersRef.current = {}
+          let hotelAdded = false
+          for (const [brand, bHotels] of Object.entries(brandGroups)) {
+            const visible = brandVisibility[brand] !== false
+            const markers: any[] = []
+            bHotels.forEach(h => {
+              const c = (coords as Record<string, { lat: number; lng: number }>)[h.name]
+              if (!c) return
+              const hm = new google.maps.Marker({
+                position: { lat: c.lat, lng: c.lng },
+                map: visible ? mapInstance.current : null,
+                title: h.name,
+                icon: { url: iconMap[brand], scaledSize: new google.maps.Size(36, 36), anchor: new google.maps.Point(18, 18) },
+                zIndex: 10,
+              })
+              hm.addListener('mouseover', () => {
+                hoverWindow.setContent(`<div style="background:#fff;border-radius:8px;overflow:hidden;width:160px"><div style="padding:8px 10px 4px;font-size:12px;font-weight:700;color:#111">${h.name}</div><div style="padding:0 10px 8px;font-size:10px;color:#888">${h.city}</div></div>`)
+                hoverWindow.open(mapInstance.current, hm)
+              })
+              hm.addListener('mouseout', () => hoverWindow.close())
+              markers.push(hm)
+              mapBounds.extend({ lat: c.lat, lng: c.lng })
+              hotelAdded = true
+            })
+            brandMarkersRef.current[brand] = markers
+          }
+          if (hotelAdded) mapInstance.current.fitBounds(mapBounds, 48)
+        }).catch(() => {})
+      }
+
+      const mapBounds = new google.maps.LatLngBounds()
       if (pins.length > 1) {
-        map.fitBounds(L.latLngBounds(pins.map(p => p.coords)), { padding: [36, 36] })
+        pins.forEach(p => mapBounds.extend({ lat: p.coords[0], lng: p.coords[1] }))
+        mapInstance.current.fitBounds(mapBounds, 48)
       }
     }
 
-    if ((window as any).L) {
-      initMap((window as any).L)
-    } else {
-      const script = document.createElement('script')
-      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
-      script.onload = () => initMap((window as any).L)
-      document.head.appendChild(script)
-    }
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+    if (!apiKey) return
 
-    return () => {
-      if (mapInstance.current) { mapInstance.current.remove(); mapInstance.current = null }
+    if ((window as any).google?.maps) {
+      initMap((window as any).google)
+    } else if (!document.getElementById('gmaps-script')) {
+      const script = document.createElement('script')
+      script.id = 'gmaps-script'
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}`
+      script.onload = () => initMap((window as any).google)
+      document.head.appendChild(script)
+    } else {
+      // Script already loading — poll until ready
+      const interval = setInterval(() => {
+        if ((window as any).google?.maps) {
+          clearInterval(interval)
+          initMap((window as any).google)
+        }
+      }, 100)
+      setTimeout(() => clearInterval(interval), 10000)
     }
+    } // close renderMap
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stableKey])
+
+  // Sync brand visibility changes to markers without re-rendering
+  useEffect(() => {
+    if (!mapInstance.current) return
+    for (const [brand, markers] of Object.entries(brandMarkersRef.current)) {
+      const visible = brandVisibility[brand] !== false
+      markers.forEach(m => m.setMap(visible ? mapInstance.current : null))
+    }
+  }, [brandVisibility])
 
   return (
     <div style={{ borderRadius:14, overflow:'hidden', border:'1px solid var(--border)', height:380, position:'relative' }}>
@@ -771,7 +997,15 @@ function WeatherWidget({ city }: { city: string }) {
 export default function GuestHomePage() {
   const [data,        setData]        = useState<OnboardingData | null>(null)
   const [itinerary,   setItinerary]   = useState<CitySection[]>([])
-  const [photoMap,    setPhotoMap]    = useState<Record<string, string>>({})
+  const [photoMap,          setPhotoMap]          = useState<Record<string, string>>({})
+  const [hotelPhotoMap,     setHotelPhotoMap]     = useState<Record<string, string>>({})
+  const [brandVisibility,       setBrandVisibility]       = useState<Record<string, boolean>>({})
+  const [hotelMapsUrls,         setHotelMapsUrls]         = useState<Record<string, string>>({})
+  // Results from /api/hotel-search (Google Places nearbySearch — geo-locked to cluster)
+  const [googleLoyaltyHotels,   setGoogleLoyaltyHotels]   = useState<{ brand: string; city: string; hotels: HotelSuggestion[] }[]>([])
+  const [googleBudgetHotels,    setGoogleBudgetHotels]     = useState<{ city: string; hotels: HotelSuggestion[] }[]>([])
+  const [hotelsLoading,         setHotelsLoading]          = useState(false)
+  const [hotelSortByPrice,      setHotelSortByPrice]       = useState(false)
   const [tooltip,     setTooltip]     = useState<Tooltip | null>(null)
   const [addingTo,    setAddingTo]    = useState<{ si: number; di: number } | null>(null)
   const [addVal,      setAddVal]      = useState('')
@@ -785,7 +1019,7 @@ export default function GuestHomePage() {
   const [saving,      setSaving]      = useState(false)
   const [saveStatus,  setSaveStatus]  = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
 
-  // Load photos helper
+  // Load place photos
   const loadPhotos = useCallback((od: OnboardingData) => {
     const cities = Object.keys(od.placesByCity || {})
     if (!cities.length && od.destination) cities.push(od.destination)
@@ -798,6 +1032,27 @@ export default function GuestHomePage() {
       results.flat().forEach(p => { if (p.name && p.image) map[p.name] = p.image })
       setPhotoMap(map)
     })
+  }, [])
+
+  // Load hotel photos dynamically from Google Places API (cached in DB)
+  const loadHotelPhotos = useCallback((hotels: { name: string; city: string }[]) => {
+    if (!hotels.length) return
+    fetch('/api/hotel-photo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ hotels }),
+    })
+      .then(r => r.json())
+      .then(({ photos }: { photos: Record<string, string> }) => {
+        // Deduplicate: if two hotels share the same photo URL, discard all but the first
+        const seenUrls = new Set<string>()
+        const deduped: Record<string, string> = {}
+        for (const [name, url] of Object.entries(photos)) {
+          if (!seenUrls.has(url)) { seenUrls.add(url); deduped[name] = url }
+        }
+        setHotelPhotoMap(prev => ({ ...prev, ...deduped }))
+      })
+      .catch(() => {})
   }, [])
 
   useEffect(() => {
@@ -819,26 +1074,35 @@ export default function GuestHomePage() {
           setUserName(json.userName)
 
           if (!json.trip) {
-            // Logged in but no trips → start onboarding
-            window.location.href = '/plan'
+            // Logged in but no trips — show preview if onboarding data exists in
+            // localStorage (user just completed onboarding but hasn't saved yet).
+            // Only redirect to /plan when there is truly no data to show, and use
+            // replace() so this intermediate page doesn't pollute the back-button
+            // history stack.
+            const localRaw = localStorage.getItem('tripzync_onboarding')
+            if (!localRaw) {
+              window.location.replace('/plan')
+              return
+            }
+            // Fall through to the localStorage path below so the trip preview
+            // renders correctly for the authenticated user.
+          } else {
+            // Logged in with a saved trip → load from DB
+            setTripId(json.trip.id)
+            const meta = json.trip.tripMeta ?? {}
+            const enriched: OnboardingData = {
+              ...meta,
+              startDate:   json.trip.startDate,
+              endDate:     json.trip.endDate,
+              destination: json.trip.destination,
+            }
+            setData(enriched)
+            const it = buildItinerary(enriched)
+            setItinerary(it)
+            if (it.length > 0) setActiveDay(it[0].days[0]?.dayNumber ?? 1)
+            loadPhotos(enriched)
             return
           }
-
-          // Logged in with a saved trip → load from DB
-          setTripId(json.trip.id)
-          const meta = json.trip.tripMeta ?? {}
-          const enriched: OnboardingData = {
-            ...meta,
-            startDate:   json.trip.startDate,
-            endDate:     json.trip.endDate,
-            destination: json.trip.destination,
-          }
-          setData(enriched)
-          const it = buildItinerary(enriched)
-          setItinerary(it)
-          if (it.length > 0) setActiveDay(it[0].days[0]?.dayNumber ?? 1)
-          loadPhotos(enriched)
-          return
         }
       } catch { /* not logged in or network error — fall through to localStorage */ }
 
@@ -926,6 +1190,12 @@ export default function GuestHomePage() {
   }
 
   // ── Derived values ──────────────────────────────────────────────────────────
+  const itineraryPlacesByCity = itinerary.reduce<Record<string, string[]>>((acc, sec) => {
+    const places = sec.days.flatMap(d => d.places).filter(Boolean)
+    if (places.length > 0) acc[sec.city] = places
+    return acc
+  }, {})
+
   const destination = data?.destination || data?.cities?.[0] || data?.countries?.[0] || 'Your Trip'
   const destWords   = destination.toUpperCase().split(' ')
   const startDateStr = data?.startDate || data?.pendingTrip?.startDate
@@ -947,17 +1217,81 @@ export default function GuestHomePage() {
   )
   const tripCentroid = centroid(allPlaceCoords)
 
-  // Hotel suggestions — sorted by proximity to trip centroid
-  const rawHotelSuggestions = noMembership
-    ? [] // will use budget instead
-    : getHotelSuggestions(hotelBrands, suggestCities)
-        .sort((a, b) => {
-          const ca = CITY_COORDS[a.city] || [0,0] as [number,number]
-          const cb = CITY_COORDS[b.city] || [0,0] as [number,number]
-          return haversineKm(tripCentroid, ca) - haversineKm(tripCentroid, cb)
-        })
+  // Hotels come from /api/hotel-search (Google Places searchNearby) — not the static HOTEL_DB.
+  // mapHotels is used only for map pins and uses the already-fetched Google results.
+  const mapHotels: { name: string; city: string; brand: string }[] = [
+    ...googleLoyaltyHotels.flatMap(({ brand, city, hotels }) =>
+      hotels.map(h => ({ name: h.name, city, brand }))
+    ),
+    ...googleBudgetHotels.flatMap(({ city, hotels }) =>
+      hotels.map(h => ({ name: h.name, city, brand: 'budget' }))
+    ),
+  ]
 
-  const budgetHotels = noMembership ? getBudgetHotels(suggestCities) : []
+  // Fetch real nearby hotels from Google Places whenever selected places or brands change.
+  // The geo-boundary is enforced at the searchNearby API level — no post-processing filter needed.
+  useEffect(() => {
+    if (!suggestCities.length) {
+      setGoogleLoyaltyHotels([])
+      setGoogleBudgetHotels([])
+      return
+    }
+
+    // Per-city cluster: center = centroid of selected places, radius = spread + 15 km buffer
+    const MIN_RADIUS_KM = 20
+    const BUFFER_KM = 15
+    const clusters = suggestCities.flatMap(city => {
+      const cityPlaceCoords = (data?.placesByCity?.[city] || [])
+        .map(p => PLACE_COORDS[p] || CITY_COORDS[city])
+        .filter(Boolean) as [number, number][]
+
+      const cityCenter: [number, number] | null = cityPlaceCoords.length > 0
+        ? centroid(cityPlaceCoords)
+        : (CITY_COORDS[city] ?? null)
+
+      if (!cityCenter || (cityCenter[0] === 0 && cityCenter[1] === 0)) return []
+
+      const maxDistKm = cityPlaceCoords.length > 1
+        ? Math.max(...cityPlaceCoords.map(c => haversineKm(cityCenter, c)))
+        : 0
+      const radiusKm = Math.max(MIN_RADIUS_KM, maxDistKm + BUFFER_KM)
+
+      return [{ city, lat: cityCenter[0], lng: cityCenter[1], radiusMeters: radiusKm * 1000 }]
+    })
+
+    if (!clusters.length) return
+
+    setHotelsLoading(true)
+    fetch('/api/hotel-search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clusters, brands: hotelBrands }),
+    })
+      .then(r => r.json())
+      .then(({ loyalty, budget, mapsUrls }: {
+        loyalty:  { brand: string; city: string; hotels: HotelSuggestion[] }[]
+        budget:   { city: string; hotels: HotelSuggestion[] }[]
+        mapsUrls: Record<string, string>
+      }) => {
+        setGoogleLoyaltyHotels(loyalty)
+        setGoogleBudgetHotels(budget)
+        setHotelMapsUrls(mapsUrls)
+
+        // Trigger photo fetch for all returned hotels
+        const allHotels = [
+          ...loyalty.flatMap(({ city, hotels }) => hotels.map(h => ({ name: h.name, city }))),
+          ...budget.flatMap(({ city, hotels }) => hotels.map(h => ({ name: h.name, city }))),
+        ]
+        if (allHotels.length) loadHotelPhotos(allHotels)
+      })
+      .catch((err) => {
+        console.error('[hotel-search] client fetch error:', err)
+        setGoogleLoyaltyHotels([])
+        setGoogleBudgetHotels([])
+      })
+      .finally(() => setHotelsLoading(false))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [suggestCities.join(','), allPlaceCoords.map(c => c.join(',')).join('|'), hotelBrands.join(',')])
 
   // city for weather — first city or first selected country
   const weatherCity = data?.cities?.[0] || data?.countries?.[0] || destination
@@ -1066,27 +1400,67 @@ export default function GuestHomePage() {
           )}
 
           {/* ── HOTEL RECOMMENDATIONS (sidebar, under Save Your Plan) ──────── */}
-          {(rawHotelSuggestions.length > 0 || budgetHotels.length > 0) && (() => {
-            if (noMembership) {
-              // 3-star budget fallback
+          {hotelsLoading && (
+            <div style={{ fontFamily:"'Space Mono',monospace", fontSize:9, letterSpacing:2, color:'rgba(255,255,255,.35)', textTransform:'uppercase', textAlign:'center', padding:'12px 0' }}>
+              Finding hotels near your route…
+            </div>
+          )}
+          {!hotelsLoading && (googleLoyaltyHotels.length > 0 || googleBudgetHotels.length > 0) && (() => {
+            // Sort hotels by travel time (default) or price (toggle)
+            const extractPrice = (p: string) => parseInt(p.replace(/[^0-9]/g, '')) || 9999
+            const sortHotels = (hotels: HotelSuggestion[]) =>
+              [...hotels].sort((a, b) =>
+                hotelSortByPrice
+                  ? extractPrice(a.price) - extractPrice(b.price)
+                  : (a.travelMins ?? 999) - (b.travelMins ?? 999)
+              )
+
+            const SortToggle = () => (
+              <div style={{ display:'flex', gap:4 }}>
+                <button onClick={() => setHotelSortByPrice(false)}
+                  style={{ fontFamily:"'Space Mono',monospace", fontSize:8, letterSpacing:1, padding:'3px 9px', borderRadius:20, cursor:'pointer', border:'1px solid', transition:'all .2s',
+                    background: !hotelSortByPrice ? 'rgba(64,224,208,.15)' : 'rgba(255,255,255,.05)',
+                    borderColor: !hotelSortByPrice ? 'rgba(64,224,208,.4)' : 'rgba(255,255,255,.12)',
+                    color: !hotelSortByPrice ? 'var(--accent)' : 'rgba(255,255,255,.3)',
+                  }}>⏱ Time</button>
+                <button onClick={() => setHotelSortByPrice(true)}
+                  style={{ fontFamily:"'Space Mono',monospace", fontSize:8, letterSpacing:1, padding:'3px 9px', borderRadius:20, cursor:'pointer', border:'1px solid', transition:'all .2s',
+                    background: hotelSortByPrice ? 'rgba(255,201,71,.15)' : 'rgba(255,255,255,.05)',
+                    borderColor: hotelSortByPrice ? 'rgba(255,201,71,.4)' : 'rgba(255,255,255,.12)',
+                    color: hotelSortByPrice ? '#FFC947' : 'rgba(255,255,255,.3)',
+                  }}>💰 Price</button>
+              </div>
+            )
+
+            // Show budget picks when: no loyalty selected, OR loyalty selected but no brand hotels found nearby
+            const showBudgetMode = noMembership || googleLoyaltyHotels.length === 0
+            if (showBudgetMode) {
+              // Budget picks from Google Places
               return (
                 <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-                  <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, fontWeight:700, letterSpacing:3, textTransform:'uppercase', color:'rgba(255,255,255,.45)' }}>
-                    3-Star Picks Near Your Route
+                  <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                    <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, fontWeight:700, letterSpacing:3, textTransform:'uppercase', color:'rgba(255,255,255,.45)' }}>
+                      Picks Near Your Route
+                    </div>
+                    <SortToggle />
                   </div>
-                  {budgetHotels.map(({ city, hotels }) => (
+                  {googleBudgetHotels.map(({ city, hotels }) => {
+                    const sorted = sortHotels(hotels)
+                    if (!sorted.length) return null
+                    return (
                     <div key={city} style={{ background:'var(--card)', border:'1px solid var(--border)', borderRadius:12, overflow:'hidden' }}>
                       <div style={{ padding:'8px 14px', borderBottom:'1px solid var(--border)', fontFamily:"'Barlow Condensed',sans-serif", fontSize:12, fontWeight:700, letterSpacing:2, textTransform:'uppercase', color:'rgba(255,255,255,.6)' }}>
                         📍 {city}
                       </div>
-                      {hotels.map(h => (
+                      {sorted.map(h => (
                         <div key={h.name} style={{ borderTop:'1px solid var(--border)' }}>
-                          <div style={{ position:'relative', width:'100%', height:100, overflow:'hidden' }}>
+                          <div style={{ position:'relative', width:'100%', height:100, overflow:'hidden', background:'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f2447 100%)' }}>
                             <img
-                              src={getHotelPhoto(h.name, h.tier)}
+                              key={hotelPhotoMap[h.name] || 'static'}
+                              src={hotelPhotoMap[h.name] || getHotelPhoto(h.name, h.tier)}
                               alt={h.name}
                               style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}
-                              onError={e => { (e.currentTarget as HTMLImageElement).style.display='none' }}
+                              onError={e => { const el = e.currentTarget as HTMLImageElement; el.style.opacity='0' }}
                             />
                             <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(7,8,15,.85) 0%, transparent 60%)' }} />
                             <div style={{ position:'absolute', bottom:6, right:8, color:'#FFC947', fontSize:9, letterSpacing:1 }}>
@@ -1096,27 +1470,43 @@ export default function GuestHomePage() {
                           <div style={{ display:'flex', alignItems:'center', gap:10, padding:'8px 14px' }}>
                             <div style={{ flex:1, minWidth:0 }}>
                               <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, fontWeight:700, color:'#fff', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', lineHeight:1.2 }}>{h.name}</div>
-                              <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, letterSpacing:1, textTransform:'uppercase', color:'rgba(255,255,255,.5)', marginTop:2 }}>{h.tier}</div>
+                              <div style={{ display:'flex', alignItems:'center', gap:6, marginTop:2 }}>
+                                <span style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, letterSpacing:1, textTransform:'uppercase', color:'rgba(255,255,255,.5)' }}>{h.tier}</span>
+                                {h.travelMins !== undefined && (
+                                  <span style={{ fontFamily:"'Space Mono',monospace", fontSize:8, color:'rgba(64,224,208,.8)', background:'rgba(64,224,208,.08)', border:'1px solid rgba(64,224,208,.2)', borderRadius:10, padding:'1px 6px' }}>
+                                    ~{h.travelMins} min
+                                  </span>
+                                )}
+                                {hotelMapsUrls[h.name] && (
+                                  <a href={hotelMapsUrls[h.name]} target="_blank" rel="noopener noreferrer"
+                                    style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:8, letterSpacing:1, textTransform:'uppercase', color:'#4A9EFF', textDecoration:'none', background:'rgba(74,158,255,.1)', border:'1px solid rgba(74,158,255,.25)', borderRadius:10, padding:'1px 6px' }}>
+                                    📍 Maps
+                                  </a>
+                                )}
+                              </div>
                             </div>
                             <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:12, fontWeight:700, color:'#fff', flexShrink:0 }}>{h.price}</div>
                           </div>
                         </div>
                       ))}
                     </div>
-                  ))}
+                  )})}
                 </div>
               )
             }
-            // Loyalty brand hotels
+            // Loyalty brand hotels — grouped by brand from Google Places results
             const byBrand: Record<string, { city: string; hotels: HotelSuggestion[] }[]> = {}
-            rawHotelSuggestions.forEach(({ brand, city, hotels }) => {
+            googleLoyaltyHotels.forEach(({ brand, city, hotels }) => {
               if (!byBrand[brand]) byBrand[brand] = []
               byBrand[brand].push({ city, hotels })
             })
             return (
               <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-                <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, fontWeight:700, letterSpacing:3, textTransform:'uppercase', color:'rgba(255,255,255,.45)' }}>
-                  Your Loyalty Hotels · Nearest First
+                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                  <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, fontWeight:700, letterSpacing:3, textTransform:'uppercase', color:'rgba(255,255,255,.45)' }}>
+                    Your Loyalty Hotels
+                  </div>
+                  <SortToggle />
                 </div>
                 {Object.entries(byBrand).map(([brand, cityGroups]) => (
                   <div key={brand} style={{ background:'var(--card)', border:'1px solid var(--border)', borderRadius:12, overflow:'hidden' }}>
@@ -1137,21 +1527,39 @@ export default function GuestHomePage() {
                         <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:14, fontWeight:900, letterSpacing:2, textTransform:'uppercase', color:'#fff', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{HOTEL_NAMES[brand]}</div>
                         <div style={{ fontFamily:"'Space Mono',monospace", fontSize:8, letterSpacing:1, color:'rgba(255,255,255,.4)', marginTop:2 }}>{cityGroups.reduce((s,g)=>s+g.hotels.length,0)} properties</div>
                       </div>
-                      <span style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:8, letterSpacing:2, textTransform:'uppercase', color:'#FFC947', background:'rgba(255,201,71,.12)', border:'1px solid rgba(255,201,71,.3)', borderRadius:20, padding:'2px 8px', flexShrink:0 }}>★ Loyalty</span>
+                      <button
+                        onClick={() => setBrandVisibility(prev => ({ ...prev, [brand]: prev[brand] === false ? true : false }))}
+                        style={{
+                          display:'flex', alignItems:'center', gap:4, flexShrink:0,
+                          background: brandVisibility[brand] !== false ? 'rgba(255,201,71,.12)' : 'rgba(255,255,255,.06)',
+                          border: `1px solid ${brandVisibility[brand] !== false ? 'rgba(255,201,71,.3)' : 'rgba(255,255,255,.12)'}`,
+                          borderRadius:20, padding:'3px 10px', cursor:'pointer',
+                          fontFamily:"'Barlow Condensed',sans-serif", fontSize:8, fontWeight:700,
+                          letterSpacing:2, textTransform:'uppercase',
+                          color: brandVisibility[brand] !== false ? '#FFC947' : 'rgba(255,255,255,.3)',
+                          transition:'all .2s',
+                        }}
+                      >
+                        {brandVisibility[brand] !== false ? 'Show' : 'Hide'}
+                      </button>
                     </div>
-                    {cityGroups.map(({ city, hotels }) => (
+                    {cityGroups.map(({ city, hotels }) => {
+                      const sorted = sortHotels(hotels)
+                      if (!sorted.length) return null
+                      return (
                       <div key={city}>
                         {cityGroups.length > 1 && (
                           <div style={{ padding:'6px 14px 0', fontFamily:"'Space Mono',monospace", fontSize:8, letterSpacing:2, textTransform:'uppercase', color:'rgba(255,255,255,.4)' }}>{city}</div>
                         )}
-                        {hotels.map(h => (
+                        {sorted.map(h => (
                           <div key={h.name} style={{ borderTop:'1px solid var(--border)' }}>
-                            <div style={{ position:'relative', width:'100%', height:100, overflow:'hidden' }}>
+                            <div style={{ position:'relative', width:'100%', height:100, overflow:'hidden', background:'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f2447 100%)' }}>
                               <img
-                                src={getHotelPhoto(h.name, h.tier)}
+                                key={hotelPhotoMap[h.name] || 'static'}
+                                src={hotelPhotoMap[h.name] || getHotelPhoto(h.name, h.tier)}
                                 alt={h.name}
                                 style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}
-                                onError={e => { (e.currentTarget as HTMLImageElement).style.display='none' }}
+                                onError={e => { const el = e.currentTarget as HTMLImageElement; el.style.opacity='0' }}
                               />
                               <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(7,8,15,.85) 0%, transparent 60%)' }} />
                               <div style={{ position:'absolute', bottom:6, right:8, color:'#FFC947', fontSize:9, letterSpacing:1 }}>
@@ -1161,14 +1569,28 @@ export default function GuestHomePage() {
                             <div style={{ display:'flex', alignItems:'center', gap:10, padding:'8px 14px' }}>
                               <div style={{ flex:1, minWidth:0 }}>
                                 <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, fontWeight:700, color:'#fff', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', lineHeight:1.2 }}>{h.name}</div>
-                                <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, letterSpacing:1, textTransform:'uppercase', color:'rgba(255,255,255,.5)', marginTop:2 }}>{h.tier}</div>
+                                <div style={{ display:'flex', alignItems:'center', gap:6, marginTop:2 }}>
+                                  <span style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, letterSpacing:1, textTransform:'uppercase', color:'rgba(255,255,255,.5)' }}>{h.tier}</span>
+                                  {h.travelMins !== undefined && (
+                                    <span style={{ fontFamily:"'Space Mono',monospace", fontSize:8, color:'rgba(64,224,208,.8)', background:'rgba(64,224,208,.08)', border:'1px solid rgba(64,224,208,.2)', borderRadius:10, padding:'1px 6px' }}>
+                                      ~{h.travelMins} min
+                                    </span>
+                                  )}
+                                  {hotelMapsUrls[h.name] && (
+                                    <a href={hotelMapsUrls[h.name]} target="_blank" rel="noopener noreferrer"
+                                      style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:8, letterSpacing:1, textTransform:'uppercase', color:'#4A9EFF', textDecoration:'none', background:'rgba(74,158,255,.1)', border:'1px solid rgba(74,158,255,.25)', borderRadius:10, padding:'1px 6px' }}>
+                                      📍 Maps
+                                    </a>
+                                  )}
+                                </div>
                               </div>
                               <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:12, fontWeight:700, color:'#fff', flexShrink:0 }}>{h.price}</div>
                             </div>
                           </div>
                         ))}
                       </div>
-                    ))}
+                      )
+                    })}
                     <div style={{ padding:'10px 14px', borderTop:'1px solid var(--border)' }}>
                       <a href="/login" style={{ display:'block', textAlign:'center', fontFamily:"'Barlow Condensed',sans-serif", fontSize:11, fontWeight:700, letterSpacing:2, textTransform:'uppercase', padding:'8px', background:'var(--accent)', color:'var(--bg)', borderRadius:6, textDecoration:'none' }}>
                         Sign In to Book →
@@ -1351,7 +1773,7 @@ export default function GuestHomePage() {
           )}
 
           {/* ── City Map with place pins ─────────────────────────────────────────── */}
-          {data?.placesByCity && Object.keys(data.placesByCity).length > 0 && (
+          {Object.keys(itineraryPlacesByCity).length > 0 && (
             <>
               <div className="section-head" style={{ marginTop: 28 }}>
                 <div className="section-line" />
@@ -1361,7 +1783,7 @@ export default function GuestHomePage() {
               <p style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, color:'rgba(255,255,255,.5)', marginBottom:14, marginTop:-6 }}>
                 Pins show your selected places — clustered by location
               </p>
-              <MapView placesByCity={data.placesByCity} />
+              <MapView placesByCity={itineraryPlacesByCity} photoMap={photoMap} hotels={mapHotels} brandVisibility={brandVisibility} />
             </>
           )}
 

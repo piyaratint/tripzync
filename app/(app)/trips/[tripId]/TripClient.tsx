@@ -681,7 +681,10 @@ function AIDrawer({ trip, hotels, currency }: { trip: Trip; hotels: Hotel[]; cur
     setLoading(true)
 
     const hotelNames = hotels.map(h => h.name).join(', ')
-    const system = systemOverride ?? `You are a helpful travel assistant. Trip: "${trip.title1} ${trip.title2}". Destination: ${trip.destCity ?? trip.destination}. Dates: ${trip.startDate} to ${trip.endDate}. Hotels: ${hotelNames}. Currency: ${currency}. Keep answers concise and travel-focused.`
+    // Include hotel Maps URLs so the AI knows the exact hotel location when recommending
+    // nearby restaurants, transit, or activities — preventing out-of-area suggestions.
+    const hotelLocationCtx = hotels.filter(h => h.mapsUrl).map(h => `${h.name} (${h.mapsUrl})`).join('; ')
+    const system = systemOverride ?? `You are a helpful travel assistant. Trip: "${trip.title1} ${trip.title2}". Destination: ${trip.destCity ?? trip.destination}. Dates: ${trip.startDate} to ${trip.endDate}. Hotels: ${hotelNames}.${hotelLocationCtx ? ` Hotel locations: ${hotelLocationCtx}.` : ''} Currency: ${currency}. Keep answers concise and travel-focused. Only recommend places within the destination area.`
 
     try {
       const resp = await fetch('/api/chat', {
@@ -702,9 +705,11 @@ function AIDrawer({ trip, hotels, currency }: { trip: Trip; hotels: Hotel[]; cur
   function askTransit() {
     const hotelNames = hotels.map(h => h.name).join(', ')
     const dest = trip.destCity ?? trip.destination
+    // Embed the exact hotel Maps URL so the AI routes to the correct physical location
+    const hotelLocationCtx = hotels.filter(h => h.mapsUrl).map(h => `${h.name} (${h.mapsUrl})`).join('; ')
     const system = `You are a travel assistant. Return ONLY a JSON object (no markdown, no prose) with this exact shape:
 {"__type":"transport_options","route":"<ORIGIN> → <DESTINATION>","options":[{"title":"...","badge":"...","badgeColor":"#hex","fields":[{"label":"...","value":"..."}],"note":"..."}],"proTip":"..."}
-Rules: include 2-4 transport options from airport/station to the hotel, each with 3 fields (e.g. Bus no./Type/Route, Cost, Duration). badge is optional short label like "Recommended" or "Most convenient". proTip is one short sentence. Respond with raw JSON only.`
+Rules: include 2-4 transport options from airport/station to the hotel in ${dest}, each with 3 fields (e.g. Bus no./Type/Route, Cost, Duration). badge is optional short label like "Recommended" or "Most convenient". proTip is one short sentence.${hotelLocationCtx ? ` Hotel exact location: ${hotelLocationCtx}.` : ''} Respond with raw JSON only.`
     askAI(`How do I get from the main airport to my hotel (${hotelNames}) in ${dest}? Provide transport options.`, system)
   }
 

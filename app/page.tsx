@@ -299,7 +299,7 @@ export default function LandingPage() {
     if (typeof window !== 'undefined') {
       localStorage.setItem('tripzync_onboarding', JSON.stringify(data))
     }
-    window.location.href = '/home'
+    window.location.replace('/home')
   }
 
   const mapNextDisabled = selectedISOs.length === 0
