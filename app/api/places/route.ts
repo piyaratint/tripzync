@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { db } from '@/lib/db'
+import { popularPlaces } from '@/lib/db/schema'
+import { eq, and, gt } from 'drizzle-orm'
 
 interface Place {
   name: string
@@ -543,63 +546,190 @@ async function fetchWikiImage(placeName: string): Promise<string> {
   return ''
 }
 
-// ── Google Places API (server-side only) ─────────────────────────────────────
-async function fetchFromGooglePlaces(country: string): Promise<Place[] | null> {
-  const key = process.env.GOOGLE_PLACES_API_KEY
-  if (!key) return null
+// How long cached rows are considered fresh (7 days in ms)
+const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000
+
+// ── 1. Read from DB cache ─────────────────────────────────────────────────────
+// Returns cached rows if they exist AND were fetched within the last 7 days.
+async function getCachedPlaces(city: string): Promise<Place[] | null> {
+  const since = new Date(Date.now() - CACHE_TTL_MS)
+
+  const rows = await db
+    .select()
+    .from(popularPlaces)
+    .where(
+      and(
+        eq(popularPlaces.city, city.toLowerCase()),
+        gt(popularPlaces.updatedAt, since)
+      )
+    )
+    .orderBy(popularPlaces.rank)
+
+  if (!rows.length) return null
+
+  // If any cached name contains non-Latin characters (e.g., Chinese stored before
+  // languageCode:'en' was enforced), treat the whole city as a cache miss so the
+  // next fetchAndCacheFromGoogle call stores English names instead.
+  const hasNonLatin = rows.some(r => /[^ -ɏ]/.test(r.name))
+  if (hasNonLatin) return null
+
+  const apiKey = process.env.GOOGLE_PLACES_API_KEY ?? ''
+
+  return rows.map(r => ({
+    name:  r.name,
+    type:  r.type ?? 'Attraction',
+    // photoRef now stores the resolved CDN URL directly
+    image: r.photoRef ?? `https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80`,
+    rank:  r.rank,
+  }))
+}
+
+// ── 2. Fetch fresh data from Google Places API (New) ─────────────────────────
+// Uses the Places API v1 textSearch endpoint (not the legacy Maps API).
+// Requires "Places API (New)" enabled in Google Cloud Console.
+async function fetchAndCacheFromGoogle(city: string): Promise<Place[] | null> {
+  const apiKey = process.env.GOOGLE_PLACES_API_KEY
+  if (!apiKey) return null
+
+  const cityKey = city.toLowerCase()
+
+  async function googleSearch(query: string): Promise<any[]> {
+    try {
+      const res = await fetch('https://places.googleapis.com/v1/places:searchText', {
+        method: 'POST',
+        headers: {
+          'Content-Type':     'application/json',
+          'X-Goog-Api-Key':   apiKey!,
+          'X-Goog-FieldMask': 'places.id,places.displayName,places.rating,places.location,places.photos,places.types',
+        },
+        body: JSON.stringify({
+          textQuery:      query,
+          maxResultCount: 20,
+          languageCode:   'en',
+        }),
+        cache: 'no-store',
+      })
+      if (!res.ok) return []
+      const data = await res.json()
+      return Array.isArray(data.places) ? data.places : []
+    } catch { return [] }
+  }
 
   try {
-    const query = encodeURIComponent(`top tourist attractions in ${country}`)
-    const url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${query}&key=${key}`
-    const res = await fetch(url, { next: { revalidate: 86400 } }) // cache 24h
-    if (!res.ok) return null
-    const data = await res.json()
-    if (!data.results?.length) return null
+    // Primary query — top tourist attractions
+    let places = await googleSearch(`top tourist attractions in ${city}`)
 
-    return data.results.slice(0, 10).map((r: any, i: number) => {
-      let image = `https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80`
-      if (r.photos?.[0]?.photo_reference) {
-        image = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=600&photo_reference=${r.photos[0].photo_reference}&key=${key}`
+    // If fewer than 10 results, supplement with a second query to reach 10
+    if (places.length < 10) {
+      const extra = await googleSearch(`popular landmarks sightseeing ${city}`)
+      const seen = new Set(places.map((p: any) => p.id))
+      for (const p of extra) {
+        if (!seen.has(p.id)) {
+          seen.add(p.id)
+          places.push(p)
+        }
+        if (places.length >= 10) break
       }
-      return {
-        name: r.name,
-        type: r.types?.[0]?.replace(/_/g, ' ') ?? 'Attraction',
-        image,
-        rank: i + 1,
-      }
-    })
-  } catch {
+    }
+
+    if (!places.length) return null
+
+    // Cap at 10 results
+    places = places.slice(0, 10)
+
+    const now = new Date()
+
+    // Delete stale rows for this city before inserting fresh ones
+    await db
+      .delete(popularPlaces)
+      .where(eq(popularPlaces.city, cityKey))
+
+    // Resolve each photo reference to a final CDN URL (follow redirect server-side)
+    // so browsers can load the image directly without API key or referrer issues
+    const resolved = await Promise.all(
+      places.map(async (p: any) => {
+        if (!p.photos?.[0]?.name) return null
+        const mediaUrl = `https://places.googleapis.com/v1/${p.photos[0].name}/media?maxWidthPx=400&maxHeightPx=250&key=${apiKey}`
+        try {
+          const r = await fetch(mediaUrl, { redirect: 'follow' })
+          return r.url // final CDN URL after redirect
+        } catch { return null }
+      })
+    )
+
+    // Build insert rows
+    const toInsert = places.map((p: any, i: number) => ({
+      city:      cityKey,
+      placeId:   p.id,
+      name:      p.displayName?.text ?? 'Unknown',
+      rating:    p.rating ? String(p.rating) : null,
+      lat:       p.location?.latitude  != null ? String(p.location.latitude)  : null,
+      lng:       p.location?.longitude != null ? String(p.location.longitude) : null,
+      photoRef:  resolved[i] ?? null, // store resolved CDN URL directly
+      type:      p.types?.[0]?.replace(/_/g, ' ') ?? 'Attraction',
+      rank:      i + 1,
+      updatedAt: now,
+    }))
+
+    await db.insert(popularPlaces).values(toInsert)
+
+    return toInsert.map(r => ({
+      name:  r.name,
+      type:  r.type,
+      image: r.photoRef ?? `https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80`,
+      rank:  r.rank,
+    }))
+  } catch (err) {
+    console.error('[places] Google fetch failed:', err)
     return null
   }
 }
 
-export async function GET(req: NextRequest) {
-  const country = req.nextUrl.searchParams.get('country')?.trim()
-  if (!country) {
-    return NextResponse.json({ error: 'country param required' }, { status: 400 })
-  }
-
-  // 1. Try Google Places API
-  const googlePlaces = await fetchFromGooglePlaces(country)
-  if (googlePlaces) {
-    return NextResponse.json({ places: googlePlaces, source: 'google' })
-  }
-
-  // 2. Curated static DB — normalise country name
+// ── 3. Static fallback (no Google key / Google failed) ───────────────────────
+// Only used for cities/countries explicitly listed in PLACES_DB.
+// Returns null for unknown cities to avoid serving generic placeholder names.
+async function getStaticPlaces(city: string): Promise<Place[] | null> {
   const normalised = Object.keys(PLACES_DB).find(
-    k => k.toLowerCase() === country.toLowerCase()
-  ) ?? '_default'
+    k => k.toLowerCase() === city.toLowerCase()
+  )
 
-  const raw = PLACES_DB[normalised] ?? PLACES_DB['_default']
+  if (!normalised) return null
 
-  // Enrich each place with a real Wikipedia photo in parallel.
-  // Falls back to the Unsplash URL in PLACES_DB if Wikipedia has no image.
-  const places: Place[] = await Promise.all(
+  const raw = PLACES_DB[normalised]
+
+  return Promise.all(
     raw.map(async (p, i) => {
       const wikiImg = await fetchWikiImage(p.name)
       return { ...p, image: wikiImg || p.image, rank: i + 1 }
     })
   )
+}
 
-  return NextResponse.json({ places, source: 'wiki' })
+// ── GET /api/places?country=<city> ───────────────────────────────────────────
+export async function GET(req: NextRequest) {
+  const city = req.nextUrl.searchParams.get('country')?.trim()
+  if (!city) {
+    return NextResponse.json({ error: 'country param required' }, { status: 400 })
+  }
+
+  // Step 1 — serve from DB cache if data is fresh (< 7 days old)
+  const cached = await getCachedPlaces(city)
+  if (cached) {
+    return NextResponse.json({ places: cached, source: 'cache' })
+  }
+
+  // Step 2 — cache miss or stale: fetch from Google and persist to DB
+  const fresh = await fetchAndCacheFromGoogle(city)
+  if (fresh) {
+    return NextResponse.json({ places: fresh, source: 'google' })
+  }
+
+  // Step 3 — Google unavailable: fall back to curated static data + Wikipedia photos
+  const fallback = await getStaticPlaces(city)
+  if (fallback) {
+    return NextResponse.json({ places: fallback, source: 'static' })
+  }
+
+  // No data available for this city — return empty rather than fake names
+  return NextResponse.json({ places: [], source: 'none' })
 }
