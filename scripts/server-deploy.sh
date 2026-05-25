@@ -36,4 +36,5 @@ else
   pm2 save
 fi
 
-echo "✅ Deploy complete"
+echo "▶ Running post-deploy checks"
+bash "$APP_DIR/scripts/post-deploy.sh"
