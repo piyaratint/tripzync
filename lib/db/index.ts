@@ -1,11 +1,15 @@
-import { neon, neonConfig } from '@neondatabase/serverless'
-import { drizzle } from 'drizzle-orm/neon-http'
+import postgres from 'postgres'
+import { drizzle } from 'drizzle-orm/postgres-js'
 import * as schema from './schema'
 
-// Cache HTTP connections to reduce Neon cold-start latency
-neonConfig.fetchConnectionCache = true
+// Standard postgres.js connection — works with any PostgreSQL server
+// (Neon, Supabase, Jelastic, self-hosted, etc.)
+const client = postgres(process.env.DATABASE_URL!, {
+  max: 10,          // max connections in pool
+  idle_timeout: 30, // close idle connections after 30s
+  connect_timeout: 10,
+})
 
-const sql = neon(process.env.DATABASE_URL!)
-export const db = drizzle(sql, { schema })
+export const db = drizzle(client, { schema })
 
 export type DB = typeof db
