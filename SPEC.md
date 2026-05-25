@@ -1,7 +1,8 @@
 # TripZync® — Product Requirements & Implementation Status
 
 > Last updated: 2026-05-25  
-> Production URL: https://tripzync-fresh.vercel.app  
+> Production URL: https://tripzync-fresh.vercel.app (Vercel — being migrated)  
+> Target deploy: Jelastic cloud server (Node 26, PM2, standalone build)  
 > Repository: private GitHub repo (macOS Keychain credentials)
 
 ---
@@ -13,7 +14,7 @@
 | ✅ | Fully implemented & deployed to Vercel |
 | 🚧 | Partial / in progress |
 | ❌ | Not yet started |
-| 🔒 | Requires environment variable in Vercel |
+| 🔒 | Requires environment variable on server |
 
 ---
 
@@ -246,7 +247,7 @@ https://tripzync-fresh.vercel.app/api/auth/callback/google   (prod)
 | `place_coords` | Geocoded lat/lng cache (permanent) |
 | `popular_places` | Google Places top-10 attractions per city (7-day TTL) |
 
-**Migrations:** Drizzle-managed, auto-applied on Vercel build via `vercel.json` `buildCommand`.
+**Migrations:** Drizzle-managed, auto-applied on every deploy via `scripts/server-deploy.sh` (`npm run db:migrate` before `npm run build`).
 
 ---
 
@@ -293,12 +294,27 @@ https://tripzync-fresh.vercel.app/api/auth/callback/google   (prod)
 | `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` | Google Maps embed with pins (client-side) |
 | `ANTHROPIC_API_KEY` | AI travel assistant chat |
 
-### Add to Vercel
+### Add to Jelastic server
 
+Set in the **Jelastic dashboard → your Node.js environment → Variables tab**, then redeploy.
+
+Alternatively export them in the server shell before starting PM2:
 ```bash
-echo "VALUE" | npx vercel env add VARIABLE_NAME production
-npx vercel --prod   # redeploy to pick up
+export DATABASE_URL="..."
+pm2 restart tripzync
 ```
+
+### GitHub Actions secrets (for CI/CD deploy)
+
+Add these in **GitHub → repo → Settings → Secrets → Actions**:
+
+| Secret | Value |
+|--------|-------|
+| `JELASTIC_HOST` | SSH hostname from Jelastic dashboard |
+| `JELASTIC_USER` | SSH username (usually `jelastic`) |
+| `JELASTIC_SSH_KEY` | Private key (paste full PEM content) |
+| `JELASTIC_PORT` | SSH port (usually `3022` on Jelastic) |
+| `JELASTIC_APP_DIR` | Absolute path to app on server (e.g. `/var/www/webroot/ROOT`) |
 
 ---
 
@@ -339,7 +355,7 @@ npx vercel --prod   # redeploy to pick up
 | Styling | Global CSS (`globals.css`) | — |
 | Validation | Zod | — |
 | Testing | Vitest | — |
-| Deploy | Vercel | — |
+| Deploy | Jelastic (Node 26, PM2, standalone) | Self-hosted cloud server |
 | CI | GitHub Actions | lint → typecheck → test → build |
 
 ---
