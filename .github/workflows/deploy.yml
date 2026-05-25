@@ -1,0 +1,22 @@
+name: Deploy to Jelastic
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: SSH deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.JELASTIC_HOST }}
+          username: ${{ secrets.JELASTIC_USER }}
+          key: ${{ secrets.JELASTIC_SSH_KEY }}
+          port: ${{ secrets.JELASTIC_PORT }}       # usually 3022 on Jelastic, or 22
+          script: |
+            export APP_DIR="${{ secrets.JELASTIC_APP_DIR }}"
+            bash $APP_DIR/scripts/server-deploy.sh
