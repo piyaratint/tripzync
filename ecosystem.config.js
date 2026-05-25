@@ -23,6 +23,11 @@ module.exports = {
       max_restarts: 10,
       min_uptime: '10s',
 
+      // Default env — PORT 3000 always applied regardless of --env flag
+      env: {
+        PORT: 3000,
+      },
+
       env_production: {
         NODE_ENV: 'production',
         PORT: 3000,
