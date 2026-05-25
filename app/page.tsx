@@ -1,7 +1,26 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import dynamic from 'next/dynamic'
 import { TripZyncLogo } from '@/components/TripZyncLogo'
+
+const WorldMap = dynamic(
+  () => import('@/components/WorldMap').then(m => ({ default: m.WorldMap })),
+  {
+    ssr: false,
+    loading: () => (
+      <div style={{
+        height: 320, background: 'rgba(7,10,25,0.95)', borderRadius: 16,
+        border: '1px solid rgba(64,224,208,0.18)', display: 'flex',
+        alignItems: 'center', justifyContent: 'center',
+        fontFamily: "'Space Mono',monospace", fontSize: 11,
+        color: 'rgba(255,255,255,0.25)', letterSpacing: '0.1em',
+      }}>
+        LOADING MAP…
+      </div>
+    ),
+  }
+)
 
 // ── TYPES ────────────────────────────────────────────────────────────────────
 type Screen = 'hero' | 'mode-select' | 'map' | 'places' | 'hotels' | 'duration'
@@ -192,6 +211,20 @@ const COUNTRY_CITIES: Record<string, string[]> = {
   FJI: ['Nadi','Suva','Yasawa Islands','Coral Coast'],
 }
 
+// Reverse lookup: city name → ISO A3
+const CITY_TO_ISO: Record<string, string> = {}
+Object.entries(COUNTRY_CITIES).forEach(([iso, cities]) => {
+  cities.forEach(city => { CITY_TO_ISO[city] = iso })
+})
+
+// Flat sorted list for search autocomplete
+interface CityOption { city: string; iso: string; countryName: string }
+const ALL_CITIES: CityOption[] = Object.entries(COUNTRY_CITIES)
+  .flatMap(([iso, cities]) =>
+    cities.map(city => ({ city, iso, countryName: ISO_NAME[iso] || iso }))
+  )
+  .sort((a, b) => a.city.localeCompare(b.city))
+
 const HOTEL_PROGRAMS = [
   { id: 'marriott', name: 'Marriott Bonvoy', tiers: 'Gold · Platinum · Titanium', emoji: '🏨', logo: '/logos/marriott.svg' },
   { id: 'hilton',   name: 'Hilton Honors',   tiers: 'Gold · Diamond',             emoji: '🏩', logo: '/logos/hilton.svg'   },
@@ -224,6 +257,10 @@ export default function LandingPage() {
   const [startDate, setStartDate] = useState('')
   const [endDate,   setEndDate]   = useState('')
   const [showGuestModal, setShowGuestModal] = useState(false)
+  // ── City search state ──────────────────────────────────────────────────────
+  const [searchQuery,   setSearchQuery]   = useState('')
+  const [showDropdown,  setShowDropdown]  = useState(false)
+  const searchRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -302,7 +339,40 @@ export default function LandingPage() {
     window.location.replace('/home')
   }
 
-  const mapNextDisabled = selectedISOs.length === 0
+  // ── City search handlers ──────────────────────────────────────────────────
+  const filteredCities: CityOption[] = searchQuery.length < 1
+    ? []
+    : ALL_CITIES
+        .filter(o => o.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                     o.countryName.toLowerCase().includes(searchQuery.toLowerCase()))
+        .slice(0, 8)
+
+  const handleCitySelect = (city: string, iso: string) => {
+    if (!selectedCities.includes(city)) {
+      setSelectedCities(prev => [...prev, city])
+      if (!selectedISOs.includes(iso)) {
+        setSelectedISOs(prev => [...prev, iso])
+      }
+      if (!continent) setContinent(ISO_CONTINENT[iso] || '')
+    }
+    setSearchQuery('')
+    setShowDropdown(false)
+  }
+
+  const handleCityRemove = (city: string) => {
+    const iso = CITY_TO_ISO[city]
+    const newCities = selectedCities.filter(c => c !== city)
+    setSelectedCities(newCities)
+    // Remove ISO if no remaining cities from that country
+    if (iso) {
+      const stillHas = newCities.some(c => CITY_TO_ISO[c] === iso)
+      if (!stillHas) {
+        setSelectedISOs(prev => prev.filter(i => i !== iso))
+      }
+    }
+  }
+
+  const mapNextDisabled = selectedCities.length === 0
 
   // ── RENDER: HERO ──────────────────────────────────────────────────────────
   if (screen === 'hero') return (
@@ -425,7 +495,7 @@ export default function LandingPage() {
     </div>
   )
 
-  // ── RENDER: MAP (continent cards + country chips) ─────────────────────────
+  // ── RENDER: MAP (city search + world map) ────────────────────────────────
   if (screen === 'map') return (
     <div className="ob-screen" style={{ justifyContent: 'flex-start' }}>
       <div className="ob-grid-bg" />
@@ -434,90 +504,173 @@ export default function LandingPage() {
         <a href="/plan" className="ob-nav-link">Already have a plan? Set up your trip ↗</a>
       </nav>
 
-      <div className="ob-screen-content">
+      <div className="ob-screen-content" style={{ paddingBottom: 120 }}>
         <div className="ob-step-num">STEP 01 / 04</div>
         <h2 className="ob-screen-title">WHERE ARE YOU HEADED?</h2>
-        <p className="ob-screen-sub">Choose a region → select countries → pick cities</p>
+        <p className="ob-screen-sub">Search for a city, region, or destination</p>
 
-        {/* Continent selection */}
-        <div className="ob-region-label">Select a region</div>
-        <div className="ob-continent-grid">
-          {Object.keys(CONTINENT_ISOS).map(cont => (
-            <button
-              key={cont}
-              className={`ob-continent-card${continent === cont ? ' active' : ''}`}
+        {/* ── Search bar ── */}
+        <div ref={searchRef} style={{ position: 'relative', maxWidth: 520, width: '100%', marginTop: 20 }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 10,
+            background: 'rgba(255,255,255,0.05)',
+            border: `1.5px solid ${showDropdown ? 'var(--accent)' : 'rgba(255,255,255,0.14)'}`,
+            borderRadius: showDropdown && filteredCities.length > 0 ? '12px 12px 0 0' : 12,
+            padding: '12px 16px',
+            transition: 'border-color 0.2s',
+          }}>
+            {/* Search icon */}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, opacity: 0.5 }}>
+              <circle cx="11" cy="11" r="7" stroke="white" strokeWidth="2"/>
+              <path d="M16.5 16.5L21 21" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+            <input
+              type="text"
+              placeholder="Tokyo, Bangkok, Los Angeles…"
+              value={searchQuery}
+              onChange={e => { setSearchQuery(e.target.value); setShowDropdown(true) }}
+              onFocus={() => { if (searchQuery.length > 0) setShowDropdown(true) }}
+              onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
               style={{
-                background: continent === cont ? CONTINENT_HOVER[cont] : CONTINENT_COLOR[cont],
-                borderColor: continent === cont ? 'var(--accent)' : 'rgba(255,255,255,.06)',
+                flex: 1, background: 'none', border: 'none', outline: 'none',
+                color: '#fff', fontFamily: "'Rajdhani', sans-serif",
+                fontSize: 16, fontWeight: 500,
               }}
-              onClick={() => {
-                setContinent(cont)
-                setSelectedISOs([])
-                setSelectedCities([])
-              }}
-            >
-              <div className="ob-continent-emoji">{CONTINENT_EMOJI[cont]}</div>
-              <div className="ob-continent-name">{cont}</div>
-              <div className="ob-continent-count">{CONTINENT_ISOS[cont].length} countries</div>
-            </button>
-          ))}
-        </div>
-
-        {/* Country chips */}
-        {continent && (
-          <>
-            <div className="ob-region-label" style={{ marginTop: 20 }}>
-              {continent} — pick your countries
-            </div>
-            <div className="ob-country-chips">
-              {CONTINENT_ISOS[continent].map(iso => (
-                <button
-                  key={iso}
-                  className={`ob-country-chip${selectedISOs.includes(iso) ? ' selected' : ''}`}
-                  onClick={() => handleCountryToggle(iso)}
-                >
-                  {selectedISOs.includes(iso) ? '✓ ' : ''}{ISO_NAME[iso] || iso}
-                </button>
-              ))}
-            </div>
-          </>
-        )}
-
-        {/* City chips — per selected country */}
-        {selectedISOs.filter(iso => (COUNTRY_CITIES[iso]?.length ?? 0) > 0).map(iso => (
-          <div key={iso} style={{ marginTop: 20 }}>
-            <div className="ob-region-label">
-              {ISO_NAME[iso] || iso} — pick cities
-            </div>
-            <div className="ob-country-chips">
-              {COUNTRY_CITIES[iso].map(city => (
-                <button
-                  key={city}
-                  className={`ob-country-chip${selectedCities.includes(city) ? ' selected city' : ''}`}
-                  onClick={() => setSelectedCities(prev =>
-                    prev.includes(city) ? prev.filter(c => c !== city) : [...prev, city]
-                  )}
-                >
-                  {selectedCities.includes(city) ? '✓ ' : ''}{city}
-                </button>
-              ))}
-            </div>
-          </div>
-        ))}
-
-        {/* Summary line */}
-        {selectedISOs.length > 0 && (
-          <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <div style={{ fontFamily: "'Space Mono', monospace", fontSize: 10, letterSpacing: 2, color: 'var(--accent)', textTransform: 'uppercase' }}>
-              Countries: {selectedISOs.map(i => ISO_NAME[i] || i).join(' · ')}
-            </div>
-            {selectedCities.length > 0 && (
-              <div style={{ fontFamily: "'Space Mono', monospace", fontSize: 10, letterSpacing: 2, color: 'var(--hi)', textTransform: 'uppercase' }}>
-                Cities: {selectedCities.join(' · ')}
-              </div>
+            />
+            {searchQuery && (
+              <button
+                onClick={() => { setSearchQuery(''); setShowDropdown(false) }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.4)', fontSize: 18, lineHeight: 1, padding: 0 }}
+              >×</button>
             )}
           </div>
+
+          {/* ── Dropdown ── */}
+          {showDropdown && filteredCities.length > 0 && (
+            <div style={{
+              position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50,
+              background: '#0D1528',
+              border: '1.5px solid var(--accent)',
+              borderTop: '1px solid rgba(64,224,208,0.25)',
+              borderRadius: '0 0 12px 12px',
+              overflow: 'hidden',
+              boxShadow: '0 12px 40px rgba(0,0,0,0.7)',
+            }}>
+              {filteredCities.map((opt, idx) => (
+                <button
+                  key={`${opt.iso}-${opt.city}`}
+                  onMouseDown={e => e.preventDefault()}
+                  onClick={() => handleCitySelect(opt.city, opt.iso)}
+                  style={{
+                    width: '100%', display: 'flex', alignItems: 'center',
+                    gap: 12, padding: '11px 16px', background: 'none', border: 'none',
+                    cursor: 'pointer', textAlign: 'left',
+                    borderBottom: idx < filteredCities.length - 1
+                      ? '1px solid rgba(255,255,255,0.06)' : 'none',
+                    transition: 'background 0.12s',
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'rgba(64,224,208,0.08)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'none')}
+                >
+                  <span style={{ fontSize: 16 }}>📍</span>
+                  <div>
+                    <div style={{
+                      fontFamily: "'Rajdhani', sans-serif", fontSize: 15,
+                      fontWeight: 600, color: '#fff',
+                    }}>{opt.city}</div>
+                    <div style={{
+                      fontFamily: "'Space Mono', monospace", fontSize: 9,
+                      letterSpacing: '0.1em', color: 'rgba(255,255,255,0.4)',
+                      textTransform: 'uppercase', marginTop: 1,
+                    }}>{opt.countryName}</div>
+                  </div>
+                  {selectedCities.includes(opt.city) && (
+                    <span style={{ marginLeft: 'auto', color: 'var(--accent)', fontSize: 14 }}>✓</span>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* No results */}
+          {showDropdown && searchQuery.length > 1 && filteredCities.length === 0 && (
+            <div style={{
+              position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50,
+              background: '#0D1528', border: '1.5px solid rgba(64,224,208,0.2)',
+              borderTop: 'none', borderRadius: '0 0 12px 12px',
+              padding: '14px 16px',
+              fontFamily: "'Space Mono', monospace", fontSize: 10,
+              color: 'rgba(255,255,255,0.3)', letterSpacing: '0.1em',
+            }}>
+              No cities found for "{searchQuery}"
+            </div>
+          )}
+        </div>
+
+        {/* ── Selected city pills ── */}
+        {selectedCities.length > 0 && (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 14, maxWidth: 520 }}>
+            {selectedCities.map(city => {
+              const iso = CITY_TO_ISO[city]
+              return (
+                <div key={city} style={{
+                  display: 'flex', alignItems: 'center', gap: 7,
+                  background: 'rgba(64,224,208,0.10)',
+                  border: '1px solid rgba(64,224,208,0.35)',
+                  borderRadius: 20, padding: '6px 12px 6px 10px',
+                }}>
+                  <span style={{ fontSize: 13 }}>📍</span>
+                  <div>
+                    <span style={{
+                      fontFamily: "'Rajdhani', sans-serif", fontSize: 14,
+                      fontWeight: 600, color: 'var(--accent)',
+                    }}>{city}</span>
+                    {iso && (
+                      <span style={{
+                        fontFamily: "'Space Mono', monospace", fontSize: 8,
+                        color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase',
+                        letterSpacing: '0.1em', marginLeft: 6,
+                      }}>{ISO_NAME[iso] || iso}</span>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => handleCityRemove(city)}
+                    style={{
+                      background: 'none', border: 'none', cursor: 'pointer',
+                      color: 'rgba(255,255,255,0.4)', fontSize: 16,
+                      lineHeight: 1, padding: 0, marginLeft: 2,
+                    }}
+                  >×</button>
+                </div>
+              )
+            })}
+          </div>
         )}
+
+        {/* ── Hint text ── */}
+        {selectedCities.length === 0 && (
+          <p style={{
+            fontFamily: "'Space Mono', monospace", fontSize: 9,
+            letterSpacing: '0.12em', color: 'rgba(255,255,255,0.25)',
+            textTransform: 'uppercase', marginTop: 10,
+          }}>
+            Add one or more cities to see them on the map
+          </p>
+        )}
+        {selectedCities.length > 0 && selectedCities.length <= 2 && (
+          <p style={{
+            fontFamily: "'Space Mono', monospace", fontSize: 9,
+            letterSpacing: '0.12em', color: 'rgba(255,255,255,0.25)',
+            textTransform: 'uppercase', marginTop: 10,
+          }}>
+            Add 3+ cities to zoom in &amp; see city pins on the map
+          </p>
+        )}
+
+        {/* ── World Map ── */}
+        <div style={{ marginTop: 24, width: '100%', maxWidth: 700 }}>
+          <WorldMap selectedISOs={selectedISOs} selectedCities={selectedCities} />
+        </div>
       </div>
 
       <div className="ob-progress">
