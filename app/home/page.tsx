@@ -1274,13 +1274,15 @@ export default function GuestHomePage() {
         mapsUrls: Record<string, string>
       }) => {
         setGoogleLoyaltyHotels(loyalty)
-        setGoogleBudgetHotels(budget)
+        // Only surface budget picks when the user has no loyalty programme
+        setGoogleBudgetHotels(noMembership ? budget : [])
         setHotelMapsUrls(mapsUrls)
 
         // Trigger photo fetch for all returned hotels
+        const budgetForPhotos = noMembership ? budget : []
         const allHotels = [
           ...loyalty.flatMap(({ city, hotels }) => hotels.map(h => ({ name: h.name, city }))),
-          ...budget.flatMap(({ city, hotels }) => hotels.map(h => ({ name: h.name, city }))),
+          ...budgetForPhotos.flatMap(({ city, hotels }) => hotels.map(h => ({ name: h.name, city }))),
         ]
         if (allHotels.length) loadHotelPhotos(allHotels)
       })
@@ -1432,8 +1434,8 @@ export default function GuestHomePage() {
               </div>
             )
 
-            // Show budget picks when: no loyalty selected, OR loyalty selected but no brand hotels found nearby
-            const showBudgetMode = noMembership || googleLoyaltyHotels.length === 0
+            // Show budget picks only when user explicitly has no loyalty programme
+            const showBudgetMode = noMembership
             if (showBudgetMode) {
               // Budget picks from Google Places
               return (
