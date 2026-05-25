@@ -21,6 +21,9 @@ echo "▶ Running DB migrations"
 npm run db:migrate
 
 echo "▶ Building Next.js (standalone)"
+# Unset NODE_ENV first, then set to production — overrides any value in .env
+# or the system environment that would trigger Next.js non-standard NODE_ENV warning
+unset NODE_ENV
 NODE_ENV=production npm run build
 
 # Copy static assets into the standalone output (Next.js requires this step)
