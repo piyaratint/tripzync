@@ -21,7 +21,7 @@ echo "▶ Running DB migrations"
 npm run db:migrate
 
 echo "▶ Building Next.js (standalone)"
-npm run build
+NODE_ENV=production npm run build
 
 # Copy static assets into the standalone output (Next.js requires this step)
 echo "▶ Copying public/ and static assets into standalone build"
