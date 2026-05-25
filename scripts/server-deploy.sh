@@ -5,7 +5,7 @@
 # ─────────────────────────────────────────────────────────────────────────────
 set -euo pipefail
 
-APP_DIR="${APP_DIR:-/var/www/webroot/ROOT}"   # default Jelastic app root
+APP_DIR="${APP_DIR:-/home/jelastic/ROOT}"     # Jelastic app root
 PORT="${PORT:-3000}"                          # Next.js listens on this port
 
 echo "▶ Entering $APP_DIR"

@@ -18,5 +18,5 @@ jobs:
           key: ${{ secrets.JELASTIC_SSH_KEY }}
           port: ${{ secrets.JELASTIC_PORT }}       # usually 3022 on Jelastic, or 22
           script: |
-            export APP_DIR="${{ secrets.JELASTIC_APP_DIR }}"
+            export APP_DIR="${{ secrets.JELASTIC_APP_DIR || '/home/jelastic/ROOT' }}"
             bash $APP_DIR/scripts/server-deploy.sh
