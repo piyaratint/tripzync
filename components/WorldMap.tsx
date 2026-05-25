@@ -1,7 +1,7 @@
 'use client'
 
-import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps'
-import { useMemo } from 'react'
+import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from 'react-simple-maps'
+import { useMemo, useState, useEffect } from 'react'
 
 const GEO_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'
 
@@ -282,6 +282,9 @@ const CITY_COORDS: Record<string, [number, number]> = {
   'Yasawa Islands':[177.53,-17.04],'Coral Coast':[177.78,-18.14],
 }
 
+// Base projection scale — ZoomableGroup multiplies on top of this
+const BASE_SCALE = 140
+
 interface WorldMapProps {
   selectedISOs: string[]
   selectedCities: string[]
@@ -293,111 +296,205 @@ export function WorldMap({ selectedISOs, selectedCities }: WorldMapProps) {
     [selectedISOs]
   )
 
-  // Switch to zoomed + dots when >2 cities all from one country
-  const showDots    = selectedCities.length > 2
-  const singleISO   = selectedISOs.length === 1
-  const zoomConfig  = showDots && singleISO ? COUNTRY_ZOOM[selectedISOs[0]] ?? null : null
+  // ── Zoom/pan state ────────────────────────────────────────────────────────
+  const [mapCenter, setMapCenter] = useState<[number, number]>([0, 15])
+  const [mapZoom,   setMapZoom]   = useState(1)
+  const [isDragging, setIsDragging] = useState(false)
 
-  const projConfig = zoomConfig
-    ? { center: zoomConfig.center, scale: zoomConfig.scale }
-    : { center: [0, 15] as [number, number], scale: 140 }
+  // Determine auto-zoom target based on city selection
+  const showDots  = selectedCities.length > 2
+  const singleISO = selectedISOs.length === 1
+  const zoomConfig = showDots && singleISO ? COUNTRY_ZOOM[selectedISOs[0]] ?? null : null
 
-  // Height adapts: taller in zoomed mode to fit cities + labels
-  const mapHeight = zoomConfig ? 420 : 320
+  // When auto-zoom target changes, fly there
+  useEffect(() => {
+    if (zoomConfig) {
+      setMapCenter(zoomConfig.center)
+      setMapZoom(Math.round(zoomConfig.scale / BASE_SCALE))
+    } else {
+      setMapCenter([0, 15])
+      setMapZoom(1)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedISOs.join(','), showDots])
+
+  const handleZoomIn  = () => setMapZoom(z => Math.min(z * 1.6, 40))
+  const handleZoomOut = () => setMapZoom(z => Math.max(z / 1.6, 1))
+  const handleReset   = () => { setMapCenter([0, 15]); setMapZoom(1) }
+
+  // Label: show dots in zoomed mode OR when user has zoomed in manually
+  const isZoomedIn = mapZoom > 3
+  const showLabels = isZoomedIn && showDots
+
+  // Dot size inversely scales so pins stay readable at any zoom
+  const dotR = isZoomedIn ? Math.max(3, 6 / Math.sqrt(mapZoom / 8)) : 3.5
+
+  const statusLabel = zoomConfig
+    ? `↗ zoomed · ${selectedCities.length} cities`
+    : selectedCities.length > 2
+      ? `${selectedISOs.length} countries · ${selectedCities.length} cities`
+      : selectedISOs.length > 0
+        ? `${selectedISOs.length} countr${selectedISOs.length > 1 ? 'ies' : 'y'} highlighted`
+        : null
 
   return (
     <div style={{
       width: '100%',
-      height: mapHeight,
+      height: 400,
       background: 'rgba(7,10,25,0.95)',
       borderRadius: 16,
       overflow: 'hidden',
       border: '1px solid rgba(64,224,208,0.18)',
       boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
-      transition: 'height 0.4s ease',
       position: 'relative',
+      cursor: isDragging ? 'grabbing' : 'grab',
+      userSelect: 'none',
     }}>
-      {/* Map mode label */}
-      {selectedISOs.length > 0 && (
+
+      {/* ── Status label ── */}
+      {statusLabel && (
         <div style={{
           position: 'absolute', top: 12, left: 16, zIndex: 10,
           fontFamily: "'Space Mono', monospace",
           fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase',
-          color: 'var(--accent)', opacity: 0.75,
-          background: 'rgba(7,10,25,0.8)',
+          color: 'var(--accent)', opacity: 0.8,
+          background: 'rgba(7,10,25,0.85)',
           padding: '4px 8px', borderRadius: 6,
+          backdropFilter: 'blur(4px)',
+          pointerEvents: 'none',
         }}>
-          {zoomConfig
-            ? `↗ zoomed · ${selectedCities.length} cities`
-            : selectedCities.length > 2
-              ? `${selectedISOs.length} countries · ${selectedCities.length} cities`
-              : `${selectedISOs.length} countr${selectedISOs.length > 1 ? 'ies' : 'y'} highlighted`}
+          {statusLabel}
         </div>
       )}
 
+      {/* ── Zoom controls ── */}
+      <div style={{
+        position: 'absolute', bottom: 16, right: 16, zIndex: 10,
+        display: 'flex', flexDirection: 'column', gap: 6,
+      }}>
+        {[
+          { label: '+', title: 'Zoom in',    onClick: handleZoomIn  },
+          { label: '−', title: 'Zoom out',   onClick: handleZoomOut },
+          { label: '⊙', title: 'Reset view', onClick: handleReset   },
+        ].map(({ label, title, onClick }) => (
+          <button
+            key={label}
+            title={title}
+            onClick={onClick}
+            style={{
+              width: 32, height: 32,
+              background: 'rgba(7,10,25,0.90)',
+              border: '1px solid rgba(64,224,208,0.30)',
+              borderRadius: 8,
+              color: 'var(--accent)',
+              fontSize: label === '⊙' ? 16 : 20,
+              lineHeight: 1,
+              cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              backdropFilter: 'blur(4px)',
+              transition: 'border-color 0.15s, background 0.15s',
+            }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLButtonElement).style.background = 'rgba(64,224,208,0.15)'
+              ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--accent)'
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLButtonElement).style.background = 'rgba(7,10,25,0.90)'
+              ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(64,224,208,0.30)'
+            }}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {/* ── Scroll hint (shown only on world view) ── */}
+      {mapZoom === 1 && (
+        <div style={{
+          position: 'absolute', bottom: 14, left: 16, zIndex: 10,
+          fontFamily: "'Space Mono', monospace",
+          fontSize: 8, letterSpacing: '0.12em', textTransform: 'uppercase',
+          color: 'rgba(255,255,255,0.22)',
+          pointerEvents: 'none',
+        }}>
+          scroll to zoom · drag to pan
+        </div>
+      )}
+
+      {/* ── Map ── */}
       <ComposableMap
         projection="geoMercator"
-        projectionConfig={projConfig}
+        projectionConfig={{ scale: BASE_SCALE, center: [0, 15] }}
         width={800}
-        height={mapHeight}
+        height={400}
         style={{ width: '100%', height: '100%', display: 'block' }}
       >
-        <Geographies geography={GEO_URL}>
-          {({ geographies }) =>
-            geographies.map(geo => {
-              const isSelected = selectedNums.has(String(geo.id))
-              return (
-                <Geography
-                  key={geo.rsmKey}
-                  geography={geo}
-                  fill={isSelected ? 'rgba(64,224,208,0.30)' : '#0B1830'}
-                  stroke={isSelected ? '#40E0D0' : '#162540'}
-                  strokeWidth={isSelected ? 1.2 : 0.4}
-                  style={{
-                    default: { outline: 'none' },
-                    hover:   { outline: 'none' },
-                    pressed: { outline: 'none' },
-                  }}
-                />
-              )
-            })
-          }
-        </Geographies>
+        <ZoomableGroup
+          center={mapCenter}
+          zoom={mapZoom}
+          minZoom={1}
+          maxZoom={40}
+          onMoveStart={() => setIsDragging(true)}
+          onMoveEnd={({ coordinates, zoom }: { coordinates: [number, number]; zoom: number }) => {
+            setIsDragging(false)
+            setMapCenter(coordinates)
+            setMapZoom(zoom)
+          }}
+        >
+          <Geographies geography={GEO_URL}>
+            {({ geographies }) =>
+              geographies.map(geo => {
+                const isSelected = selectedNums.has(String(geo.id))
+                return (
+                  <Geography
+                    key={geo.rsmKey}
+                    geography={geo}
+                    fill={isSelected ? 'rgba(64,224,208,0.32)' : '#0B1830'}
+                    stroke={isSelected ? '#40E0D0' : '#162540'}
+                    strokeWidth={isSelected ? 1.0 / mapZoom : 0.4 / mapZoom}
+                    style={{
+                      default: { outline: 'none' },
+                      hover:   { outline: 'none', fill: isSelected ? 'rgba(64,224,208,0.45)' : '#12203a' },
+                      pressed: { outline: 'none' },
+                    }}
+                  />
+                )
+              })
+            }
+          </Geographies>
 
-        {/* City dots — appear when >2 cities selected */}
-        {showDots && selectedCities.map(city => {
-          const coords = CITY_COORDS[city]
-          if (!coords) return null
-          const r = zoomConfig ? 6 : 3.5
-          return (
-            <Marker key={city} coordinates={coords}>
-              <circle
-                r={r}
-                fill="#FFC947"
-                stroke="rgba(255,255,255,0.9)"
-                strokeWidth={1.5}
-                style={{ filter: 'drop-shadow(0 0 5px rgba(255,201,71,0.8))' }}
-              />
-              {/* City label only in zoomed mode */}
-              {zoomConfig && (
-                <text
-                  textAnchor="middle"
-                  y={-11}
-                  style={{
-                    fontFamily: "'Rajdhani', sans-serif",
-                    fontSize: 11,
-                    fontWeight: 700,
-                    fill: '#ffffff',
-                    pointerEvents: 'none',
-                    textShadow: '0 1px 3px rgba(0,0,0,0.9)',
-                  }}
-                >
-                  {city}
-                </text>
-              )}
-            </Marker>
-          )
-        })}
+          {/* City dots */}
+          {showDots && selectedCities.map(city => {
+            const coords = CITY_COORDS[city]
+            if (!coords) return null
+            return (
+              <Marker key={city} coordinates={coords}>
+                <circle
+                  r={dotR / mapZoom}
+                  fill="#FFC947"
+                  stroke="rgba(255,255,255,0.9)"
+                  strokeWidth={1.2 / mapZoom}
+                  style={{ filter: 'drop-shadow(0 0 4px rgba(255,201,71,0.9))' }}
+                />
+                {showLabels && (
+                  <text
+                    textAnchor="middle"
+                    y={-9 / mapZoom}
+                    style={{
+                      fontFamily: "'Rajdhani', sans-serif",
+                      fontSize: 10 / mapZoom,
+                      fontWeight: 700,
+                      fill: '#ffffff',
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    {city}
+                  </text>
+                )}
+              </Marker>
+            )
+          })}
+        </ZoomableGroup>
       </ComposableMap>
     </div>
   )
