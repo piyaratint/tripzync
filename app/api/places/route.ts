@@ -284,50 +284,7 @@ const PLACES_DB: Record<string, Omit<Place, 'rank'>[]> = {
   ],
 
   // ── AMERICAS ─────────────────────────────────────────────────────────────────
-  'New York': [
-    { name: 'Central Park',          type: 'Park',          image: 'https://images.unsplash.com/photo-1534430480872-3498386e7856?w=600&q=80' },
-    { name: 'Statue of Liberty',     type: 'Landmark',      image: 'https://images.unsplash.com/photo-1534430480872-3498386e7856?w=600&q=80' },
-    { name: 'Times Square',          type: 'Urban Icon',    image: 'https://images.unsplash.com/photo-1534430480872-3498386e7856?w=600&q=80' },
-    { name: 'Brooklyn Bridge',       type: 'Landmark',      image: 'https://images.unsplash.com/photo-1449034446853-66c86144b0ad?w=600&q=80' },
-    { name: 'Metropolitan Museum',   type: 'Museum',        image: 'https://images.unsplash.com/photo-1551009175-15bdf9dcb580?w=600&q=80' },
-    { name: 'The High Line',         type: 'Park',          image: 'https://images.unsplash.com/photo-1480796927426-f609979314bd?w=600&q=80' },
-    { name: 'MoMA',                  type: 'Museum',        image: 'https://images.unsplash.com/photo-1549144511-f099e773c147?w=600&q=80' },
-    { name: 'Empire State Building', type: 'Landmark',      image: 'https://images.unsplash.com/photo-1534430480872-3498386e7856?w=600&q=80' },
-    { name: 'DUMBO & Brooklyn',      type: 'Neighbourhood', image: 'https://images.unsplash.com/photo-1543832923-44667a44c804?w=600&q=80' },
-    { name: 'One World Observatory', type: 'Landmark',      image: 'https://images.unsplash.com/photo-1534430480872-3498386e7856?w=600&q=80' },
-  ],
-  'Los Angeles': [
-    { name: 'Hollywood Walk of Fame',type: 'Landmark',      image: 'https://images.unsplash.com/photo-1581351721010-8cf859cb14a4?w=600&q=80' },
-    { name: 'Griffith Observatory', type: 'Landmark',       image: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=600&q=80' },
-    { name: 'Venice Beach',          type: 'Beach',         image: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&q=80' },
-    { name: 'The Getty Museum',      type: 'Museum',        image: 'https://images.unsplash.com/photo-1551009175-15bdf9dcb580?w=600&q=80' },
-    { name: 'Santa Monica Pier',     type: 'Entertainment', image: 'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=600&q=80' },
-    { name: 'Universal Studios Hollywood', type: 'Theme Park', image: 'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=600&q=80' },
-    { name: 'Beverly Hills',         type: 'Neighbourhood', image: 'https://images.unsplash.com/photo-1581351721010-8cf859cb14a4?w=600&q=80' },
-    { name: 'LACMA',                 type: 'Museum',        image: 'https://images.unsplash.com/photo-1549144511-f099e773c147?w=600&q=80' },
-  ],
-
-  // ── AUSTRALIA ───────────────────────────────────────────────────────────────
-  Sydney: [
-    { name: 'Sydney Opera House',    type: 'Landmark',      image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80' },
-    { name: 'Bondi Beach',           type: 'Beach',         image: 'https://images.unsplash.com/photo-1534567153574-2b12153a87f0?w=600&q=80' },
-    { name: 'Sydney Harbour Bridge', type: 'Landmark',      image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80' },
-    { name: 'Taronga Zoo',           type: 'Wildlife',      image: 'https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?w=600&q=80' },
-    { name: 'Royal Botanic Garden',  type: 'Garden',        image: 'https://images.unsplash.com/photo-1480796927426-f609979314bd?w=600&q=80' },
-    { name: 'Blue Mountains',        type: 'Nature',        image: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=600&q=80' },
-    { name: 'Darling Harbour',       type: 'Entertainment', image: 'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=600&q=80' },
-    { name: 'The Rocks',             type: 'Historical',    image: 'https://images.unsplash.com/photo-1543349689-9a4d426bee8e?w=600&q=80' },
-  ],
-  Melbourne: [
-    { name: 'Melbourne Laneways',    type: 'Urban',         image: 'https://images.unsplash.com/photo-1504214208698-ea1916a2195a?w=600&q=80' },
-    { name: 'Great Ocean Road',      type: 'Scenic Drive',  image: 'https://images.unsplash.com/photo-1493707069894-e5dde22a4c50?w=600&q=80' },
-    { name: 'Queen Victoria Market', type: 'Market',        image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&q=80' },
-    { name: 'Melbourne Museum',      type: 'Museum',        image: 'https://images.unsplash.com/photo-1551009175-15bdf9dcb580?w=600&q=80' },
-    { name: 'St Kilda Beach',        type: 'Beach',         image: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=600&q=80' },
-    { name: 'Dandenong Ranges',      type: 'Nature',        image: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=600&q=80' },
-    { name: 'National Gallery of Victoria', type: 'Museum', image: 'https://images.unsplash.com/photo-1549144511-f099e773c147?w=600&q=80' },
-    { name: 'Fitzroy & Collingwood', type: 'Neighbourhood', image: 'https://images.unsplash.com/photo-1543832923-44667a44c804?w=600&q=80' },
-  ],
+  // (New York, Los Angeles and other US cities are in the USA section below)
 
   // ── COUNTRY-LEVEL FALLBACKS (used when city not found) ───────────────────────
   Japan: [
@@ -632,7 +589,7 @@ const PLACES_DB: Record<string, Omit<Place, 'rank'>[]> = {
     { name: 'Lynn Canyon Park',       type: 'Nature',        image: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=600&q=80' },
     { name: 'Chinatown',              type: 'Cultural',      image: 'https://images.unsplash.com/photo-1519397374078-1faeb9edf073?w=600&q=80' },
   ],
-  // ── Australia — cities ───────────────────────────────────────────────────────
+  // ── Australia — cities ──────────────────────────────────────────────────────
   'Sydney': [
     { name: 'Sydney Opera House',     type: 'Landmark',      image: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=600&q=80' },
     { name: 'Sydney Harbour Bridge',  type: 'Landmark',      image: 'https://images.unsplash.com/photo-1534430480872-3498386e7856?w=600&q=80' },
