@@ -253,8 +253,9 @@ export async function POST(req: NextRequest) {
       // cap each brand at 5 properties
       if (brandBuckets[detectedBrand].length < 5) {
         const cityCenter = brandBuckets[detectedBrand].filter(x => !isAirportHotel(x.name))
-        // prefer non-airport when we already have 2+ city-center picks
-        if (isAirportHotel(hotel.name) && cityCenter.length >= 2) return
+        // Once we have 2+ city-center picks, skip airport hotels for this brand.
+        // Use `continue` (not `return`) — `return` would exit the entire route handler.
+        if (isAirportHotel(hotel.name) && cityCenter.length >= 2) continue
         brandBuckets[detectedBrand].push(hotel)
       }
     }
