@@ -61,7 +61,7 @@ const COUNTRY_ZOOM: Record<string, { center: [number, number]; scale: number }> 
   IRL:{ center:[-8,53.2],    scale:4000 },
   HUN:{ center:[19,47],      scale:4000 },
   ISL:{ center:[-18.5,65],   scale:2500 },
-  USA:{ center:[-98,38],     scale:470  },
+  USA:{ center:[-97,39],     scale:840  },  // contiguous 48 only — Alaska/Hawaii fall off edges
   CAN:{ center:[-96,60],     scale:340  },
   MEX:{ center:[-102,23.6],  scale:900  },
   BRA:{ center:[-51.9,-14.2],scale:360  },
