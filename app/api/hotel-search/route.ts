@@ -171,45 +171,37 @@ async function getTravelTimes(
 }
 
 // ── POST /api/hotel-search ────────────────────────────────────────────────────
-// Body: {
-//   clusters: Array<{ city, lat, lng, radiusMeters }>,
-//   brands:   string[],   // loyalty brand keys; empty = no membership (show all)
-// }
+// Body: { clusters: Array<{ city, lat, lng, radiusMeters }> }
 // Returns: {
-//   loyalty:  Array<{ city, brand, hotels: GoogleHotel[] }>,   // sorted by travelMins ↑
-//   budget:   Array<{ city, hotels: GoogleHotel[] }>,
+//   brands:   Array<{ city, brand, hotels: GoogleHotel[] }>,  // sorted by travelMins ↑
 //   mapsUrls: Record<string, string>,
 // }
 //
 // Pipeline:
 //   searchNearby (geo-locked)
 //   → Distance Matrix (≤ 45 min driving filter)
-//   → brand match
-//   → sort by travelMins ascending
+//   → group ALL hotels by detected brand ('independent' when no brand matches)
+//   → sort by travelMins ascending within each brand group
 export async function POST(req: NextRequest) {
-  const body    = await req.json()
+  const body     = await req.json()
   const clusters: ClusterDef[] = body.clusters ?? []
-  const brands:   string[]     = body.brands   ?? []
-  const noMembership = brands.length === 0
 
   console.log('[hotel-search] clusters:', JSON.stringify(clusters))
-  console.log('[hotel-search] brands:', brands, '| noMembership:', noMembership)
 
   if (!clusters.length) {
     console.log('[hotel-search] ❌ no clusters — returning empty')
-    return NextResponse.json({ loyalty: [], budget: [], mapsUrls: {} })
+    return NextResponse.json({ brands: [], mapsUrls: {} })
   }
 
   const apiKey = process.env.GOOGLE_PLACES_API_KEY
   if (!apiKey) {
     console.log('[hotel-search] ❌ GOOGLE_PLACES_API_KEY not set')
-    return NextResponse.json({ loyalty: [], budget: [], mapsUrls: {} })
+    return NextResponse.json({ brands: [], mapsUrls: {} })
   }
 
   const MAX_TRAVEL_MINS = 45 // 45-minute driving cutoff
 
-  const loyalty: { city: string; brand: string; hotels: GoogleHotel[] }[] = []
-  const budget:  { city: string; hotels: GoogleHotel[] }[]                = []
+  const brands: { city: string; brand: string; hotels: GoogleHotel[] }[] = []
   const mapsUrls: Record<string, string> = {}
 
   await Promise.all(clusters.map(async cluster => {
@@ -223,19 +215,16 @@ export async function POST(req: NextRequest) {
     console.log(`[hotel-search] travelMap size: ${travelMap.size} / ${candidates.length}`)
 
     // Step 3 — attach travel time, filter > 45 min, enrich with display data
-    const enriched: (GoogleHotel & { brand: string | null; travelSecs: number })[] = []
+    const enriched: (GoogleHotel & { detectedBrand: string; travelSecs: number })[] = []
 
     candidates.forEach((c, idx) => {
-      // Skip obvious non-hotels
       if (!isRealHotel(c.name)) return
 
-      // Travel time: use Distance Matrix result if available, else estimate via Haversine
       const dmSecs = travelMap.get(idx)
       const travelMins = dmSecs !== undefined
         ? Math.round(dmSecs / 60)
         : estimateTravelMins(c.lat, c.lng, cluster.lat, cluster.lng)
 
-      // Exclude hotels that take more than 45 minutes to reach the cluster center
       if (travelMins > MAX_TRAVEL_MINS) return
 
       const travelSecs = dmSecs !== undefined ? dmSecs : travelMins * 60
@@ -245,40 +234,43 @@ export async function POST(req: NextRequest) {
         : `https://www.google.com/maps/search/?api=1&query=${c.lat},${c.lng}`
 
       mapsUrls[c.name] = mapsUrl
-      enriched.push({ name: c.name, tier, price, stars, mapsUrl, travelMins, lat: c.lat, lng: c.lng, brand: detectBrand(c.name), travelSecs })
+      enriched.push({
+        name: c.name, tier, price, stars, mapsUrl, travelMins,
+        lat: c.lat, lng: c.lng,
+        detectedBrand: detectBrand(c.name) ?? 'independent',
+        travelSecs,
+      })
     })
 
-    // Step 4 — sort by travel time ascending
+    // Step 4 — sort all hotels by proximity ascending
     enriched.sort((a, b) => a.travelSecs - b.travelSecs)
 
-    // Step 5 — split into loyalty brand buckets; always build budget as fallback
+    // Step 5 — group into brand buckets (preserving proximity order)
     const brandBuckets: Record<string, GoogleHotel[]> = {}
-    const budgetBucket: GoogleHotel[] = []
-
     for (const h of enriched) {
-      const { travelSecs: _, brand: detectedBrand, ...hotel } = h
-      budgetBucket.push(hotel) // always — used as fallback when no brand matches found
-      if (!noMembership && detectedBrand && brands.includes(detectedBrand)) {
-        if (!brandBuckets[detectedBrand]) brandBuckets[detectedBrand] = []
+      const { travelSecs: _, detectedBrand, ...hotel } = h
+      if (!brandBuckets[detectedBrand]) brandBuckets[detectedBrand] = []
+      // cap each brand at 5 properties
+      if (brandBuckets[detectedBrand].length < 5) {
+        const cityCenter = brandBuckets[detectedBrand].filter(x => !isAirportHotel(x.name))
+        // prefer non-airport when we already have 2+ city-center picks
+        if (isAirportHotel(hotel.name) && cityCenter.length >= 2) return
         brandBuckets[detectedBrand].push(hotel)
       }
     }
 
-    // Loyalty: prefer non-airport, top 5 per brand
-    for (const [brand, hotels] of Object.entries(brandBuckets)) {
-      const cityCenter = hotels.filter(h => !isAirportHotel(h.name))
-      const toShow = cityCenter.length >= 2 ? cityCenter.slice(0, 5) : hotels.slice(0, 5)
-      if (toShow.length) loyalty.push({ city: cluster.city, brand, hotels: toShow })
-    }
-
-    // Budget: always computed — primary display when noMembership, fallback when no brand matches
-    if (budgetBucket.length) {
-      const cityCenter = budgetBucket.filter(h => !isAirportHotel(h.name))
-      const toShow = (cityCenter.length >= 2 ? cityCenter : budgetBucket).slice(0, 5)
-      if (toShow.length) budget.push({ city: cluster.city, hotels: toShow })
+    // Step 6 — push brand groups: known chains first, then independents
+    const knownOrder = ['marriott', 'hilton', 'hyatt', 'ihg', 'accor']
+    const sorted = [
+      ...knownOrder.filter(b => brandBuckets[b]),
+      ...Object.keys(brandBuckets).filter(b => !knownOrder.includes(b) && b !== 'independent'),
+      ...(brandBuckets['independent'] ? ['independent'] : []),
+    ]
+    for (const brand of sorted) {
+      brands.push({ city: cluster.city, brand, hotels: brandBuckets[brand] })
     }
   }))
 
-  console.log(`[hotel-search] ✅ returning loyalty:${loyalty.length} budget:${budget.length}`)
-  return NextResponse.json({ loyalty, budget, mapsUrls })
+  console.log(`[hotel-search] ✅ returning ${brands.length} brand groups`)
+  return NextResponse.json({ brands, mapsUrls })
 }

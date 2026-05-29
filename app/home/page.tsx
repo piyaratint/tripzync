@@ -999,9 +999,8 @@ export default function GuestHomePage() {
   const [hotelPhotoMap,     setHotelPhotoMap]     = useState<Record<string, string>>({})
   const [brandVisibility,       setBrandVisibility]       = useState<Record<string, boolean>>({})
   const [hotelMapsUrls,         setHotelMapsUrls]         = useState<Record<string, string>>({})
-  // Results from /api/hotel-search (Google Places nearbySearch — geo-locked to cluster)
-  const [googleLoyaltyHotels,   setGoogleLoyaltyHotels]   = useState<{ brand: string; city: string; hotels: HotelSuggestion[] }[]>([])
-  const [googleBudgetHotels,    setGoogleBudgetHotels]     = useState<{ city: string; hotels: HotelSuggestion[] }[]>([])
+  // Results from /api/hotel-search — all hotels grouped by brand, sorted by proximity
+  const [googleHotelsByBrand,   setGoogleHotelsByBrand]   = useState<{ brand: string; city: string; hotels: HotelSuggestion[] }[]>([])
   const [hotelsLoading,         setHotelsLoading]          = useState(false)
   const [hotelSortByPrice,      setHotelSortByPrice]       = useState(false)
   const [tooltip,     setTooltip]     = useState<Tooltip | null>(null)
@@ -1215,24 +1214,18 @@ export default function GuestHomePage() {
   )
   const tripCentroid = centroid(allPlaceCoords)
 
-  // Hotels come from /api/hotel-search (Google Places searchNearby) — not the static HOTEL_DB.
-  // mapHotels is used only for map pins and uses the already-fetched Google results.
-  // lat/lng come directly from the searchNearby response so no /api/place-coords re-fetch is needed.
-  const mapHotels: { name: string; city: string; brand: string; lat?: number; lng?: number }[] = [
-    ...googleLoyaltyHotels.flatMap(({ brand, city, hotels }) =>
+  // Hotels come from /api/hotel-search (Google Places searchNearby).
+  // lat/lng come directly from the API so no /api/place-coords re-fetch is needed.
+  const mapHotels: { name: string; city: string; brand: string; lat?: number; lng?: number }[] =
+    googleHotelsByBrand.flatMap(({ brand, city, hotels }) =>
       hotels.map(h => ({ name: h.name, city, brand, lat: h.lat, lng: h.lng }))
-    ),
-    ...googleBudgetHotels.flatMap(({ city, hotels }) =>
-      hotels.map(h => ({ name: h.name, city, brand: 'budget', lat: h.lat, lng: h.lng }))
-    ),
-  ]
+    )
 
   // Fetch real nearby hotels from Google Places whenever selected places or brands change.
   // The geo-boundary is enforced at the searchNearby API level — no post-processing filter needed.
   useEffect(() => {
     if (!suggestCities.length) {
-      setGoogleLoyaltyHotels([])
-      setGoogleBudgetHotels([])
+      setGoogleHotelsByBrand([])
       return
     }
 
@@ -1264,35 +1257,29 @@ export default function GuestHomePage() {
     fetch('/api/hotel-search', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ clusters, brands: hotelBrands }),
+      body: JSON.stringify({ clusters }),
     })
       .then(r => r.json())
-      .then(({ loyalty, budget, mapsUrls }: {
-        loyalty:  { brand: string; city: string; hotels: HotelSuggestion[] }[]
-        budget:   { city: string; hotels: HotelSuggestion[] }[]
+      .then(({ brands, mapsUrls }: {
+        brands:   { brand: string; city: string; hotels: HotelSuggestion[] }[]
         mapsUrls: Record<string, string>
       }) => {
-        setGoogleLoyaltyHotels(loyalty)
-        // Only surface budget picks when the user has no loyalty programme
-        setGoogleBudgetHotels(noMembership ? budget : [])
+        setGoogleHotelsByBrand(brands)
         setHotelMapsUrls(mapsUrls)
 
         // Trigger photo fetch for all returned hotels
-        const budgetForPhotos = noMembership ? budget : []
-        const allHotels = [
-          ...loyalty.flatMap(({ city, hotels }) => hotels.map(h => ({ name: h.name, city }))),
-          ...budgetForPhotos.flatMap(({ city, hotels }) => hotels.map(h => ({ name: h.name, city }))),
-        ]
+        const allHotels = brands.flatMap(({ city, hotels }) =>
+          hotels.map(h => ({ name: h.name, city }))
+        )
         if (allHotels.length) loadHotelPhotos(allHotels)
       })
       .catch((err) => {
         console.error('[hotel-search] client fetch error:', err)
-        setGoogleLoyaltyHotels([])
-        setGoogleBudgetHotels([])
+        setGoogleHotelsByBrand([])
       })
       .finally(() => setHotelsLoading(false))
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [suggestCities.join(','), allPlaceCoords.map(c => c.join(',')).join('|'), hotelBrands.join(',')])
+  }, [suggestCities.join(','), allPlaceCoords.map(c => c.join(',')).join('|')])
 
   // city for weather — first city or first selected country
   const weatherCity = data?.cities?.[0] || data?.countries?.[0] || destination
@@ -1406,8 +1393,8 @@ export default function GuestHomePage() {
               Finding hotels near your route…
             </div>
           )}
-          {!hotelsLoading && (googleLoyaltyHotels.length > 0 || googleBudgetHotels.length > 0) && (() => {
-            // Sort hotels by travel time (default) or price (toggle)
+          {!hotelsLoading && googleHotelsByBrand.length > 0 && (() => {
+            // Sort within each brand group by proximity (default) or price
             const extractPrice = (p: string) => parseInt(p.replace(/[^0-9]/g, '')) || 9999
             const sortHotels = (hotels: HotelSuggestion[]) =>
               [...hotels].sort((a, b) =>
@@ -1423,7 +1410,7 @@ export default function GuestHomePage() {
                     background: !hotelSortByPrice ? 'rgba(64,224,208,.15)' : 'rgba(255,255,255,.05)',
                     borderColor: !hotelSortByPrice ? 'rgba(64,224,208,.4)' : 'rgba(255,255,255,.12)',
                     color: !hotelSortByPrice ? 'var(--accent)' : 'rgba(255,255,255,.3)',
-                  }}>⏱ Time</button>
+                  }}>⏱ Nearest</button>
                 <button onClick={() => setHotelSortByPrice(true)}
                   style={{ fontFamily:"'Space Mono',monospace", fontSize:8, letterSpacing:1, padding:'3px 9px', borderRadius:20, cursor:'pointer', border:'1px solid', transition:'all .2s',
                     background: hotelSortByPrice ? 'rgba(255,201,71,.15)' : 'rgba(255,255,255,.05)',
@@ -1433,100 +1420,56 @@ export default function GuestHomePage() {
               </div>
             )
 
-            // Show budget picks only when user explicitly has no loyalty programme
-            const showBudgetMode = noMembership
-            if (showBudgetMode) {
-              // Budget picks from Google Places
-              return (
-                <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-                  <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-                    <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, fontWeight:700, letterSpacing:3, textTransform:'uppercase', color:'rgba(255,255,255,.45)' }}>
-                      Picks Near Your Route
-                    </div>
-                    <SortToggle />
-                  </div>
-                  {googleBudgetHotels.map(({ city, hotels }) => {
-                    const sorted = sortHotels(hotels)
-                    if (!sorted.length) return null
-                    return (
-                    <div key={city} style={{ background:'var(--card)', border:'1px solid var(--border)', borderRadius:12, overflow:'hidden' }}>
-                      <div style={{ padding:'8px 14px', borderBottom:'1px solid var(--border)', fontFamily:"'Barlow Condensed',sans-serif", fontSize:12, fontWeight:700, letterSpacing:2, textTransform:'uppercase', color:'rgba(255,255,255,.6)' }}>
-                        📍 {city}
-                      </div>
-                      {sorted.map(h => (
-                        <div key={h.name} style={{ borderTop:'1px solid var(--border)' }}>
-                          <div style={{ position:'relative', width:'100%', height:100, overflow:'hidden', background:'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f2447 100%)' }}>
-                            <img
-                              key={hotelPhotoMap[h.name] || 'static'}
-                              src={hotelPhotoMap[h.name] || getHotelPhoto(h.name, h.tier)}
-                              alt={h.name}
-                              style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}
-                              onError={e => { const el = e.currentTarget as HTMLImageElement; el.style.opacity='0' }}
-                            />
-                            <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(7,8,15,.85) 0%, transparent 60%)' }} />
-                            <div style={{ position:'absolute', bottom:6, right:8, color:'#FFC947', fontSize:9, letterSpacing:1 }}>
-                              {'★'.repeat(h.stars)}
-                            </div>
-                          </div>
-                          <div style={{ display:'flex', alignItems:'center', gap:10, padding:'8px 14px' }}>
-                            <div style={{ flex:1, minWidth:0 }}>
-                              <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, fontWeight:700, color:'#fff', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', lineHeight:1.2 }}>{h.name}</div>
-                              <div style={{ display:'flex', alignItems:'center', gap:6, marginTop:2 }}>
-                                <span style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, letterSpacing:1, textTransform:'uppercase', color:'rgba(255,255,255,.5)' }}>{h.tier}</span>
-                                {h.travelMins !== undefined && (
-                                  <span style={{ fontFamily:"'Space Mono',monospace", fontSize:8, color:'rgba(64,224,208,.8)', background:'rgba(64,224,208,.08)', border:'1px solid rgba(64,224,208,.2)', borderRadius:10, padding:'1px 6px' }}>
-                                    ~{h.travelMins} min
-                                  </span>
-                                )}
-                                {hotelMapsUrls[h.name] && (
-                                  <a href={hotelMapsUrls[h.name]} target="_blank" rel="noopener noreferrer"
-                                    style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:8, letterSpacing:1, textTransform:'uppercase', color:'#4A9EFF', textDecoration:'none', background:'rgba(74,158,255,.1)', border:'1px solid rgba(74,158,255,.25)', borderRadius:10, padding:'1px 6px' }}>
-                                    📍 Maps
-                                  </a>
-                                )}
-                              </div>
-                            </div>
-                            <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:12, fontWeight:700, color:'#fff', flexShrink:0 }}>{h.price}</div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )})}
-                </div>
-              )
-            }
-            // Loyalty brand hotels — grouped by brand from Google Places results
+            // Merge same brand across cities
             const byBrand: Record<string, { city: string; hotels: HotelSuggestion[] }[]> = {}
-            googleLoyaltyHotels.forEach(({ brand, city, hotels }) => {
+            googleHotelsByBrand.forEach(({ brand, city, hotels }) => {
               if (!byBrand[brand]) byBrand[brand] = []
               byBrand[brand].push({ city, hotels })
             })
+
+            const brandLabel = (brand: string) =>
+              HOTEL_NAMES[brand] || (brand === 'independent' ? 'Independent Hotels' : brand.charAt(0).toUpperCase() + brand.slice(1))
+
             return (
               <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
                 <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
                   <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, fontWeight:700, letterSpacing:3, textTransform:'uppercase', color:'rgba(255,255,255,.45)' }}>
-                    Your Loyalty Hotels
+                    Hotels Near Your Route
                   </div>
                   <SortToggle />
                 </div>
+
                 {Object.entries(byBrand).map(([brand, cityGroups]) => (
                   <div key={brand} style={{ background:'var(--card)', border:'1px solid var(--border)', borderRadius:12, overflow:'hidden' }}>
+                    {/* Brand header */}
                     <div style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 14px', borderBottom:'1px solid var(--border)' }}>
                       <div style={{ width:36, height:36, borderRadius:8, background:'#fff', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, overflow:'hidden' }}>
-                        <img src={BRAND_LOGOS[brand] || ''} alt={HOTEL_NAMES[brand]}
-                          style={{ width:28, height:28, objectFit:'contain' }}
-                          onError={e => {
-                            (e.currentTarget as HTMLImageElement).style.display='none'
-                            const fb = e.currentTarget.nextSibling as HTMLElement
-                            if (fb) fb.style.display='flex'
-                          }} />
-                        <span style={{ display:'none', width:28, height:28, alignItems:'center', justifyContent:'center', fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, fontWeight:900, color:'#555', letterSpacing:1 }}>
-                          {BRAND_INITIALS[brand] || brand[0].toUpperCase()}
-                        </span>
+                        {BRAND_LOGOS[brand] ? (
+                          <>
+                            <img src={BRAND_LOGOS[brand]} alt={brandLabel(brand)}
+                              style={{ width:28, height:28, objectFit:'contain' }}
+                              onError={e => {
+                                (e.currentTarget as HTMLImageElement).style.display='none'
+                                const fb = e.currentTarget.nextSibling as HTMLElement
+                                if (fb) fb.style.display='flex'
+                              }} />
+                            <span style={{ display:'none', width:28, height:28, alignItems:'center', justifyContent:'center', fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, fontWeight:900, color:'#555', letterSpacing:1 }}>
+                              {BRAND_INITIALS[brand] || brand[0].toUpperCase()}
+                            </span>
+                          </>
+                        ) : (
+                          <span style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:14, color:'#555' }}>
+                            {brand === 'independent' ? '🏨' : brand[0].toUpperCase()}
+                          </span>
+                        )}
                       </div>
                       <div style={{ flex:1, minWidth:0 }}>
-                        <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:14, fontWeight:900, letterSpacing:2, textTransform:'uppercase', color:'#fff', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{HOTEL_NAMES[brand]}</div>
-                        <div style={{ fontFamily:"'Space Mono',monospace", fontSize:8, letterSpacing:1, color:'rgba(255,255,255,.4)', marginTop:2 }}>{cityGroups.reduce((s,g)=>s+g.hotels.length,0)} properties</div>
+                        <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:14, fontWeight:900, letterSpacing:2, textTransform:'uppercase', color:'#fff', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                          {brandLabel(brand)}
+                        </div>
+                        <div style={{ fontFamily:"'Space Mono',monospace", fontSize:8, letterSpacing:1, color:'rgba(255,255,255,.4)', marginTop:2 }}>
+                          {cityGroups.reduce((s, g) => s + g.hotels.length, 0)} properties
+                        </div>
                       </div>
                       <button
                         onClick={() => setBrandVisibility(prev => ({ ...prev, [brand]: prev[brand] === false ? true : false }))}
@@ -1541,57 +1484,60 @@ export default function GuestHomePage() {
                           transition:'all .2s',
                         }}
                       >
-                        {brandVisibility[brand] !== false ? 'Show' : 'Hide'}
+                        {brandVisibility[brand] !== false ? 'On Map' : 'Hidden'}
                       </button>
                     </div>
+
+                    {/* Hotel rows — sorted by proximity */}
                     {cityGroups.map(({ city, hotels }) => {
                       const sorted = sortHotels(hotels)
                       if (!sorted.length) return null
                       return (
-                      <div key={city}>
-                        {cityGroups.length > 1 && (
-                          <div style={{ padding:'6px 14px 0', fontFamily:"'Space Mono',monospace", fontSize:8, letterSpacing:2, textTransform:'uppercase', color:'rgba(255,255,255,.4)' }}>{city}</div>
-                        )}
-                        {sorted.map(h => (
-                          <div key={h.name} style={{ borderTop:'1px solid var(--border)' }}>
-                            <div style={{ position:'relative', width:'100%', height:100, overflow:'hidden', background:'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f2447 100%)' }}>
-                              <img
-                                key={hotelPhotoMap[h.name] || 'static'}
-                                src={hotelPhotoMap[h.name] || getHotelPhoto(h.name, h.tier)}
-                                alt={h.name}
-                                style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}
-                                onError={e => { const el = e.currentTarget as HTMLImageElement; el.style.opacity='0' }}
-                              />
-                              <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(7,8,15,.85) 0%, transparent 60%)' }} />
-                              <div style={{ position:'absolute', bottom:6, right:8, color:'#FFC947', fontSize:9, letterSpacing:1 }}>
-                                {'★'.repeat(h.stars)}
-                              </div>
-                            </div>
-                            <div style={{ display:'flex', alignItems:'center', gap:10, padding:'8px 14px' }}>
-                              <div style={{ flex:1, minWidth:0 }}>
-                                <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, fontWeight:700, color:'#fff', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', lineHeight:1.2 }}>{h.name}</div>
-                                <div style={{ display:'flex', alignItems:'center', gap:6, marginTop:2 }}>
-                                  <span style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, letterSpacing:1, textTransform:'uppercase', color:'rgba(255,255,255,.5)' }}>{h.tier}</span>
-                                  {h.travelMins !== undefined && (
-                                    <span style={{ fontFamily:"'Space Mono',monospace", fontSize:8, color:'rgba(64,224,208,.8)', background:'rgba(64,224,208,.08)', border:'1px solid rgba(64,224,208,.2)', borderRadius:10, padding:'1px 6px' }}>
-                                      ~{h.travelMins} min
-                                    </span>
-                                  )}
-                                  {hotelMapsUrls[h.name] && (
-                                    <a href={hotelMapsUrls[h.name]} target="_blank" rel="noopener noreferrer"
-                                      style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:8, letterSpacing:1, textTransform:'uppercase', color:'#4A9EFF', textDecoration:'none', background:'rgba(74,158,255,.1)', border:'1px solid rgba(74,158,255,.25)', borderRadius:10, padding:'1px 6px' }}>
-                                      📍 Maps
-                                    </a>
-                                  )}
+                        <div key={city}>
+                          {cityGroups.length > 1 && (
+                            <div style={{ padding:'6px 14px 0', fontFamily:"'Space Mono',monospace", fontSize:8, letterSpacing:2, textTransform:'uppercase', color:'rgba(255,255,255,.4)' }}>{city}</div>
+                          )}
+                          {sorted.map(h => (
+                            <div key={h.name} style={{ borderTop:'1px solid var(--border)' }}>
+                              <div style={{ position:'relative', width:'100%', height:100, overflow:'hidden', background:'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f2447 100%)' }}>
+                                <img
+                                  key={hotelPhotoMap[h.name] || 'static'}
+                                  src={hotelPhotoMap[h.name] || getHotelPhoto(h.name, h.tier)}
+                                  alt={h.name}
+                                  style={{ width:'100%', height:'100%', objectFit:'cover', display:'block' }}
+                                  onError={e => { (e.currentTarget as HTMLImageElement).style.opacity='0' }}
+                                />
+                                <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(7,8,15,.85) 0%, transparent 60%)' }} />
+                                <div style={{ position:'absolute', bottom:6, right:8, color:'#FFC947', fontSize:9, letterSpacing:1 }}>
+                                  {'★'.repeat(h.stars)}
                                 </div>
                               </div>
-                              <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:12, fontWeight:700, color:'#fff', flexShrink:0 }}>{h.price}</div>
+                              <div style={{ display:'flex', alignItems:'center', gap:10, padding:'8px 14px' }}>
+                                <div style={{ flex:1, minWidth:0 }}>
+                                  <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, fontWeight:700, color:'#fff', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', lineHeight:1.2 }}>{h.name}</div>
+                                  <div style={{ display:'flex', alignItems:'center', gap:6, marginTop:2 }}>
+                                    <span style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, letterSpacing:1, textTransform:'uppercase', color:'rgba(255,255,255,.5)' }}>{h.tier}</span>
+                                    {h.travelMins !== undefined && (
+                                      <span style={{ fontFamily:"'Space Mono',monospace", fontSize:8, color:'rgba(64,224,208,.8)', background:'rgba(64,224,208,.08)', border:'1px solid rgba(64,224,208,.2)', borderRadius:10, padding:'1px 6px' }}>
+                                        ~{h.travelMins} min
+                                      </span>
+                                    )}
+                                    {hotelMapsUrls[h.name] && (
+                                      <a href={hotelMapsUrls[h.name]} target="_blank" rel="noopener noreferrer"
+                                        style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:8, letterSpacing:1, textTransform:'uppercase', color:'#4A9EFF', textDecoration:'none', background:'rgba(74,158,255,.1)', border:'1px solid rgba(74,158,255,.25)', borderRadius:10, padding:'1px 6px' }}>
+                                        📍 Maps
+                                      </a>
+                                    )}
+                                  </div>
+                                </div>
+                                <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:12, fontWeight:700, color:'#fff', flexShrink:0 }}>{h.price}</div>
+                              </div>
                             </div>
-                          </div>
-                        ))}
-                      </div>
+                          ))}
+                        </div>
                       )
                     })}
+
                     <div style={{ padding:'10px 14px', borderTop:'1px solid var(--border)' }}>
                       <a href="/login" style={{ display:'block', textAlign:'center', fontFamily:"'Barlow Condensed',sans-serif", fontSize:11, fontWeight:700, letterSpacing:2, textTransform:'uppercase', padding:'8px', background:'var(--accent)', color:'var(--bg)', borderRadius:6, textDecoration:'none' }}>
                         Sign In to Book →
