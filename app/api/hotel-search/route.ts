@@ -33,6 +33,8 @@ export interface GoogleHotel {
   stars: number
   mapsUrl: string
   travelMins: number   // rounded travel minutes to cluster center
+  lat: number
+  lng: number
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -243,7 +245,7 @@ export async function POST(req: NextRequest) {
         : `https://www.google.com/maps/search/?api=1&query=${c.lat},${c.lng}`
 
       mapsUrls[c.name] = mapsUrl
-      enriched.push({ name: c.name, tier, price, stars, mapsUrl, travelMins, brand: detectBrand(c.name), travelSecs })
+      enriched.push({ name: c.name, tier, price, stars, mapsUrl, travelMins, lat: c.lat, lng: c.lng, brand: detectBrand(c.name), travelSecs })
     })
 
     // Step 4 — sort by travel time ascending

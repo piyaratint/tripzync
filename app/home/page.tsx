@@ -30,7 +30,7 @@ const HOTEL_NAMES: Record<string,string> = {
   hyatt:'World of Hyatt', accor:'Accor ALL', none:'No membership',
 }
 
-interface HotelSuggestion { name: string; tier: string; price: string; stars: number; travelMins?: number }
+interface HotelSuggestion { name: string; tier: string; price: string; stars: number; travelMins?: number; lat?: number; lng?: number }
 
 // ── Hotel photo lookup ────────────────────────────────────────────────────────
 // Specific Unsplash photo IDs for well-known hotels
@@ -688,7 +688,7 @@ function buildItinerary(data: OnboardingData): CitySection[] {
 function MapView({ placesByCity, photoMap, hotels, brandVisibility }: {
   placesByCity: Record<string, string[]>
   photoMap: Record<string, string>
-  hotels: { name: string; city: string; brand: string }[]
+  hotels: { name: string; city: string; brand: string; lat?: number; lng?: number }[]
   brandVisibility: Record<string, boolean>
 }) {
   const mapRef = useRef<HTMLDivElement>(null)
@@ -827,6 +827,8 @@ function MapView({ placesByCity, photoMap, hotels, brandVisibility }: {
       })
 
       // Hotel markers — per brand, using brand logo icons
+      // Coordinates come directly from /api/hotel-search (Google Places searchNearby),
+      // so no secondary /api/place-coords lookup is needed.
       if (hotels.length > 0) {
         const brandGroups: Record<string, typeof hotels> = {}
         hotels.forEach(h => {
@@ -857,43 +859,39 @@ function MapView({ placesByCity, photoMap, hotels, brandVisibility }: {
           })
         }
 
-        Promise.all([
-          fetch('/api/place-coords', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ places: hotels.map(h => ({ name: h.name, city: h.city })) }),
-          }).then(r => r.json()),
-          Promise.all(Object.keys(brandGroups).map(b => makeBrandIcon(b).then(url => [b, url] as [string, string])))
-            .then(entries => Object.fromEntries(entries)),
-        ]).then(([{ coords }, iconMap]: [{ coords: Record<string, { lat: number; lng: number }> }, Record<string, string>]) => {
-          Object.values(brandMarkersRef.current).flat().forEach(m => m.setMap(null))
-          brandMarkersRef.current = {}
-          let hotelAdded = false
-          for (const [brand, bHotels] of Object.entries(brandGroups)) {
-            const visible = brandVisibility[brand] !== false
-            const markers: any[] = []
-            bHotels.forEach(h => {
-              const c = (coords as Record<string, { lat: number; lng: number }>)[h.name]
-              if (!c) return
-              const hm = new google.maps.Marker({
-                position: { lat: c.lat, lng: c.lng },
-                map: visible ? mapInstance.current : null,
-                title: h.name,
-                icon: { url: iconMap[brand], scaledSize: new google.maps.Size(36, 36), anchor: new google.maps.Point(18, 18) },
-                zIndex: 10,
+        Promise.all(Object.keys(brandGroups).map(b => makeBrandIcon(b).then(url => [b, url] as [string, string])))
+          .then(entries => Object.fromEntries(entries))
+          .then((iconMap: Record<string, string>) => {
+            Object.values(brandMarkersRef.current).flat().forEach(m => m.setMap(null))
+            brandMarkersRef.current = {}
+            let hotelAdded = false
+            for (const [brand, bHotels] of Object.entries(brandGroups)) {
+              const visible = brandVisibility[brand] !== false
+              const markers: any[] = []
+              bHotels.forEach(h => {
+                // Use coordinates returned by /api/hotel-search — they come from Google Places
+                // searchNearby so they are always present and accurate.
+                if (h.lat == null || h.lng == null) return
+                const hm = new google.maps.Marker({
+                  position: { lat: h.lat, lng: h.lng },
+                  map: visible ? mapInstance.current : null,
+                  title: h.name,
+                  icon: { url: iconMap[brand], scaledSize: new google.maps.Size(36, 36), anchor: new google.maps.Point(18, 18) },
+                  zIndex: 10,
+                })
+                hm.addListener('mouseover', () => {
+                  hoverWindow.setContent(`<div style="background:#fff;border-radius:8px;overflow:hidden;width:160px"><div style="padding:8px 10px 4px;font-size:12px;font-weight:700;color:#111">${h.name}</div><div style="padding:0 10px 8px;font-size:10px;color:#888">${h.city}</div></div>`)
+                  hoverWindow.open(mapInstance.current, hm)
+                })
+                hm.addListener('mouseout', () => hoverWindow.close())
+                markers.push(hm)
+                mapBounds.extend({ lat: h.lat, lng: h.lng })
+                hotelAdded = true
               })
-              hm.addListener('mouseover', () => {
-                hoverWindow.setContent(`<div style="background:#fff;border-radius:8px;overflow:hidden;width:160px"><div style="padding:8px 10px 4px;font-size:12px;font-weight:700;color:#111">${h.name}</div><div style="padding:0 10px 8px;font-size:10px;color:#888">${h.city}</div></div>`)
-                hoverWindow.open(mapInstance.current, hm)
-              })
-              hm.addListener('mouseout', () => hoverWindow.close())
-              markers.push(hm)
-              mapBounds.extend({ lat: c.lat, lng: c.lng })
-              hotelAdded = true
-            })
-            brandMarkersRef.current[brand] = markers
-          }
-          if (hotelAdded) mapInstance.current.fitBounds(mapBounds, 48)
-        }).catch(() => {})
+              brandMarkersRef.current[brand] = markers
+            }
+            if (hotelAdded) mapInstance.current.fitBounds(mapBounds, 48)
+          }).catch(() => {})
       }
 
       const mapBounds = new google.maps.LatLngBounds()
@@ -1219,12 +1217,13 @@ export default function GuestHomePage() {
 
   // Hotels come from /api/hotel-search (Google Places searchNearby) — not the static HOTEL_DB.
   // mapHotels is used only for map pins and uses the already-fetched Google results.
-  const mapHotels: { name: string; city: string; brand: string }[] = [
+  // lat/lng come directly from the searchNearby response so no /api/place-coords re-fetch is needed.
+  const mapHotels: { name: string; city: string; brand: string; lat?: number; lng?: number }[] = [
     ...googleLoyaltyHotels.flatMap(({ brand, city, hotels }) =>
-      hotels.map(h => ({ name: h.name, city, brand }))
+      hotels.map(h => ({ name: h.name, city, brand, lat: h.lat, lng: h.lng }))
     ),
     ...googleBudgetHotels.flatMap(({ city, hotels }) =>
-      hotels.map(h => ({ name: h.name, city, brand: 'budget' }))
+      hotels.map(h => ({ name: h.name, city, brand: 'budget', lat: h.lat, lng: h.lng }))
     ),
   ]
 
