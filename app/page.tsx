@@ -657,13 +657,13 @@ export default function LandingPage() {
             Add one or more cities to see them on the map
           </p>
         )}
-        {selectedCities.length > 0 && selectedCities.length <= 2 && (
+        {selectedCities.length > 1 && selectedISOs.length > 1 && (
           <p style={{
             fontFamily: "'Space Mono', monospace", fontSize: 9,
             letterSpacing: '0.12em', color: 'rgba(255,255,255,0.25)',
             textTransform: 'uppercase', marginTop: 10,
           }}>
-            Add 3+ cities to zoom in &amp; see city pins on the map
+            Multiple countries selected — world view shown
           </p>
         )}
 

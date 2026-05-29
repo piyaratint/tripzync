@@ -301,12 +301,14 @@ export function WorldMap({ selectedISOs, selectedCities }: WorldMapProps) {
   const [mapZoom,   setMapZoom]   = useState(1)
   const [isDragging, setIsDragging] = useState(false)
 
-  // Determine auto-zoom target based on city selection
-  const showDots  = selectedCities.length > 2
-  const singleISO = selectedISOs.length === 1
-  const zoomConfig = showDots && singleISO ? COUNTRY_ZOOM[selectedISOs[0]] ?? null : null
+  // Show pins as soon as any city is selected
+  const showDots  = selectedCities.length > 0
+  // Zoom to country as soon as first city is picked (single country only)
+  // Multi-country: stay on world view so all countries are visible
+  const singleISO  = selectedISOs.length === 1
+  const zoomConfig = singleISO ? COUNTRY_ZOOM[selectedISOs[0]] ?? null : null
 
-  // When auto-zoom target changes, fly there
+  // When selected country changes, fly to it (or reset to world view)
   useEffect(() => {
     if (zoomConfig) {
       setMapCenter(zoomConfig.center)
@@ -316,7 +318,7 @@ export function WorldMap({ selectedISOs, selectedCities }: WorldMapProps) {
       setMapZoom(1)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedISOs.join(','), showDots])
+  }, [selectedISOs.join(',')])
 
   const handleZoomIn  = () => setMapZoom(z => Math.min(z * 1.6, 40))
   const handleZoomOut = () => setMapZoom(z => Math.max(z / 1.6, 1))
@@ -329,13 +331,9 @@ export function WorldMap({ selectedISOs, selectedCities }: WorldMapProps) {
   // Dot size inversely scales so pins stay readable at any zoom
   const dotR = isZoomedIn ? Math.max(3, 6 / Math.sqrt(mapZoom / 8)) : 3.5
 
-  const statusLabel = zoomConfig
-    ? `↗ zoomed · ${selectedCities.length} cities`
-    : selectedCities.length > 2
-      ? `${selectedISOs.length} countries · ${selectedCities.length} cities`
-      : selectedISOs.length > 0
-        ? `${selectedISOs.length} countr${selectedISOs.length > 1 ? 'ies' : 'y'} highlighted`
-        : null
+  const statusLabel = selectedCities.length > 0
+    ? `${selectedISOs.length} countr${selectedISOs.length > 1 ? 'ies' : 'y'} · ${selectedCities.length} cit${selectedCities.length > 1 ? 'ies' : 'y'}`
+    : null
 
   return (
     <div style={{
