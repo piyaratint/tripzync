@@ -63,11 +63,11 @@ export function EditTripModal({ open, onClose }: Props) {
 
   const inputStyle = {
     width: '100%',
-    background: 'rgba(255,255,255,.05)',
-    border: '1px solid rgba(255,255,255,.12)',
+    background: 'var(--card2)',
+    border: '1px solid var(--border)',
     borderRadius: 8,
     padding: '8px 12px',
-    color: '#fff',
+    color: 'var(--text, #fff)',
     fontFamily: 'inherit',
     fontSize: 13,
     outline: 'none',
@@ -79,7 +79,7 @@ export function EditTripModal({ open, onClose }: Props) {
     fontSize: 10,
     letterSpacing: '.14em',
     textTransform: 'uppercase' as const,
-    color: 'rgba(255,255,255,.4)',
+    color: 'var(--muted, rgba(255,255,255,.4))',
     marginBottom: 4,
     display: 'block',
   }
@@ -89,7 +89,7 @@ export function EditTripModal({ open, onClose }: Props) {
       {/* Backdrop */}
       <div onClick={onClose} style={{
         position: 'fixed', inset: 0,
-        background: 'rgba(0,0,0,.6)',
+        background: 'rgba(0,0,0,.4)',
         backdropFilter: 'blur(4px)',
         zIndex: 100,
       }} />
@@ -99,8 +99,8 @@ export function EditTripModal({ open, onClose }: Props) {
         position: 'fixed',
         top: '50%', left: '50%',
         transform: 'translate(-50%, -50%)',
-        background: '#1a1a1a',
-        border: '1px solid rgba(255,255,255,.1)',
+        background: 'var(--card)',
+        border: '1px solid var(--border)',
         borderRadius: 16,
         padding: 24,
         width: 'min(480px, 90vw)',
@@ -110,13 +110,14 @@ export function EditTripModal({ open, onClose }: Props) {
         display: 'flex',
         flexDirection: 'column',
         gap: 16,
+        boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
       }}>
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 22, fontWeight: 900, fontStyle: 'italic', textTransform: 'uppercase' }}>
+          <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 22, fontWeight: 900, fontStyle: 'italic', textTransform: 'uppercase', color: 'var(--text, #fff)' }}>
             ✏️ Edit Trip
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,.4)', fontSize: 20, cursor: 'pointer' }}>✕</button>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--muted, rgba(255,255,255,.4))', fontSize: 20, cursor: 'pointer' }}>✕</button>
         </div>
 
         {/* Form */}
@@ -190,15 +191,15 @@ export function EditTripModal({ open, onClose }: Props) {
           <button onClick={onClose} style={{
             flex: 1, padding: '10px 0',
             background: 'transparent',
-            border: '1px solid rgba(255,255,255,.15)',
-            borderRadius: 8, color: 'rgba(255,255,255,.5)',
+            border: '1px solid var(--border)',
+            borderRadius: 8, color: 'var(--muted, rgba(255,255,255,.5))',
             fontFamily: "'Barlow Condensed'", fontSize: 13,
             letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer',
           }}>Cancel</button>
           <button onClick={handleSave} disabled={loading} style={{
             flex: 2, padding: '10px 0',
-            background: 'var(--red)', border: 'none',
-            borderRadius: 8, color: '#fff',
+            background: 'var(--accent)', border: 'none',
+            borderRadius: 8, color: 'var(--bg)',
             fontFamily: "'Barlow Condensed'", fontSize: 13,
             letterSpacing: '.1em', textTransform: 'uppercase',
             cursor: loading ? 'not-allowed' : 'pointer',
@@ -207,7 +208,7 @@ export function EditTripModal({ open, onClose }: Props) {
         </div>
 
         {/* Delete zone */}
-        <div style={{ borderTop: '1px solid rgba(255,255,255,.06)', paddingTop: 16, marginTop: 4 }}>
+        <div style={{ borderTop: '1px solid var(--border)', paddingTop: 16, marginTop: 4 }}>
           {!showDelete ? (
             <button onClick={() => setShowDelete(true)} style={{
               background: 'none', border: 'none',
@@ -217,14 +218,14 @@ export function EditTripModal({ open, onClose }: Props) {
             }}>🗑 Delete this trip</button>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <div style={{ fontSize: 12, color: 'rgba(255,255,255,.4)' }}>
+              <div style={{ fontSize: 12, color: 'var(--muted, rgba(255,255,255,.4))' }}>
                 ⚠️ This will permanently delete the trip and all its data.
               </div>
               <div style={{ display: 'flex', gap: 8 }}>
                 <button onClick={() => setShowDelete(false)} style={{
                   flex: 1, padding: '8px 0',
-                  background: 'transparent', border: '1px solid rgba(255,255,255,.15)',
-                  borderRadius: 8, color: 'rgba(255,255,255,.4)',
+                  background: 'transparent', border: '1px solid var(--border)',
+                  borderRadius: 8, color: 'var(--muted, rgba(255,255,255,.4))',
                   fontFamily: "'Barlow Condensed'", fontSize: 12,
                   cursor: 'pointer', textTransform: 'uppercase',
                 }}>Cancel</button>
