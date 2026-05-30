@@ -266,7 +266,39 @@ export default function LandingPage() {
     if (typeof window === 'undefined') return
     const p = new URLSearchParams(window.location.search)
     const s = p.get('screen')
-    if (s && (['map','places','hotels','duration'] as string[]).includes(s)) setScreen(s as Screen)
+    if (!s || !(['map','places','hotels','duration'] as string[]).includes(s)) return
+
+    // Restore full onboarding state from localStorage so the user can
+    // continue editing (e.g. coming back from /home via ← Back) without
+    // losing their selections.
+    try {
+      const raw = localStorage.getItem('tripzync_onboarding')
+      if (raw) {
+        const saved = JSON.parse(raw) as Record<string, unknown>
+        // Restore date pickers
+        if (typeof saved.startDate === 'string') setStartDate(saved.startDate)
+        if (typeof saved.endDate   === 'string') setEndDate(saved.endDate)
+        // Restore map / city selections
+        if (typeof saved.continent === 'string') setContinent(saved.continent)
+        if (Array.isArray(saved.cities)) setSelectedCities(saved.cities as string[])
+        if (Array.isArray(saved.hotels)) setSelHotels(saved.hotels as string[])
+        // Rebuild ISO selections from saved countries list
+        if (Array.isArray(saved.countries)) {
+          const nameToISO = Object.fromEntries(Object.entries(ISO_NAME).map(([k,v]) => [v, k]))
+          setSelectedISOs((saved.countries as string[]).map(n => nameToISO[n] || n).filter(Boolean))
+        }
+        // Rebuild selPlaceKeys from placesByCity map
+        if (saved.placesByCity && typeof saved.placesByCity === 'object') {
+          const keys: string[] = []
+          for (const [city, places] of Object.entries(saved.placesByCity as Record<string,string[]>)) {
+            for (const name of (places as string[])) keys.push(`${city}::${name}`)
+          }
+          setSelPlaceKeys(keys)
+        }
+      }
+    } catch { /* ignore */ }
+
+    setScreen(s as Screen)
   }, [])
 
   // ── NAVIGATION ────────────────────────────────────────────────────────────

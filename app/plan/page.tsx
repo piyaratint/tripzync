@@ -5,38 +5,63 @@ import { TripZyncLogo } from '@/components/TripZyncLogo'
 
 const todayStr = new Date().toISOString().split('T')[0]
 
-export default function PlanPage() {
-  const [step, setStep] = useState<'form' | 'auth'>('form')
-  const [form, setForm] = useState({
-    destination: '',
-    startDate: '',
-    endDate: '',
-  })
+const HOTEL_NAMES: Record<string, string> = {
+  marriott: 'Marriott Bonvoy',
+  hilton:   'Hilton Honors',
+  ihg:      'IHG One Rewards',
+  hyatt:    'World of Hyatt',
+  accor:    'Accor ALL',
+}
 
+export default function PlanPage() {
+  const [form, setForm] = useState({ startDate: '', endDate: '' })
+  const [tripSummary, setTripSummary] = useState<{
+    destination: string
+    cities: string[]
+    hotels: string[]
+  }>({ destination: '', cities: [], hotels: [] })
+  const [saved, setSaved] = useState(false)
+
+  // Pre-fill from localStorage
   useEffect(() => {
     try {
       const raw = localStorage.getItem('tripzync_onboarding')
       if (!raw) return
       const data = JSON.parse(raw)
-      const dest = data.destination || data.countries?.[0] || ''
-      if (dest) setForm(f => ({ ...f, destination: dest }))
+      setForm({
+        startDate: data.startDate || data.pendingTrip?.startDate || '',
+        endDate:   data.endDate   || data.pendingTrip?.endDate   || '',
+      })
+      setTripSummary({
+        destination: data.destination || data.cities?.[0] || data.countries?.[0] || '',
+        cities:      data.cities  || [],
+        hotels:      (data.hotels || []).filter((h: string) => h && h !== 'none'),
+      })
     } catch { /* ignore */ }
   }, [])
 
-  const handleContinue = () => {
-    if (!form.destination) return
-    setStep('auth')
-  }
+  const durationDays = form.startDate && form.endDate
+    ? Math.max(1, Math.round(
+        (new Date(form.endDate).getTime() - new Date(form.startDate).getTime()) / 86400000
+      ) + 1)
+    : null
 
-  const savePlan = () => {
+  const handleSave = () => {
     try {
       const existing = JSON.parse(localStorage.getItem('tripzync_onboarding') || '{}')
       localStorage.setItem('tripzync_onboarding', JSON.stringify({
         ...existing,
-        pendingTrip: form,
-        destination: form.destination,
+        startDate: form.startDate,
+        endDate:   form.endDate,
+        pendingTrip: {
+          ...(existing.pendingTrip || {}),
+          startDate: form.startDate,
+          endDate:   form.endDate,
+        },
       }))
     } catch { /* ignore */ }
+    setSaved(true)
+    setTimeout(() => window.location.replace('/home'), 600)
   }
 
   const inputStyle = {
@@ -50,6 +75,7 @@ export default function PlanPage() {
     fontSize: 15,
     outline: 'none',
     boxSizing: 'border-box' as const,
+    colorScheme: 'dark' as const,
   }
 
   const labelStyle = {
@@ -68,112 +94,142 @@ export default function PlanPage() {
 
       <nav className="ob-nav">
         <TripZyncLogo href="/" />
-        <a href="/login" className="ob-nav-link">Sign in ↗</a>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          <a href="/?screen=duration" className="ob-nav-link">← Step 04</a>
+          <a href="/home" className="ob-nav-link">My Trip →</a>
+        </div>
       </nav>
 
       <div className="ob-auth-card" style={{ maxWidth: 480, width: '100%' }}>
 
-        {step === 'form' ? (
-          <>
-            <div style={{ fontSize: 36, marginBottom: 12 }}>✈️</div>
-            <div className="ob-auth-title" style={{ marginBottom: 6 }}>PLAN YOUR TRIP</div>
-            <p className="ob-auth-sub" style={{ marginBottom: 24 }}>
-              No account needed — fill in the details and start exploring.
-            </p>
+        <div style={{ fontSize: 36, marginBottom: 12 }}>✈️</div>
+        <div className="ob-auth-title" style={{ marginBottom: 6 }}>EDIT YOUR TRIP</div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, textAlign: 'left', width: '100%' }}>
-              <div>
-                <label style={labelStyle}>Destination *</label>
-                <input
-                  style={inputStyle}
-                  placeholder="e.g. Tokyo, Japan"
-                  value={form.destination}
-                  onChange={e => setForm(f => ({ ...f, destination: e.target.value }))}
-                />
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                <div>
-                  <label style={labelStyle}>Start Date</label>
-                  <input
-                    type="date"
-                    style={inputStyle}
-                    value={form.startDate}
-                    min={todayStr}
-                    onChange={e => setForm(f => ({ ...f, startDate: e.target.value }))}
-                  />
-                </div>
-                <div>
-                  <label style={labelStyle}>End Date</label>
-                  <input
-                    type="date"
-                    style={inputStyle}
-                    value={form.endDate}
-                    min={form.startDate || todayStr}
-                    onChange={e => setForm(f => ({ ...f, endDate: e.target.value }))}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <button
-              className="ob-auth-signup"
-              style={{ marginTop: 24, opacity: form.destination ? 1 : .5 }}
-              disabled={!form.destination}
-              onClick={handleContinue}
-            >
-              CONTINUE →
-            </button>
-
-            <div style={{ marginTop: 16, fontFamily: "'Rajdhani', sans-serif", fontSize: 12, color: '#fff', letterSpacing: 1 }}>
-              Already have an account?{' '}
-              <a href="/login" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Sign in</a>
-            </div>
-          </>
-        ) : (
-          <>
-            <div style={{ fontSize: 40, marginBottom: 16 }}>🌍</div>
-            <div className="ob-auth-title">ALMOST THERE!</div>
-            <p className="ob-auth-sub">
-              Destination: <strong style={{ color: 'var(--accent)' }}>{form.destination}</strong>
-              {form.startDate && form.endDate && (
-                <><br />{form.startDate} → {form.endDate}</>
-              )}
-            </p>
-
-            <div className="ob-guest-warning">
-              ⚠️ <strong>Guest mode:</strong> Create a free account to save your trip and access it from any device. Otherwise your plan stays on this browser only.
-            </div>
-
-            <button
-              className="ob-auth-signup"
-              onClick={() => { savePlan(); window.location.replace('/login') }}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-              </svg>
-              CREATE FREE ACCOUNT
-            </button>
-
-            <button
-              className="ob-auth-skip"
-              onClick={() => { savePlan(); window.location.replace('/home') }}
-            >
-              Continue as guest
-            </button>
-
-            <button
-              className="ob-step-back"
-              style={{ display: 'block', margin: '12px auto 0', background: 'transparent', border: 'none', color: 'var(--dim)', cursor: 'pointer', fontFamily: "'Barlow Condensed'", fontSize: 12, letterSpacing: '.1em' }}
-              onClick={() => setStep('form')}
-            >
-              ← Edit details
-            </button>
-          </>
+        {/* Destination chip */}
+        {tripSummary.destination && (
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            background: 'rgba(64,224,208,.08)', border: '1px solid rgba(64,224,208,.2)',
+            borderRadius: 20, padding: '4px 14px', marginBottom: 20,
+          }}>
+            <span style={{ fontSize: 14 }}>📍</span>
+            <span style={{
+              fontFamily: "'Barlow Condensed', sans-serif", fontSize: 12,
+              fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase',
+              color: 'var(--accent)',
+            }}>
+              {tripSummary.cities.length > 1
+                ? tripSummary.cities.join(' · ')
+                : tripSummary.destination}
+            </span>
+          </div>
         )}
+
+        <p className="ob-auth-sub" style={{ marginBottom: 24 }}>
+          Update your travel dates or go back to any step to change your cities, places, or hotels.
+        </p>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, textAlign: 'left', width: '100%' }}>
+
+          {/* Date pickers */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div>
+              <label style={labelStyle}>Start Date</label>
+              <input
+                type="date"
+                style={inputStyle}
+                value={form.startDate}
+                min={todayStr}
+                onChange={e => setForm(f => ({ ...f, startDate: e.target.value }))}
+              />
+            </div>
+            <div>
+              <label style={labelStyle}>End Date</label>
+              <input
+                type="date"
+                style={inputStyle}
+                value={form.endDate}
+                min={form.startDate || todayStr}
+                onChange={e => setForm(f => ({ ...f, endDate: e.target.value }))}
+              />
+            </div>
+          </div>
+
+          {/* Duration badge */}
+          {durationDays && (
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 12,
+              background: 'rgba(64,224,208,.07)', border: '1px solid rgba(64,224,208,.2)',
+              borderRadius: 10, padding: '12px 16px',
+            }}>
+              <span style={{ fontSize: 20 }}>📅</span>
+              <div>
+                <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 20, fontWeight: 900, color: 'var(--accent)' }}>
+                  {durationDays} {durationDays === 1 ? 'Day' : 'Days'}
+                </div>
+                <div style={{ fontFamily: "'Space Mono', monospace", fontSize: 8, letterSpacing: 2, color: 'rgba(255,255,255,.5)', textTransform: 'uppercase', marginTop: 2 }}>
+                  Trip duration
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Loyalty programmes summary */}
+          {tripSummary.hotels.length > 0 && (
+            <div style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.08)', borderRadius: 10, padding: '10px 14px' }}>
+              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 9, letterSpacing: 3, textTransform: 'uppercase', color: 'rgba(255,255,255,.4)', marginBottom: 6 }}>
+                Loyalty programmes
+              </div>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                {tripSummary.hotels.map(h => (
+                  <span key={h} style={{
+                    fontFamily: "'Barlow Condensed', sans-serif", fontSize: 10,
+                    fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase',
+                    background: 'rgba(255,201,71,.1)', border: '1px solid rgba(255,201,71,.25)',
+                    borderRadius: 20, padding: '2px 10px', color: '#FFC947',
+                  }}>
+                    {HOTEL_NAMES[h] || h}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Quick-edit step links */}
+        <div style={{ display: 'flex', gap: 8, marginTop: 20, flexWrap: 'wrap', justifyContent: 'center' }}>
+          {[
+            { label: 'Cities',  href: '/?screen=map' },
+            { label: 'Places',  href: '/?screen=places' },
+            { label: 'Hotels',  href: '/?screen=hotels' },
+            { label: 'Dates',   href: '/?screen=duration' },
+          ].map(({ label, href }) => (
+            <a key={label} href={href} style={{
+              fontFamily: "'Barlow Condensed', sans-serif", fontSize: 9,
+              fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase',
+              color: 'rgba(255,255,255,.5)', textDecoration: 'none',
+              background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)',
+              borderRadius: 20, padding: '4px 12px',
+            }}>
+              Edit {label}
+            </a>
+          ))}
+        </div>
+
+        <button
+          className="ob-auth-signup"
+          style={{ marginTop: 24, opacity: saved ? .7 : 1 }}
+          disabled={saved}
+          onClick={handleSave}
+        >
+          {saved ? '✓ SAVED — RETURNING TO TRIP' : 'SAVE & BACK TO MY TRIP →'}
+        </button>
+
+        <div style={{ marginTop: 16, fontFamily: "'Rajdhani', sans-serif", fontSize: 12, color: '#fff', letterSpacing: 1 }}>
+          Already have an account?{' '}
+          <a href="/login" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Sign in</a>
+        </div>
+
       </div>
     </div>
   )

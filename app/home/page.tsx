@@ -1300,7 +1300,7 @@ export default function GuestHomePage() {
             </>
           ) : (
             <>
-              <a href="/plan" className="ob-nav-link">← Back</a>
+              <a href="/?screen=duration" className="ob-nav-link">← Back</a>
               <a href="/login" className="ob-nav-link" style={{ borderColor: 'var(--accent)', color: 'var(--accent)' }}>Sign In</a>
             </>
           )}
