@@ -552,11 +552,14 @@ body {
   /* Hide most buttons but keep structural content visible */
   button:not(.tab-btn):not(.fl-tab) { display: none !important; }
 
-  /* Full-width single column */
+  /* Full-width single column — remove all scroll/height constraints */
   .page { max-width: 100%; padding: 0 16px !important; }
-  .page-inner { grid-template-columns: 1fr !important; gap: 0 !important; }
-  .sidebar { position: static !important; }
-  .main-col { padding-top: 12px !important; }
+  .page-inner { grid-template-columns: 1fr !important; gap: 0 !important; display: block !important; }
+  .sidebar { position: static !important; max-height: none !important; overflow: visible !important; }
+  .main-col { padding-top: 12px !important; overflow: visible !important; }
+
+  /* Remove fixed positioning that can cause blank print */
+  .top-nav, .ob-nav, .ob-progress { position: static !important; }
 
   /* Hero */
   .hero { border-bottom: 2px solid #ddd !important; padding: 16px 0 12px !important; margin-bottom: 16px !important; }
@@ -579,10 +582,14 @@ body {
   .section-label { color: #888 !important; }
 
   /* Show all day panels when printing */
-  .day-panel-hidden { display: block !important; }
+  .day-panel-hidden { display: block !important; visibility: visible !important; height: auto !important; overflow: visible !important; }
 
   /* Day panel */
-  .day-panel { background: #fafafa !important; border: 1px solid #ddd !important; margin-bottom: 16px !important; page-break-inside: avoid; }
+  .day-panel { background: #fafafa !important; border: 1px solid #ddd !important; margin-bottom: 16px !important; page-break-inside: avoid; display: block !important; visibility: visible !important; }
+
+  /* Ensure main column shows all content */
+  .main-col { overflow: visible !important; max-height: none !important; }
+  .sidebar { overflow: visible !important; max-height: none !important; }
   .day-panel-head { background: #f0f0f0 !important; border-bottom: 1px solid #ddd !important; }
   .day-date { color: #888 !important; }
   .day-title { color: #111 !important; }
