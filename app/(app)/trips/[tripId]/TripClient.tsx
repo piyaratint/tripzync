@@ -257,10 +257,10 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
               </div>
             ))}
 
-            {/* City Map — shows pins for events on the active day */}
+            {/* City Map — shows pins for all events across the whole trip */}
             <CityMap
               city={trip.destCity ?? trip.destination ?? ''}
-              events={activeDay?.events ?? []}
+              events={itinerary.flatMap(day => day.events)}
             />
           </main>
         </div>

@@ -544,7 +544,13 @@ body {
   .hotel-chip .edit-hint,
   .edit-title-hint,
   .print-btn,
-  button:not(.tab-btn) { display: none !important; }
+  .theme-toggle,
+  .city-map-section,
+  .top-nav,
+  .ob-nav { display: none !important; }
+
+  /* Hide most buttons but keep structural content visible */
+  button:not(.tab-btn):not(.fl-tab) { display: none !important; }
 
   /* Full-width single column */
   .page { max-width: 100%; padding: 0 16px !important; }
