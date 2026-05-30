@@ -153,19 +153,31 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
                   }}>👥 Invite</button>
                 )}
                 <button className="print-btn" onClick={() => {
-                  // Force-show all hidden day panels
+                  // Remove hidden class from all day panels so they're all visible for print
                   const hiddenDays = document.querySelectorAll<HTMLElement>('.day-panel-hidden')
-                  hiddenDays.forEach(el => el.style.setProperty('display', 'block', 'important'))
-                  // Force-show all flight panes
-                  const hiddenFlightPanes = document.querySelectorAll<HTMLElement>('.fl-pane')
-                  hiddenFlightPanes.forEach(el => el.style.setProperty('display', 'block', 'important'))
-                  const restore = () => {
-                    hiddenDays.forEach(el => el.style.removeProperty('display'))
-                    hiddenFlightPanes.forEach(el => el.style.removeProperty('display'))
-                    window.removeEventListener('afterprint', restore)
-                  }
-                  window.addEventListener('afterprint', restore)
-                  window.print()
+                  hiddenDays.forEach(el => el.classList.remove('day-panel-hidden'))
+                  // Show all flight panes
+                  const hiddenFlightPanes = document.querySelectorAll<HTMLElement>('.fl-pane:not(.active)')
+                  hiddenFlightPanes.forEach(el => el.classList.add('active'))
+                  // Add print class to body for any extra print-only styles
+                  document.body.classList.add('printing')
+
+                  // Small delay to let DOM update before print dialog
+                  setTimeout(() => {
+                    window.print()
+
+                    // Restore after print
+                    const restore = () => {
+                      document.body.classList.remove('printing')
+                      // Re-hide non-active day panels by re-adding the class
+                      document.querySelectorAll<HTMLElement>('.day-panel').forEach((el, i) => {
+                        if (i !== activeDayIndex) el.classList.add('day-panel-hidden')
+                      })
+                      hiddenFlightPanes.forEach(el => el.classList.remove('active'))
+                      window.removeEventListener('afterprint', restore)
+                    }
+                    window.addEventListener('afterprint', restore)
+                  }, 100)
                 }} style={{
                   background: 'none', border: '1px solid rgba(255,255,255,.15)',
                   borderRadius: 6, padding: '4px 10px', color: '#fff',
