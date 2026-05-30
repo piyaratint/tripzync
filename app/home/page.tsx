@@ -684,6 +684,91 @@ function buildItinerary(data: OnboardingData): CitySection[] {
   return sections
 }
 
+// ── PlaceAddInput — dropdown-enabled place search for the +ADD flow ──────────
+function PlaceAddInput({ value, onChange, onAdd, onCancel, photoMap }: {
+  value: string
+  onChange: (v: string) => void
+  onAdd: (name: string) => void
+  onCancel: () => void
+  photoMap: Record<string, string>
+}) {
+  const [showDrop, setShowDrop] = useState(false)
+  const wrapRef = useRef<HTMLDivElement>(null)
+  const dropRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      const t = e.target as Node
+      if (wrapRef.current?.contains(t) || dropRef.current?.contains(t)) return
+      setShowDrop(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
+
+  const allPlaces = Object.keys(photoMap)
+  const filtered = value.trim()
+    ? allPlaces.filter(n => n.toLowerCase().includes(value.toLowerCase()))
+    : allPlaces
+
+  const handleSelect = (name: string) => {
+    setShowDrop(false)
+    onAdd(name)
+  }
+
+  return (
+    <div style={{ position:'relative', marginTop:8 }} ref={wrapRef}>
+      <div style={{ display:'flex', gap:8 }}>
+        <input
+          ref={inputRef}
+          autoFocus
+          value={value}
+          onChange={e => { onChange(e.target.value); setShowDrop(true) }}
+          onFocus={() => setShowDrop(true)}
+          onKeyDown={e => {
+            if (e.key === 'Enter') { onAdd(value); setShowDrop(false) }
+            if (e.key === 'Escape') { onCancel(); setShowDrop(false) }
+          }}
+          placeholder="Search or type a place…"
+          style={{ flex:1, background:'var(--bg)', border:'1px solid var(--border2)', borderRadius:8, padding:'7px 12px', color:'#fff', fontFamily:"'Rajdhani',sans-serif", fontSize:14, outline:'none' }}
+        />
+        <button onClick={() => { onAdd(value); setShowDrop(false) }}
+          style={{ background:'var(--accent)', border:'none', borderRadius:8, padding:'7px 16px', color:'var(--bg)', fontFamily:"'Barlow Condensed',sans-serif", fontSize:12, fontWeight:700, letterSpacing:2, textTransform:'uppercase', cursor:'pointer' }}>
+          Add
+        </button>
+        <button onClick={onCancel}
+          style={{ background:'transparent', border:'1px solid var(--border)', borderRadius:8, padding:'7px 12px', color:'#fff', fontFamily:"'Barlow Condensed',sans-serif", fontSize:11, cursor:'pointer' }}>
+          ✕
+        </button>
+      </div>
+      {showDrop && filtered.length > 0 && (
+        <div ref={dropRef} style={{
+          position:'absolute', top:'100%', left:0, right:80, zIndex:9000, marginTop:4,
+          background:'#1e1e20', border:'1px solid rgba(255,255,255,.12)', borderRadius:10,
+          maxHeight:220, overflowY:'auto', boxShadow:'0 8px 24px rgba(0,0,0,.6)',
+        }}>
+          {filtered.map(name => (
+            <div key={name} onClick={() => handleSelect(name)} style={{
+              display:'flex', alignItems:'center', gap:10, padding:'8px 10px', cursor:'pointer',
+              transition:'background .15s',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,.08)')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+            >
+              {photoMap[name]
+                ? <img src={photoMap[name]} alt="" style={{ width:38, height:38, borderRadius:8, objectFit:'cover', flexShrink:0 }} />
+                : <div style={{ width:38, height:38, borderRadius:8, background:'var(--border)', flexShrink:0 }} />
+              }
+              <span style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, fontWeight:600, color:'#fff', letterSpacing:.3 }}>{name}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ── MapView — Google Maps with red pins + per-brand hotel logo pins ───────────
 function MapView({ placesByCity, photoMap, hotels, brandVisibility }: {
   placesByCity: Record<string, string[]>
@@ -1125,13 +1210,22 @@ export default function GuestHomePage() {
         ...day, places: day.places.filter(p => p !== place) })
     }))
 
-  const addPlace = (si: number, di: number) => {
-    const name = addVal.trim(); if (!name) return
+  const addPlace = (si: number, di: number, overrideName?: string) => {
+    const name = (overrideName ?? addVal).trim(); if (!name) return
     setItinerary(prev => prev.map((sec, s) => s !== si ? sec : {
       ...sec, days: sec.days.map((day, d) => d !== di ? day : {
         ...day, places: [...day.places, name] })
     }))
     setAddVal(''); setAddingTo(null)
+    if (!photoMap[name]) {
+      fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(name)}`)
+        .then(r => r.ok ? r.json() : null)
+        .then(d => {
+          const img = d?.thumbnail?.source || d?.originalimage?.source
+          if (img) setPhotoMap(prev => ({ ...prev, [name]: img }))
+        })
+        .catch(() => {})
+    }
   }
 
   const removeDay = (si: number, dayNum: number) => {
@@ -1683,29 +1777,15 @@ export default function GuestHomePage() {
                         )}
                       </div>
 
-                      {/* Add place input — inline below chips */}
+                      {/* Add place input with dropdown — inline below chips */}
                       {addingTo?.si === si && addingTo?.di === di && (
-                        <div style={{ display:'flex', gap:8, marginTop:8 }}>
-                          <input
-                            autoFocus
-                            value={addVal}
-                            onChange={e => setAddVal(e.target.value)}
-                            onKeyDown={e => {
-                              if (e.key === 'Enter') addPlace(si, di)
-                              if (e.key === 'Escape') { setAddingTo(null); setAddVal('') }
-                            }}
-                            placeholder="Place name…"
-                            style={{ flex:1, background:'var(--bg)', border:'1px solid var(--border2)', borderRadius:8, padding:'7px 12px', color:'#fff', fontFamily:"'Rajdhani',sans-serif", fontSize:14, outline:'none' }}
-                          />
-                          <button onClick={() => addPlace(si, di)}
-                            style={{ background:'var(--accent)', border:'none', borderRadius:8, padding:'7px 16px', color:'var(--bg)', fontFamily:"'Barlow Condensed',sans-serif", fontSize:12, fontWeight:700, letterSpacing:2, textTransform:'uppercase', cursor:'pointer' }}>
-                            Add
-                          </button>
-                          <button onClick={() => { setAddingTo(null); setAddVal('') }}
-                            style={{ background:'transparent', border:'1px solid var(--border)', borderRadius:8, padding:'7px 12px', color:'#fff', fontFamily:"'Barlow Condensed',sans-serif", fontSize:11, cursor:'pointer' }}>
-                            ✕
-                          </button>
-                        </div>
+                        <PlaceAddInput
+                          value={addVal}
+                          onChange={setAddVal}
+                          onAdd={(name) => addPlace(si, di, name)}
+                          onCancel={() => { setAddingTo(null); setAddVal('') }}
+                          photoMap={photoMap}
+                        />
                       )}
                     </div>
                   ))}
