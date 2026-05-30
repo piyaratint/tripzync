@@ -36,7 +36,7 @@ export function EventItem({ tripId, event: ev, isLast }: Props) {
 
       <div className="ev-body" style={{ borderBottom: isLast ? 'none' : undefined }}>
         <div className="ev-act">{ev.act}</div>
-        {ev.sub && <div className="ev-sub">{ev.sub}</div>}
+        {ev.sub && ev.sub !== '_place' && <div className="ev-sub">{ev.sub}</div>}
         {(ev.fromPlace || ev.toPlace) && (
           <div className="ev-route">
             {ev.fromPlace && <span className="route-stop">{ev.fromPlace}</span>}
