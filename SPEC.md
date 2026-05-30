@@ -1,6 +1,6 @@
 # TripZync® — Product Requirements & Implementation Status
 
-> Last updated: 2026-05-30  
+> Last updated: 2026-05-31  
 > Production URL: https://tripzync-fresh.vercel.app (Vercel — being migrated)  
 > Target deploy: Jelastic cloud server (Node 26, PM2, standalone build)  
 > Repository: private GitHub repo (macOS Keychain credentials)
@@ -121,12 +121,15 @@ The per-trip homepage shown immediately after onboarding and on return visits.
 - `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` required client-side
 - Hotel lat/lng carried from `/api/hotel-search` response — no redundant `/api/place-coords` call for hotels
 
-### Places Display
+### Places Display & Editing
 
 **Status: ✅ Complete**
 
-- Selected attractions shown as cards with real photos (Wikipedia CC / Google Places)
+- Selected attractions shown as place chips with real photos (Wikipedia CC / Google Places)
 - Grouped by city
+- **Places Autocomplete** — +ADD input queries Google Places Autocomplete API (`/api/place-autocomplete`) with 300ms debounce, showing two sections: curated "Top Places" with photo thumbnails and "Search Results" from Google with location descriptions
+- **Drag-and-drop** — place chips are draggable between days; drop target highlights with teal border/glow; uses native HTML5 Drag and Drop API (no library)
+- Custom-added places fetch photos from Wikipedia API as fallback
 
 ### AI Travel Assistant
 
@@ -175,6 +178,9 @@ All routes under `(app)/` are protected — redirect to `/login` if unauthentica
 
 - Day-by-day timeline (`DayPanel` + `EventItem`)
 - Add / edit / delete events (`AddEventBar`, `EditEventModal`)
+- **Place dropdown** — AddEventBar shows searchable dropdown of curated places for the destination city (fetched from `/api/places` via Zustand store); dropdown uses `createPortal` to escape `overflow:hidden` clipping
+- **Place photo cards** — events matching a known place show a photo card with type label (e.g. Temple, Park) in the timeline (`EventItem`)
+- **City Map** — embedded Google Maps iframe below the schedule showing pins for the active day's events; pins fetched from `/api/place-coords`; clickable pin chips link to Google Maps
 - Hotel banner per day
 - Key event flagging (`isKey`) and seasonal flags (`isSakura`)
 - Sort order drag handles
@@ -292,7 +298,8 @@ https://tripzync-fresh.vercel.app/api/auth/callback/google   (prod)
 | `/api/hotel-search` | POST | Google Places hotel search — all brands, grouped by chain, sorted by proximity 🔒 |
 | `/api/hotel-photo` | GET | Google Places photo proxy + cache 🔒 |
 | `/api/places` | GET | Google Places attractions per city + cache 🔒 |
-| `/api/place-coords` | GET | Geocode place name → lat/lng + cache 🔒 |
+| `/api/place-coords` | POST | Geocode place names → lat/lng + cache (key: `name\|city`) 🔒 |
+| `/api/place-autocomplete` | GET | Google Places Autocomplete proxy — typeahead search 🔒 |
 | `/api/chat` | POST | Anthropic AI travel assistant (streaming) 🔒 |
 
 ---
@@ -355,7 +362,8 @@ Add these in **GitHub → repo → Settings → Secrets → Actions**:
 | `DayPanel` | `components/itinerary/DayPanel.tsx` | Day header + hotel banner + timeline |
 | `EventItem` | `components/itinerary/EventItem.tsx` | Single event row (edit/delete) |
 | `EditEventModal` | `components/itinerary/EditEventModal.tsx` | Edit event form modal |
-| `AddEventBar` | `components/itinerary/AddEventBar.tsx` | Inline add-event form |
+| `AddEventBar` | `components/itinerary/AddEventBar.tsx` | Inline add-event form with place dropdown |
+| `CityMap` | `components/itinerary/CityMap.tsx` | Embedded Google Maps with event pins |
 | `ExpenseLog` | `components/expense/ExpenseLog.tsx` | Expense card + add form |
 | `CategoryPills` | `components/expense/CategoryPills.tsx` | Category selector buttons |
 | `HotelModal` | `components/hotel/HotelModal.tsx` | Hotel detail modal |
