@@ -1,6 +1,6 @@
 # TripZync® — Product Requirements & Implementation Status
 
-> Last updated: 2026-05-25  
+> Last updated: 2026-05-30  
 > Production URL: https://tripzync-fresh.vercel.app (Vercel — being migrated)  
 > Target deploy: Jelastic cloud server (Node 26, PM2, standalone build)  
 > Repository: private GitHub repo (macOS Keychain credentials)
@@ -78,9 +78,7 @@ ISO_NUM                  // ISO A3 → TopoJSON numeric code mapping
 
 - Hotel brand multi-select (IHG, Marriott, Hilton, Hyatt, Accor, Wyndham, BW, Radisson, NH, Okura, Minor, SLH, Shangri-La, Anantara, Rosewood, Aman, etc.)
 - "No membership / budget traveller" option (mutually exclusive with brand selection)
-- `noMembership` flag: true when `hotelBrands.length === 0` after filtering 'none' entries
-- Budget hotels **only** shown if `noMembership === true`
-- Loyalty hotels shown for all brand selections
+- Selection saved to `hotels[]` in localStorage onboarding data
 
 ---
 
@@ -90,7 +88,8 @@ ISO_NUM                  // ISO A3 → TopoJSON numeric code mapping
 
 - Date range picker (start date → end date)
 - Validation: end date must be ≥ start date
-- On submit: trip saved to DB via `/api/trips` POST + redirect to `/home?tripId=...`
+- On submit: saves full trip data to localStorage → redirect to `/home`
+- **Back-navigation support:** landing on `/?screen=duration` restores all state (cities, places, hotels, dates) from localStorage so the user can continue editing without losing selections
 
 ---
 
@@ -102,21 +101,25 @@ The per-trip homepage shown immediately after onboarding and on return visits.
 
 **Status: ✅ Complete**
 
-- Calls `/api/hotel-search` with city + hotel brands
-- Uses **Google Places API** (`GOOGLE_PLACES_API_KEY`) — searches "hotels near {city}" filtered by brand keywords 🔒
-- Returns up to 10 real hotel results with name, rating, address, Google Maps URL
-- Hotel photos fetched separately via `/api/hotel-photo` and cached in `hotel_photos` DB table (30-day TTL)
-- **Loyalty mode**: shows hotels matching selected brands, hides budget section
-- **Budget mode** (`noMembership === true`): shows budget hotels only, hides loyalty section
-- Fix applied: `setGoogleBudgetHotels(noMembership ? budget : [])` prevents budget leak
+- Calls `/api/hotel-search` with city clusters (lat/lng/radius) — no brand filter
+- Uses **Google Places API** `searchNearby` 🔒
+- Pipeline: `searchNearby` → Distance Matrix (≤ 45 min filter) → group by brand → sort by proximity
+- **All hotels shown** regardless of user's loyalty membership
+- Grouped by detected chain: Marriott → Hilton → Hyatt → IHG → Accor → other → Independent
+- Up to 5 properties per brand; airport hotels suppressed when 2+ city-center picks exist
+- Sort toggle: **Nearest** (default, by `travelMins`) or **Price**
+- **On Map / Hidden** toggle per brand (controls Google Maps pins)
+- Hotel photos fetched via `/api/hotel-photo` → cached in `hotel_photos` DB table (30-day TTL)
+- Hotel map pin coordinates come directly from `searchNearby` response (no secondary geocoding call)
 
 ### Google Maps Integration
 
 **Status: ✅ Complete**
 
 - Place coordinates fetched from `/api/place-coords` (Google Geocoding → cached in `place_coords` table)
-- Interactive Google Maps embed with pins for selected places 🔒
+- Interactive Google Maps embed with pins for selected places and hotel brand logo pins 🔒
 - `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` required client-side
+- Hotel lat/lng carried from `/api/hotel-search` response — no redundant `/api/place-coords` call for hotels
 
 ### Places Display
 
@@ -131,6 +134,26 @@ The per-trip homepage shown immediately after onboarding and on return visits.
 
 - Chat drawer powered by **Anthropic API** (`ANTHROPIC_API_KEY`) via `/api/chat` route 🔒
 - Streaming responses via Vercel AI SDK
+
+---
+
+## 2b · Edit Trip Page (`/plan`)
+
+**Status: ✅ Complete (rewritten as edit page)**
+
+Accessible from the homepage nav and from Step 04 back-navigation.  
+Purpose: let the user update their trip dates or jump to any step to change selections.
+
+- **Destination field removed** — destination shown as a read-only chip (city/cities from localStorage)
+- Dates pre-filled from `tripzync_onboarding` localStorage on mount
+- Duration badge recalculates live
+- Loyalty programme summary shown as gold pills (read-only)
+- **Quick-edit links:** Edit Cities (`/?screen=map`) · Edit Places (`/?screen=places`) · Edit Hotels (`/?screen=hotels`) · Edit Dates (`/?screen=duration`)
+- CTA: "SAVE & BACK TO MY TRIP →" — merges updated dates into localStorage → `window.location.replace('/home')`
+- No auth step (user has already completed onboarding)
+
+**Navigation from `/home`:**
+- `← Back` button (guest nav) → `/?screen=duration` (Step 04 with state restored from localStorage)
 
 ---
 
@@ -266,7 +289,7 @@ https://tripzync-fresh.vercel.app/api/auth/callback/google   (prod)
 | `/api/expenses` | GET, POST, DELETE | Expense entries |
 | `/api/me/trip` | GET | Current user's active trip |
 | `/api/hotels` | GET | Hotel DB lookup (legacy) |
-| `/api/hotel-search` | GET | Google Places hotel search 🔒 |
+| `/api/hotel-search` | POST | Google Places hotel search — all brands, grouped by chain, sorted by proximity 🔒 |
 | `/api/hotel-photo` | GET | Google Places photo proxy + cache 🔒 |
 | `/api/places` | GET | Google Places attractions per city + cache 🔒 |
 | `/api/place-coords` | GET | Geocode place name → lat/lng + cache 🔒 |
