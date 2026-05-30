@@ -1269,6 +1269,35 @@ export default function GuestHomePage() {
     init()
   }, [loadPhotos])
 
+  // ── Drag-and-drop state ──────────────────────────────────────────────────────
+  const [dragSource, setDragSource] = useState<{ si: number; di: number; place: string } | null>(null)
+  const [dropTarget, setDropTarget] = useState<{ si: number; di: number } | null>(null)
+
+  const movePlace = (fromSi: number, fromDi: number, toSi: number, toDi: number, place: string) => {
+    if (fromSi === toSi && fromDi === toDi) return
+    setItinerary(prev => prev.map((sec, s) => {
+      if (s === fromSi && s === toSi) {
+        return { ...sec, days: sec.days.map((day, d) => {
+          if (d === fromDi && d === toDi) return day
+          if (d === fromDi) return { ...day, places: day.places.filter(p => p !== place) }
+          if (d === toDi) return { ...day, places: [...day.places, place] }
+          return day
+        })}
+      }
+      if (s === fromSi) {
+        return { ...sec, days: sec.days.map((day, d) =>
+          d === fromDi ? { ...day, places: day.places.filter(p => p !== place) } : day
+        )}
+      }
+      if (s === toSi) {
+        return { ...sec, days: sec.days.map((day, d) =>
+          d === toDi ? { ...day, places: [...day.places, place] } : day
+        )}
+      }
+      return sec
+    }))
+  }
+
   // ── Edit helpers ────────────────────────────────────────────────────────────
   const removePlace = (si: number, di: number, place: string) =>
     setItinerary(prev => prev.map((sec, s) => s !== si ? sec : {
@@ -1785,7 +1814,23 @@ export default function GuestHomePage() {
                     <div
                       key={day.dayNumber}
                       ref={el => { dayRefs.current[day.dayNumber] = el }}
-                      style={{ padding:'14px 18px', borderBottom:'1px solid var(--border)', background: activeDay === day.dayNumber ? 'rgba(64,224,208,.04)' : 'transparent', transition:'background .2s' }}
+                      onDragOver={e => { e.preventDefault(); setDropTarget({ si, di }) }}
+                      onDragLeave={() => setDropTarget(null)}
+                      onDrop={e => {
+                        e.preventDefault()
+                        setDropTarget(null)
+                        if (dragSource) {
+                          movePlace(dragSource.si, dragSource.di, si, di, dragSource.place)
+                          setDragSource(null)
+                        }
+                      }}
+                      style={{
+                        padding:'14px 18px', borderBottom:'1px solid var(--border)', transition:'background .2s, border-color .2s',
+                        background: dropTarget?.si === si && dropTarget?.di === di
+                          ? 'rgba(64,224,208,.12)'
+                          : activeDay === day.dayNumber ? 'rgba(64,224,208,.04)' : 'transparent',
+                        borderLeft: dropTarget?.si === si && dropTarget?.di === di ? '3px solid rgba(64,224,208,.6)' : '3px solid transparent',
+                      }}
                     >
                       {/* Day label row */}
                       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10 }}>
@@ -1812,15 +1857,24 @@ export default function GuestHomePage() {
                         )}
                         {day.places.map(place => (
                           <div key={place}
-                            style={{ position:'relative' }}
+                            draggable
+                            onDragStart={e => {
+                              setDragSource({ si, di, place })
+                              setTooltip(null)
+                              e.dataTransfer.effectAllowed = 'move'
+                              e.dataTransfer.setData('text/plain', place)
+                            }}
+                            onDragEnd={() => { setDragSource(null); setDropTarget(null) }}
+                            style={{ position:'relative', opacity: dragSource?.si === si && dragSource?.di === di && dragSource?.place === place ? 0.4 : 1, transition:'opacity .15s' }}
                             onMouseEnter={e => {
+                              if (dragSource) return
                               const img = photoMap[place]; if (!img) return
                               const r = (e.currentTarget as HTMLElement).getBoundingClientRect()
                               setTooltip({ name: place, image: img, x: r.left + r.width / 2, y: r.top - 10 })
                             }}
                             onMouseLeave={() => setTooltip(null)}
                           >
-                            <div style={{ display:'flex', alignItems:'center', gap:6, background:'var(--card2)', border:'1px solid var(--border2)', borderRadius:20, padding:'5px 10px 5px 6px', cursor:'default' }}>
+                            <div style={{ display:'flex', alignItems:'center', gap:6, background:'var(--card2)', border:'1px solid var(--border2)', borderRadius:20, padding:'5px 10px 5px 6px', cursor:'grab' }}>
                               {photoMap[place]
                                 ? <img src={photoMap[place]} alt="" style={{ width:22, height:22, borderRadius:'50%', objectFit:'cover', flexShrink:0, border:'1px solid var(--border2)' }} />
                                 : <div style={{ width:22, height:22, borderRadius:'50%', background:'var(--border)', flexShrink:0 }} />
