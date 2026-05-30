@@ -32,26 +32,25 @@ export function ThemeToggle() {
       className="theme-toggle"
       style={{
         position: 'fixed',
-        top: 10,
-        right: 200,
+        top: 12,
+        left: 195,
         zIndex: 9999,
-        height: 32,
-        padding: '0 12px',
-        borderRadius: 6,
+        height: 28,
+        padding: '0 10px',
+        borderRadius: 14,
         border: '1px solid var(--border)',
         background: 'var(--card)',
         cursor: 'pointer',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 6,
-        fontSize: 12,
+        gap: 5,
+        fontSize: 11,
         fontFamily: "'Barlow Condensed', sans-serif",
         fontWeight: 700,
-        letterSpacing: '0.1em',
+        letterSpacing: '0.08em',
         textTransform: 'uppercase' as const,
-        color: 'var(--text, #fff)',
-        boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
+        color: 'var(--muted, rgba(255,255,255,.5))',
         transition: 'border-color 0.2s, color 0.2s',
       }}
       onMouseEnter={e => {
@@ -60,7 +59,7 @@ export function ThemeToggle() {
       }}
       onMouseLeave={e => {
         (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border)'
-        ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--text, #fff)'
+        ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--muted, rgba(255,255,255,.5))'
       }}
     >
       {isLight ? '🌙' : '☀️'}
