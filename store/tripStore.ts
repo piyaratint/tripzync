@@ -25,7 +25,6 @@ interface TripStore {
 
   // Places cache (keyed by lowercase place name)
   places: Record<string, PlaceInfo>
-  placesLoaded: boolean
 
   // UI state
   activeDayIndex: number
@@ -38,7 +37,6 @@ interface TripStore {
   setExpenses: (expenses: Expense[]) => void
   setFlights: (flights: Flight[]) => void
   setPlaces: (places: PlaceInfo[]) => void
-  resetPlaces: () => void
   setActiveDayIndex: (i: number) => void
 
   // Optimistic event mutations
@@ -63,7 +61,6 @@ export const useTripStore = create<TripStore>()(
       expenses: [],
       flights: [],
       places: {},
-      placesLoaded: false,
       activeDayIndex: 0,
       isSidebarOpen: false,
 
@@ -73,10 +70,8 @@ export const useTripStore = create<TripStore>()(
       setExpenses: (expenses) => set({ expenses }),
       setFlights:  (flights)  => set({ flights }),
       setPlaces:   (list)     => set({
-        placesLoaded: true,
         places: Object.fromEntries(list.map(p => [p.name.toLowerCase(), p])),
       }),
-      resetPlaces: ()         => set({ places: {}, placesLoaded: false }),
       setActiveDayIndex: (i)  => set({ activeDayIndex: i }),
 
       addEventOptimistic: (event) =>

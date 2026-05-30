@@ -82,28 +82,23 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
   const [inviteOpen, setInviteOpen] = useState(false)
 
   const setPlaces = useTripStore(s => s.setPlaces)
-  const resetPlaces = useTripStore(s => s.resetPlaces)
-  const placesLoaded = useTripStore(s => s.placesLoaded)
 
-  // Hydrate store from server-fetched data
+  // Hydrate store from server-fetched data + fetch places
   useEffect(() => {
     setTrip(trip)
     setHotels(hotels)
     setEvents(events)
     setExpenses(expenses)
     setFlights(flights)
-    resetPlaces()
-  }, [trip.id]) // eslint-disable-line
 
-  // Fetch places for this city once — feeds dropdown + photo cards
-  useEffect(() => {
     const city = trip.destCity ?? trip.destination
-    if (!city || placesLoaded) return
-    fetch(`/api/places?country=${encodeURIComponent(city)}`)
-      .then(r => r.json())
-      .then(d => setPlaces(d.places ?? []))
-      .catch(() => setPlaces([]))
-  }, [trip.id, placesLoaded]) // eslint-disable-line
+    if (city) {
+      fetch(`/api/places?country=${encodeURIComponent(city)}`)
+        .then(r => r.json())
+        .then(d => setPlaces(d.places ?? []))
+        .catch(() => setPlaces([]))
+    }
+  }, [trip.id]) // eslint-disable-line
 
   const storeEvents = useTripStore(s => s.events)
   const storeExpenses = useTripStore(s => s.expenses)

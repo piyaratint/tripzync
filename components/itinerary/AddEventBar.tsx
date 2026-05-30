@@ -14,7 +14,6 @@ interface Props {
 export function AddEventBar({ tripId, date }: Props) {
   const addEvent = useAddEvent(tripId)
   const storePlaces = useTripStore(s => s.places)
-  const placesLoaded = useTripStore(s => s.placesLoaded)
   const [time, setTime] = useState('')
   const [act,  setAct]  = useState('')
   const [sub,  setSub]  = useState('')
@@ -126,7 +125,7 @@ export function AddEventBar({ tripId, date }: Props) {
             onChange={e => { setAct(e.target.value); setShowDropdown(true) }}
             onFocus={() => setShowDropdown(true)}
             onKeyDown={handleKeyDown}
-            placeholder={placesLoaded ? 'Activity / select a place ▾' : 'Loading places...'}
+            placeholder={placesList.length > 0 ? 'Activity / select a place ▾' : 'Activity name'}
             autoComplete="off"
           />
         </div>
