@@ -24,8 +24,8 @@ const THEMES = [
   {
     id: 't-arctic',
     name: 'Arctic',
-    desc: 'Light Mode · Blue · Coral',
-    bg: '#F0F4FF', accent: '#0066FF', hi: '#FF6B35',
+    desc: 'Light Mode · Cyan · Gold',
+    bg: '#F9FAFB', accent: '#40E0D0', hi: '#FFC947',
   },
   {
     id: 't-forest',
@@ -99,13 +99,13 @@ export default function SettingsPage() {
               className={`ob-theme-card${activeTheme === t.id ? ' active' : ''}`}
               style={{
                 background: t.bg,
-                borderColor: activeTheme === t.id ? t.accent : 'rgba(255,255,255,.08)',
+                borderColor: activeTheme === t.id ? t.accent : 'var(--border)',
                 cursor: 'pointer',
               }}
               onClick={() => handleTheme(t.id)}
             >
               <div className="ob-theme-name" style={{ color: t.accent }}>{t.name}</div>
-              <div className="ob-theme-desc" style={{ color: '#fff' }}>{t.desc}</div>
+              <div className="ob-theme-desc" style={{ color: t.id === 't-arctic' ? '#1A2040' : '#fff' }}>{t.desc}</div>
               <div className="ob-theme-swatches">
                 <div className="ob-theme-swatch" style={{ background: t.bg, border: '1px solid rgba(255,255,255,.2)' }} />
                 <div className="ob-theme-swatch" style={{ background: t.accent }} />
@@ -133,7 +133,7 @@ export default function SettingsPage() {
           >
             {saved ? 'Saved ✓' : 'Save Preferences'}
           </button>
-          <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 10, letterSpacing: '.1em', color: '#fff', textTransform: 'uppercase' }}>
+          <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 10, letterSpacing: '.1em', color: 'var(--text)', textTransform: 'uppercase' }}>
             Theme applies immediately
           </span>
         </div>
@@ -151,14 +151,14 @@ export default function SettingsPage() {
           Manage your TripZync account and connected services.
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div style={{ background: 'rgba(255,255,255,.03)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 13, letterSpacing: '.1em', textTransform: 'uppercase', color: '#fff' }}>
+          <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 13, letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--text)' }}>
               Connected via Google OAuth
             </span>
             <span style={{ fontSize: 18 }}>🔗</span>
           </div>
-          <div style={{ background: 'rgba(255,255,255,.03)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 13, letterSpacing: '.1em', textTransform: 'uppercase', color: '#fff' }}>
+          <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 13, letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--text)' }}>
               Hotel Loyalty Programmes
             </span>
             <a href="/dashboard" style={{ fontFamily: "'Barlow Condensed'", fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--red)', textDecoration: 'none' }}>

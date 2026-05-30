@@ -291,6 +291,15 @@ interface WorldMapProps {
 }
 
 export function WorldMap({ selectedISOs, selectedCities }: WorldMapProps) {
+  // Detect light theme for adaptive map colors
+  const [isLight, setIsLight] = useState(false)
+  useEffect(() => {
+    const check = () => setIsLight(document.body.classList.contains('t-arctic'))
+    check()
+    const obs = new MutationObserver(check)
+    obs.observe(document.body, { attributes: true, attributeFilter: ['class'] })
+    return () => obs.disconnect()
+  }, [])
   const selectedNums = useMemo(
     () => new Set(selectedISOs.map(iso => ISO_NUM[iso]).filter(Boolean)),
     [selectedISOs]
@@ -339,11 +348,11 @@ export function WorldMap({ selectedISOs, selectedCities }: WorldMapProps) {
     <div style={{
       width: '100%',
       height: 400,
-      background: 'rgba(7,10,25,0.95)',
+      background: isLight ? '#F3F4F6' : 'rgba(7,10,25,0.95)',
       borderRadius: 16,
       overflow: 'hidden',
       border: '1px solid rgba(64,224,208,0.18)',
-      boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+      boxShadow: isLight ? '0 4px 16px rgba(0,0,0,0.08)' : '0 8px 32px rgba(0,0,0,0.5)',
       position: 'relative',
       cursor: isDragging ? 'grabbing' : 'grab',
       userSelect: 'none',
@@ -356,7 +365,7 @@ export function WorldMap({ selectedISOs, selectedCities }: WorldMapProps) {
           fontFamily: "'Space Mono', monospace",
           fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase',
           color: 'var(--accent)', opacity: 0.8,
-          background: 'rgba(7,10,25,0.85)',
+          background: isLight ? 'rgba(255,255,255,0.9)' : 'rgba(7,10,25,0.85)',
           padding: '4px 8px', borderRadius: 6,
           backdropFilter: 'blur(4px)',
           pointerEvents: 'none',
@@ -381,7 +390,7 @@ export function WorldMap({ selectedISOs, selectedCities }: WorldMapProps) {
             onClick={onClick}
             style={{
               width: 32, height: 32,
-              background: 'rgba(7,10,25,0.90)',
+              background: isLight ? 'rgba(255,255,255,0.92)' : 'rgba(7,10,25,0.90)',
               border: '1px solid rgba(64,224,208,0.30)',
               borderRadius: 8,
               color: 'var(--accent)',
@@ -397,7 +406,7 @@ export function WorldMap({ selectedISOs, selectedCities }: WorldMapProps) {
               ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--accent)'
             }}
             onMouseLeave={e => {
-              (e.currentTarget as HTMLButtonElement).style.background = 'rgba(7,10,25,0.90)'
+              (e.currentTarget as HTMLButtonElement).style.background = isLight ? 'rgba(255,255,255,0.92)' : 'rgba(7,10,25,0.90)'
               ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(64,224,208,0.30)'
             }}
           >
@@ -412,7 +421,7 @@ export function WorldMap({ selectedISOs, selectedCities }: WorldMapProps) {
           position: 'absolute', bottom: 14, left: 16, zIndex: 10,
           fontFamily: "'Space Mono', monospace",
           fontSize: 8, letterSpacing: '0.12em', textTransform: 'uppercase',
-          color: 'rgba(255,255,255,0.22)',
+          color: isLight ? 'rgba(107,114,128,0.5)' : 'rgba(255,255,255,0.22)',
           pointerEvents: 'none',
         }}>
           scroll to zoom · drag to pan
@@ -447,12 +456,21 @@ export function WorldMap({ selectedISOs, selectedCities }: WorldMapProps) {
                   <Geography
                     key={geo.rsmKey}
                     geography={geo}
-                    fill={isSelected ? 'rgba(64,224,208,0.32)' : '#0B1830'}
-                    stroke={isSelected ? '#40E0D0' : '#162540'}
+                    fill={isSelected
+                      ? 'rgba(64,224,208,0.32)'
+                      : isLight ? '#D1D5DB' : '#0B1830'
+                    }
+                    stroke={isSelected
+                      ? '#40E0D0'
+                      : isLight ? '#E5E7EB' : '#162540'
+                    }
                     strokeWidth={isSelected ? 1.0 / mapZoom : 0.4 / mapZoom}
                     style={{
                       default: { outline: 'none' },
-                      hover:   { outline: 'none', fill: isSelected ? 'rgba(64,224,208,0.45)' : '#12203a' },
+                      hover:   { outline: 'none', fill: isSelected
+                        ? 'rgba(64,224,208,0.45)'
+                        : isLight ? '#C5CAD1' : '#12203a'
+                      },
                       pressed: { outline: 'none' },
                     }}
                   />

@@ -29,7 +29,7 @@ export default function LoginPage() {
             fontStyle: 'italic',
             textTransform: 'uppercase',
             lineHeight: 0.9,
-            color: '#fff',
+            color: 'var(--text, #fff)',
           }}>
             Your<br />
             <em style={{ color: 'var(--red)' }}>Travel Logbook</em>
@@ -40,9 +40,9 @@ export default function LoginPage() {
           <button
             type="submit"
             style={{
-              background: '#fff',
+              background: '#ffffff',
               color: '#111',
-              border: 'none',
+              border: '1px solid rgba(0,0,0,0.1)',
               borderRadius: 12,
               padding: '14px 32px',
               fontFamily: "'Barlow Condensed', sans-serif",
@@ -70,7 +70,7 @@ export default function LoginPage() {
           fontFamily: "'Barlow Condensed', sans-serif",
           fontSize: 9,
           letterSpacing: '.14em',
-          color: 'rgba(255,255,255,.35)',
+          color: 'var(--muted, rgba(255,255,255,.35))',
           textTransform: 'uppercase',
         }}>
           Your trips, your data.

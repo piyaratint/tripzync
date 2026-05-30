@@ -26,7 +26,7 @@ export function TripZyncLogo({ href = '/', className, style }: Props) {
     >
       {/* Three dots — dim · teal · teal */}
       <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-        <span style={{ display: 'block', width: 8, height: 8, borderRadius: '50%', background: 'rgba(255,255,255,.18)' }} />
+        <span style={{ display: 'block', width: 8, height: 8, borderRadius: '50%', background: 'var(--border2, rgba(255,255,255,.18))' }} />
         <span style={{ display: 'block', width: 8, height: 8, borderRadius: '50%', background: 'var(--accent, #40E0D0)' }} />
         <span style={{ display: 'block', width: 8, height: 8, borderRadius: '50%', background: 'var(--accent, #40E0D0)' }} />
       </div>
@@ -38,7 +38,7 @@ export function TripZyncLogo({ href = '/', className, style }: Props) {
         fontWeight: 700,
         letterSpacing: '.22em',
         textTransform: 'uppercase',
-        color: '#fff',
+        color: 'var(--text, #fff)',
         lineHeight: 1,
         whiteSpace: 'nowrap',
       }}>

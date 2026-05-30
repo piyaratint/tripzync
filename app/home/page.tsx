@@ -1570,9 +1570,23 @@ export default function GuestHomePage() {
               <p style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, color:'rgba(255,255,255,.7)', marginBottom:14 }}>
                 Create a free account to keep this itinerary and access it anywhere.
               </p>
-              <a href="/login" style={{ display:'block', textAlign:'center', fontFamily:"'Barlow Condensed',sans-serif", fontSize:13, fontWeight:700, letterSpacing:3, textTransform:'uppercase', padding:'10px', background:'var(--accent)', color:'var(--bg)', borderRadius:8, textDecoration:'none' }}>
+              <button
+                onClick={() => {
+                  // Save current itinerary to localStorage so it can be restored after login
+                  const currentPlacesByCity: Record<string, string[]> = {}
+                  for (const sec of itinerary) {
+                    currentPlacesByCity[sec.city] = sec.days.flatMap(d => d.places)
+                  }
+                  const pendingTrip = {
+                    meta: { ...data, placesByCity: currentPlacesByCity },
+                    itinerary,
+                  }
+                  localStorage.setItem('tripzync_pending_trip', JSON.stringify(pendingTrip))
+                  window.location.href = '/login?callbackUrl=%2Fdashboard'
+                }}
+                style={{ display:'block', width:'100%', textAlign:'center', fontFamily:"'Barlow Condensed',sans-serif", fontSize:13, fontWeight:700, letterSpacing:3, textTransform:'uppercase', padding:'10px', background:'var(--accent)', color:'var(--bg)', borderRadius:8, textDecoration:'none', border:'none', cursor:'pointer' }}>
                 Sign Up Free →
-              </a>
+              </button>
             </div>
           )}
 

@@ -545,16 +545,16 @@ export default function LandingPage() {
         <div ref={searchRef} style={{ position: 'relative', maxWidth: 520, width: '100%', marginTop: 20 }}>
           <div style={{
             display: 'flex', alignItems: 'center', gap: 10,
-            background: 'rgba(255,255,255,0.05)',
-            border: `1.5px solid ${showDropdown ? 'var(--accent)' : 'rgba(255,255,255,0.14)'}`,
+            background: 'var(--card)',
+            border: `1.5px solid ${showDropdown ? 'var(--accent)' : 'var(--border)'}`,
             borderRadius: showDropdown && filteredCities.length > 0 ? '12px 12px 0 0' : 12,
             padding: '12px 16px',
             transition: 'border-color 0.2s',
           }}>
             {/* Search icon */}
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, opacity: 0.5 }}>
-              <circle cx="11" cy="11" r="7" stroke="white" strokeWidth="2"/>
-              <path d="M16.5 16.5L21 21" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+              <circle cx="11" cy="11" r="7" stroke="var(--muted, white)" strokeWidth="2"/>
+              <path d="M16.5 16.5L21 21" stroke="var(--muted, white)" strokeWidth="2" strokeLinecap="round"/>
             </svg>
             <input
               type="text"
@@ -565,14 +565,14 @@ export default function LandingPage() {
               onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
               style={{
                 flex: 1, background: 'none', border: 'none', outline: 'none',
-                color: '#fff', fontFamily: "'Rajdhani', sans-serif",
+                color: 'var(--text, #fff)', fontFamily: "'Rajdhani', sans-serif",
                 fontSize: 16, fontWeight: 500,
               }}
             />
             {searchQuery && (
               <button
                 onClick={() => { setSearchQuery(''); setShowDropdown(false) }}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.4)', fontSize: 18, lineHeight: 1, padding: 0 }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted, rgba(255,255,255,0.4))', fontSize: 18, lineHeight: 1, padding: 0 }}
               >×</button>
             )}
           </div>
@@ -581,12 +581,12 @@ export default function LandingPage() {
           {showDropdown && filteredCities.length > 0 && (
             <div style={{
               position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50,
-              background: '#0D1528',
+              background: 'var(--card)',
               border: '1.5px solid var(--accent)',
-              borderTop: '1px solid rgba(64,224,208,0.25)',
+              borderTop: '1px solid var(--border)',
               borderRadius: '0 0 12px 12px',
               overflow: 'hidden',
-              boxShadow: '0 12px 40px rgba(0,0,0,0.7)',
+              boxShadow: '0 12px 40px rgba(0,0,0,0.15)',
             }}>
               {filteredCities.map((opt, idx) => (
                 <button
@@ -598,7 +598,7 @@ export default function LandingPage() {
                     gap: 12, padding: '11px 16px', background: 'none', border: 'none',
                     cursor: 'pointer', textAlign: 'left',
                     borderBottom: idx < filteredCities.length - 1
-                      ? '1px solid rgba(255,255,255,0.06)' : 'none',
+                      ? '1px solid var(--border)' : 'none',
                     transition: 'background 0.12s',
                   }}
                   onMouseEnter={e => (e.currentTarget.style.background = 'rgba(64,224,208,0.08)')}
@@ -608,11 +608,11 @@ export default function LandingPage() {
                   <div>
                     <div style={{
                       fontFamily: "'Rajdhani', sans-serif", fontSize: 15,
-                      fontWeight: 600, color: '#fff',
+                      fontWeight: 600, color: 'var(--text, #fff)',
                     }}>{opt.city}</div>
                     <div style={{
                       fontFamily: "'Space Mono', monospace", fontSize: 9,
-                      letterSpacing: '0.1em', color: 'rgba(255,255,255,0.4)',
+                      letterSpacing: '0.1em', color: 'var(--muted, rgba(255,255,255,0.4))',
                       textTransform: 'uppercase', marginTop: 1,
                     }}>{opt.countryName}</div>
                   </div>
@@ -913,24 +913,24 @@ export default function LandingPage() {
 
           <div style={{ display:'flex', flexDirection:'column', gap:20, maxWidth:420 }}>
             <div>
-              <label style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, letterSpacing:'.16em', textTransform:'uppercase' as const, color:'#fff', marginBottom:6, display:'block' }}>
+              <label style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, letterSpacing:'.16em', textTransform:'uppercase' as const, color:'var(--text, #fff)', marginBottom:6, display:'block' }}>
                 Start Date
               </label>
               <input
                 type="date"
-                style={{ width:'100%', background:'rgba(255,255,255,.05)', border:'1px solid rgba(255,255,255,.15)', borderRadius:10, padding:'12px 16px', color:'#fff', fontFamily:'inherit', fontSize:15, outline:'none', boxSizing:'border-box' as const, colorScheme:'dark' }}
+                style={{ width:'100%', background:'var(--card)', border:'1px solid var(--border)', borderRadius:10, padding:'12px 16px', color:'var(--text, #fff)', fontFamily:'inherit', fontSize:15, outline:'none', boxSizing:'border-box' as const }}
                 value={startDate}
                 min={todayStr}
                 onChange={e => setStartDate(e.target.value)}
               />
             </div>
             <div>
-              <label style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, letterSpacing:'.16em', textTransform:'uppercase' as const, color:'#fff', marginBottom:6, display:'block' }}>
+              <label style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, letterSpacing:'.16em', textTransform:'uppercase' as const, color:'var(--text, #fff)', marginBottom:6, display:'block' }}>
                 End Date
               </label>
               <input
                 type="date"
-                style={{ width:'100%', background:'rgba(255,255,255,.05)', border:'1px solid rgba(255,255,255,.15)', borderRadius:10, padding:'12px 16px', color:'#fff', fontFamily:'inherit', fontSize:15, outline:'none', boxSizing:'border-box' as const, colorScheme:'dark' }}
+                style={{ width:'100%', background:'var(--card)', border:'1px solid var(--border)', borderRadius:10, padding:'12px 16px', color:'var(--text, #fff)', fontFamily:'inherit', fontSize:15, outline:'none', boxSizing:'border-box' as const }}
                 value={endDate}
                 min={startDate || todayStr}
                 onChange={e => setEndDate(e.target.value)}

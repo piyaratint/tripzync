@@ -3,6 +3,7 @@ import { SessionProvider } from 'next-auth/react'
 import { QueryProvider } from '@/components/ui/QueryProvider'
 import { ToastProvider } from '@/components/ui/Toaster'
 import SiteFooter from '@/components/SiteFooter'
+import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import './globals.css'
 
 const BASE_URL = 'https://tripzync.vercel.app'
@@ -51,11 +52,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        <script dangerouslySetInnerHTML={{ __html: `try{var t=localStorage.getItem('tripzync_theme');if(t)document.body.className=t}catch(e){}` }} />
         <SessionProvider>
           <QueryProvider>
             <ToastProvider>
               <div style={{ flex: 1 }}>{children}</div>
               <SiteFooter />
+              <ThemeToggle />
             </ToastProvider>
           </QueryProvider>
         </SessionProvider>

@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { fmtDate, daysBetween } from '@/lib/utils'
 import { TripCard } from './TripCard'
+import { PendingTripSaver } from '@/components/PendingTripSaver'
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -36,6 +37,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="page">
+      <PendingTripSaver />
       <header style={{ padding: '32px 0 28px', borderBottom: '1px solid var(--border)', marginBottom: '32px' }}>
         <div className="hero-eyebrow">
           <div className="eyebrow-dots"><span /><span className="r" /><span /></div>

@@ -42,10 +42,10 @@ body.t-ember {
   --text: #EED8C8; --dim: #EED8C8; --muted: #EED8C8;
 }
 body.t-arctic {
-  --bg: #F0F4FF; --bg2: #E6ECFF; --card: #FFFFFF; --card2: #F5F8FF;
-  --border: #CCD5F5; --border2: #A8B8EE;
-  --accent: #0066FF; --accent2: #0044CC; --hi: #FF6B35;
-  --text: #1A2040; --dim: #5060A0; --muted: #8090C0;
+  --bg: #F9FAFB; --bg2: #F3F4F6; --card: #FFFFFF; --card2: #F9FAFB;
+  --border: #E5E7EB; --border2: #D1D5DB;
+  --accent: #40E0D0; --accent2: #20B2AA; --hi: #FFC947;
+  --text: #111827; --dim: #6B7280; --muted: #9CA3AF;
 }
 body.t-forest {
   --bg: #050F09; --bg2: #081510; --card: #0C1E12; --card2: #112618;
@@ -1146,6 +1146,266 @@ body {
 @media (max-width: 480px) {
   .site-footer-inner { grid-template-columns: 1fr; }
 }
+
+/* ══════════════════════════════════════════════════════════
+   ARCTIC (LIGHT) THEME — override all hardcoded #fff text
+   ══════════════════════════════════════════════════════════ */
+body.t-arctic {
+  color: #111827;
+  --white: #111827;
+}
+
+/* Force-override inline style="color:#fff" across all elements.
+   Exceptions (white text on dark/image backgrounds) are re-whitelisted below. */
+body.t-arctic [style*="color: rgb(255, 255, 255)"],
+body.t-arctic [style*="color:rgb(255,255,255)"],
+body.t-arctic [style*="color:#fff"],
+body.t-arctic [style*="color: #fff"],
+body.t-arctic [style*="color: white"],
+body.t-arctic [style*="color:white"],
+body.t-arctic [style*="color:var(--bg)"],
+body.t-arctic [style*="color: var(--bg)"] {
+  color: #111827 !important;
+}
+body.t-arctic [style*="rgba(255, 255, 255, 0."],
+body.t-arctic [style*="rgba(255,255,255,."],
+body.t-arctic [style*="rgba(255,255,255,0."] {
+  color: rgba(17,24,39,.65) !important;
+}
+/* Re-whitelist: keep white text on accent/dark backgrounds */
+/* Black text on cyan/accent buttons */
+body.t-arctic .fl-tab.active,
+body.t-arctic .tab-btn.active,
+body.t-arctic .btn-add,
+body.t-arctic .btn-fl-save,
+body.t-arctic .btn-save-setup,
+body.t-arctic .btn-save-edit,
+body.t-arctic .ob-cta-btn,
+body.t-arctic .ob-auth-signup,
+body.t-arctic .ob-step-next,
+body.t-arctic .cal-day.range-start,
+body.t-arctic .cal-day.range-end,
+body.t-arctic .invite-copy-btn,
+body.t-arctic .invite-gen-btn { color: #111827 !important; }
+/* Keep white text on dark/image overlays */
+body.t-arctic .flag-race,
+body.t-arctic .ai-send,
+body.t-arctic .ev-place-type,
+body.t-arctic .ob-place-name { color: #fff !important; }
+
+/* Body & top nav */
+body.t-arctic .top-nav { background: rgba(255,255,255,.92); }
+body.t-arctic .top-nav-name { color: #111827; }
+body.t-arctic .top-nav-signout { color: rgba(17,24,39,.55); border-color: rgba(17,24,39,.12); }
+body.t-arctic .top-nav-signout:hover { color: #111827; border-color: rgba(17,24,39,.3); }
+body.t-arctic .top-nav-avatar-fallback { background: rgba(64,224,208,.1); border-color: rgba(64,224,208,.3); }
+
+/* Loading */
+body.t-arctic #loading { background: var(--bg); }
+body.t-arctic .l-ring { border-color: rgba(0,0,0,.08); border-top-color: var(--accent); }
+
+/* Hero */
+body.t-arctic .hero-title { color: #111827; }
+body.t-arctic .hero-title .em { text-shadow: 1px 2px 0 rgba(0,0,0,.35); }
+body.t-arctic .meta-val { color: #111827; }
+body.t-arctic .hotel-chip { background: rgba(0,0,0,.03); }
+body.t-arctic .hotel-chip .meta-val { color: #111827; }
+body.t-arctic .hotel-chip .edit-hint { color: #6B7280; }
+body.t-arctic .edit-title-hint { color: rgba(17,24,39,.5); }
+body.t-arctic .edit-title-hint:hover { color: var(--accent); }
+
+/* Weather */
+body.t-arctic .weather-loc { color: var(--accent); }
+body.t-arctic .weather-temp-big { color: #111827; }
+body.t-arctic .weather-cond { color: #374151; }
+body.t-arctic .w-pill { background: rgba(0,0,0,.05); color: #374151; }
+body.t-arctic .wx-day-hi { color: #111827; }
+body.t-arctic .wx-day-lo { color: #6B7280; }
+body.t-arctic .wx-day { background: rgba(0,0,0,.03); border-color: rgba(0,0,0,.06); }
+body.t-arctic .wx-day.today { background: rgba(64,224,208,.06); border-color: rgba(64,224,208,.2); }
+
+/* Cards / Expense */
+body.t-arctic .card-expense { background: rgba(0,0,0,.02); border-color: var(--border); }
+body.t-arctic .total-num { color: #111827; }
+body.t-arctic .exp-cat-btn { color: rgba(17,24,39,.6); border-color: rgba(17,24,39,.15); }
+body.t-arctic .exp-cat-btn:hover { color: rgba(17,24,39,.8); border-color: rgba(17,24,39,.3); }
+body.t-arctic .exp-cat-btn[data-cat="Others"].active { background: rgba(0,0,0,.06); border-color: rgba(0,0,0,.15); color: #111827; }
+body.t-arctic .exp-input { background: rgba(0,0,0,.04); border-color: rgba(0,0,0,.1); color: #111827; }
+body.t-arctic .exp-input:focus { border-color: rgba(0,0,0,.25); }
+body.t-arctic .exp-input::placeholder { color: rgba(17,24,39,.4); }
+body.t-arctic .exp-list-item { color: #111827; }
+body.t-arctic .exp-list-amount { color: #111827; }
+body.t-arctic .sheet-sync-label { color: #6B7280; }
+body.t-arctic .sheet-link { color: rgba(17,24,39,.6); border-color: rgba(0,0,0,.08); }
+body.t-arctic .exp-toggle-btn { color: rgba(17,24,39,.5); border-color: rgba(0,0,0,.1); }
+body.t-arctic .exp-toggle-btn:hover { color: rgba(17,24,39,.75); border-color: rgba(0,0,0,.25); }
+body.t-arctic .exp-act-btn.cancel { color: #6B7280; }
+body.t-arctic .exp-act-btn.cancel:hover { color: #e8001d; }
+body.t-arctic .exp-cat-select { background: rgba(0,0,0,.04); border-color: rgba(0,0,0,.1); color: #111827; }
+
+/* Links row */
+body.t-arctic .util-link { background: rgba(0,0,0,.03); color: rgba(17,24,39,.6); }
+body.t-arctic .util-link:hover { border-color: rgba(0,0,0,.2); color: #111827; }
+
+/* Flight card */
+body.t-arctic .flight-card { background: rgba(0,0,0,.02); }
+body.t-arctic .fl-tab { color: rgba(17,24,39,.7); border-color: rgba(0,0,0,.1); }
+body.t-arctic .fl-tab:hover:not(.active) { color: #111827; border-color: rgba(0,0,0,.25); }
+body.t-arctic .fl-label { color: #6B7280; }
+body.t-arctic .fl-input { background: rgba(0,0,0,.04); border-color: rgba(0,0,0,.1); color: #111827; }
+body.t-arctic .fl-input:focus { border-color: rgba(0,0,0,.25); }
+body.t-arctic .fl-input::placeholder { color: rgba(17,24,39,.4); }
+body.t-arctic .fl-connect-note { color: rgba(17,24,39,.7); border-color: rgba(0,0,0,.12); }
+body.t-arctic .fl-d-block .fl-d-time { color: #111827; }
+body.t-arctic .fl-d-block .fl-d-label { color: #6B7280; }
+body.t-arctic .fl-d-block .fl-d-port { color: #374151; }
+body.t-arctic .fl-sep { color: #6B7280; }
+body.t-arctic .fl-chip { background: rgba(0,0,0,.04); color: rgba(17,24,39,.6); border-color: rgba(0,0,0,.08); }
+
+/* Day tabs */
+body.t-arctic .tab-btn { background: rgba(0,0,0,.03); border-color: rgba(0,0,0,.07); }
+body.t-arctic .tab-btn:hover { color: #111827; border-color: rgba(0,0,0,.3); }
+
+/* Day panel */
+body.t-arctic .day-panel { background: rgba(0,0,0,.02); border-color: rgba(0,0,0,.07); }
+body.t-arctic .day-panel-head { border-bottom-color: rgba(0,0,0,.06); }
+body.t-arctic .day-title { color: #111827; }
+body.t-arctic .day-panel.is-today .day-panel-head { background: linear-gradient(135deg,rgba(64,224,208,.06) 0%,transparent 55%); border-bottom-color: rgba(64,224,208,.15); }
+body.t-arctic .hotel-banner { background: rgba(64,224,208,.03); color: #374151; }
+
+/* Timeline events */
+body.t-arctic .ev-act { color: #111827; }
+body.t-arctic .ev-sub { color: #374151; }
+body.t-arctic .ev-route { color: #6B7280; }
+body.t-arctic .ev-route .route-stop { background: rgba(0,0,0,.04); border-color: rgba(0,0,0,.1); color: rgba(17,24,39,.55); }
+body.t-arctic .ev-route .route-arrow { color: rgba(17,24,39,.4); }
+body.t-arctic .ev-dot { background: rgba(0,0,0,.1); border-color: rgba(0,0,0,.18); }
+body.t-arctic .ev-line { background: rgba(0,0,0,.08); }
+body.t-arctic .ev-body { border-bottom-color: rgba(0,0,0,.06); }
+body.t-arctic .ev-act-btn.edit { color: rgba(17,24,39,.5); border-color: rgba(0,0,0,.1); }
+body.t-arctic .ev-act-btn.edit:hover { background: rgba(0,0,0,.06); color: #111827; border-color: rgba(0,0,0,.2); }
+
+/* Add event bar */
+body.t-arctic .add-event-bar { border-top-color: rgba(0,0,0,.06); }
+body.t-arctic .ae-input { background: rgba(0,0,0,.04); border-color: rgba(0,0,0,.08); color: #111827; }
+body.t-arctic .ae-input:focus { border-color: rgba(0,0,0,.2); }
+body.t-arctic .ae-input::placeholder { color: rgba(17,24,39,.4); }
+body.t-arctic .btn-ae { background: rgba(0,0,0,.05); border-color: rgba(0,0,0,.1); color: rgba(17,24,39,.6); }
+body.t-arctic .ae-dropdown { background: #fff; border-color: rgba(0,0,0,.12); box-shadow: 0 8px 24px rgba(0,0,0,.12); }
+body.t-arctic .ae-dropdown-item:hover { background: rgba(0,0,0,.04); }
+body.t-arctic .ae-dropdown-name { color: #111827; }
+body.t-arctic .ae-dropdown-type { color: rgba(17,24,39,.4); }
+
+/* Modal */
+body.t-arctic .modal-overlay { background: rgba(0,0,0,.3); }
+body.t-arctic .modal-box { background: #fff; border-color: var(--border); }
+body.t-arctic .modal-title { color: #111827; }
+body.t-arctic .modal-input { background: rgba(0,0,0,.04); border-color: rgba(0,0,0,.1); color: #111827; }
+body.t-arctic .modal-input:focus { border-color: rgba(0,0,0,.25); }
+body.t-arctic .modal-input::placeholder { color: rgba(17,24,39,.4); }
+body.t-arctic .cal-nav { color: #111827; border-color: rgba(0,0,0,.1); }
+body.t-arctic .cal-nav:hover { border-color: rgba(0,0,0,.3); }
+body.t-arctic .cal-month-label { color: #111827; }
+body.t-arctic .cal-day { color: rgba(17,24,39,.6); }
+body.t-arctic .cal-day:hover { background: rgba(0,0,0,.04); color: #111827; }
+body.t-arctic .cal-day.other-month { color: rgba(17,24,39,.35); }
+body.t-arctic .cal-day.in-range { color: rgba(17,24,39,.8); }
+body.t-arctic .range-display { color: #111827; }
+body.t-arctic .range-display span { color: #111827; }
+body.t-arctic .btn-add-hotel { color: rgba(17,24,39,.5); border-color: rgba(0,0,0,.15); }
+body.t-arctic .btn-add-hotel:hover { color: var(--accent); border-color: var(--accent); }
+body.t-arctic .btn-close-modal { background: rgba(0,0,0,.04); color: rgba(17,24,39,.5); border-color: rgba(0,0,0,.1); }
+body.t-arctic .btn-close-modal:hover { color: #111827; border-color: rgba(0,0,0,.3); }
+body.t-arctic .cp-custom span { color: #6B7280; }
+
+/* Section head */
+body.t-arctic .section-line { background: var(--border); }
+
+/* Edit event modal */
+body.t-arctic #edit-modal { background: rgba(0,0,0,.3); }
+body.t-arctic .edit-modal-box { background: #fff; border-color: var(--border); }
+body.t-arctic .edit-modal-title { color: #111827; }
+body.t-arctic .edit-modal-label { color: #6B7280; }
+body.t-arctic .edit-modal-input { background: rgba(0,0,0,.04); border-color: rgba(0,0,0,.1); color: #111827; }
+body.t-arctic .edit-modal-input:focus { border-color: rgba(0,0,0,.25); }
+body.t-arctic .edit-modal-input::placeholder { color: rgba(17,24,39,.4); }
+body.t-arctic .btn-cancel-edit { background: rgba(0,0,0,.04); color: rgba(17,24,39,.5); border-color: rgba(0,0,0,.1); }
+body.t-arctic .btn-cancel-edit:hover { background: rgba(0,0,0,.08); color: #111827; }
+
+/* AI drawer */
+body.t-arctic .ai-drawer { background: #fff; border-color: rgba(64,224,208,.2); }
+body.t-arctic .ai-drawer-head { border-bottom-color: rgba(0,0,0,.06); }
+body.t-arctic .ai-head-title { color: #111827; }
+body.t-arctic .ai-msg { color: #111827; }
+body.t-arctic .ai-msg.ai { background: rgba(64,224,208,.06); color: #111827; border-color: rgba(64,224,208,.12); }
+body.t-arctic .ai-msg.user { color: #111827; }
+body.t-arctic .ai-input { background: rgba(0,0,0,.04); border-color: rgba(0,0,0,.1); color: #111827; }
+body.t-arctic .ai-input:focus { border-color: rgba(64,224,208,.4); }
+body.t-arctic .ai-input::placeholder { color: rgba(17,24,39,.4); }
+body.t-arctic .ai-input-row { border-top-color: rgba(0,0,0,.06); }
+body.t-arctic .ai-md-h2 { color: #111827; }
+
+/* Transport card */
+body.t-arctic .tc-route { color: #111827; }
+body.t-arctic .tc-title { color: #111827; }
+body.t-arctic .tc-option { background: rgba(0,0,0,.02); border-color: rgba(0,0,0,.08); }
+body.t-arctic .tc-field { background: rgba(0,0,0,.02); }
+body.t-arctic .tc-field-label { color: #6B7280; }
+body.t-arctic .tc-field-value { color: #111827; }
+
+/* Invite modal */
+body.t-arctic .invite-modal { background: #fff; border-color: rgba(64,224,208,.2); }
+body.t-arctic .modal-sub { color: #6B7280; }
+body.t-arctic .invite-url-input { background: rgba(0,0,0,.04); border-color: rgba(0,0,0,.1); color: rgba(17,24,39,.7); }
+body.t-arctic .invite-member-name { color: #111827; }
+body.t-arctic .invite-members-label { color: #6B7280; }
+
+/* Empty day */
+body.t-arctic .empty-day p { color: #6B7280; }
+
+/* City map */
+body.t-arctic .city-map-iframe { filter: none; }
+body.t-arctic .city-map-pin-chip { background: rgba(0,0,0,.03); border-color: rgba(0,0,0,.1); color: rgba(17,24,39,.6); }
+body.t-arctic .city-map-pin-chip:hover { background: rgba(64,224,208,.06); border-color: rgba(64,224,208,.25); color: var(--accent); }
+
+/* Onboarding */
+body.t-arctic .ob-nav { background: rgba(255,255,255,.92); }
+body.t-arctic .ob-nav-link { color: #5060A0 !important; border-color: var(--border) !important; }
+body.t-arctic .ob-nav-link:hover { color: var(--accent) !important; border-color: var(--accent) !important; }
+body.t-arctic .ob-grid-bg { background-image: repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(0,0,0,.04) 60px), repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(0,0,0,.04) 60px); }
+body.t-arctic .ob-country-chip { color: #111827; }
+/* Keep white text on image overlays */
+body.t-arctic .ob-place-name { color: #fff; }
+body.t-arctic .ev-place-type { color: rgba(255,255,255,.8); }
+
+/* Onboarding progress bar */
+body.t-arctic .ob-progress { background: rgba(255,255,255,.92); border-top-color: var(--border); }
+body.t-arctic .ob-step-num { color: #111827; }
+body.t-arctic .ob-step-label { color: #374151; }
+
+/* Date picker — light color scheme */
+body.t-arctic input[type="date"] { color-scheme: light !important; color: #111827 !important; background: var(--card) !important; border-color: var(--border) !important; }
+
+/* Eyebrow dots */
+body.t-arctic .eyebrow-dots span { background: rgba(0,0,0,.15); }
+
+/* Footer */
+body.t-arctic .site-footer { background: #FFFFFF; border-top-color: #F3F4F6; }
+body.t-arctic .sf-logo { color: #111827 !important; }
+body.t-arctic .sf-tagline { color: rgba(17,24,39,.5) !important; }
+body.t-arctic .sf-col-head { color: rgba(17,24,39,.4) !important; }
+body.t-arctic .sf-link { color: rgba(17,24,39,.6) !important; }
+body.t-arctic .sf-bottom { color: rgba(17,24,39,.3) !important; }
+body.t-arctic .sf-bottom-link { color: rgba(17,24,39,.4) !important; }
+
+/* Policy pages */
+body.t-arctic .policy-page { color: #111827; }
+body.t-arctic .policy-page h3 { color: rgba(17,24,39,.8); }
+body.t-arctic .policy-page p, body.t-arctic .policy-page li { color: rgba(17,24,39,.7); }
+body.t-arctic .policy-page .policy-meta { color: rgba(17,24,39,.4); }
+
+/* Settings theme cards */
+body.t-arctic .ob-theme-card.active { border-color: #111827; }
 
 /* ── POLICY PAGES ── */
 .policy-page { max-width: 800px; margin: 0 auto; padding: 100px 32px 80px; color: #fff; }
