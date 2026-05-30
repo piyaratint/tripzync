@@ -685,17 +685,23 @@ function buildItinerary(data: OnboardingData): CitySection[] {
 }
 
 // ── PlaceAddInput — dropdown-enabled place search for the +ADD flow ──────────
-function PlaceAddInput({ value, onChange, onAdd, onCancel, photoMap }: {
+interface AutocompleteSuggestion { name: string; description: string; placeId: string }
+
+function PlaceAddInput({ value, onChange, onAdd, onCancel, photoMap, city }: {
   value: string
   onChange: (v: string) => void
   onAdd: (name: string) => void
   onCancel: () => void
   photoMap: Record<string, string>
+  city: string
 }) {
   const [showDrop, setShowDrop] = useState(false)
+  const [suggestions, setSuggestions] = useState<AutocompleteSuggestion[]>([])
+  const [loading, setLoading] = useState(false)
   const wrapRef = useRef<HTMLDivElement>(null)
   const dropRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(null)
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -707,15 +713,37 @@ function PlaceAddInput({ value, onChange, onAdd, onCancel, photoMap }: {
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
 
+  const fetchSuggestions = (q: string) => {
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    if (q.length < 2) { setSuggestions([]); return }
+    setLoading(true)
+    debounceRef.current = setTimeout(() => {
+      fetch(`/api/place-autocomplete?q=${encodeURIComponent(q)}&city=${encodeURIComponent(city)}`)
+        .then(r => r.json())
+        .then(d => setSuggestions(d.suggestions ?? []))
+        .catch(() => setSuggestions([]))
+        .finally(() => setLoading(false))
+    }, 300)
+  }
+
   const allPlaces = Object.keys(photoMap)
-  const filtered = value.trim()
+  const localMatches = value.trim()
     ? allPlaces.filter(n => n.toLowerCase().includes(value.toLowerCase()))
     : allPlaces
 
   const handleSelect = (name: string) => {
     setShowDrop(false)
+    setSuggestions([])
     onAdd(name)
   }
+
+  const handleInput = (v: string) => {
+    onChange(v)
+    setShowDrop(true)
+    fetchSuggestions(v)
+  }
+
+  const hasResults = localMatches.length > 0 || suggestions.length > 0
 
   return (
     <div style={{ position:'relative', marginTop:8 }} ref={wrapRef}>
@@ -724,13 +752,13 @@ function PlaceAddInput({ value, onChange, onAdd, onCancel, photoMap }: {
           ref={inputRef}
           autoFocus
           value={value}
-          onChange={e => { onChange(e.target.value); setShowDrop(true) }}
+          onChange={e => handleInput(e.target.value)}
           onFocus={() => setShowDrop(true)}
           onKeyDown={e => {
             if (e.key === 'Enter') { onAdd(value); setShowDrop(false) }
             if (e.key === 'Escape') { onCancel(); setShowDrop(false) }
           }}
-          placeholder="Search or type a place…"
+          placeholder="Search a place…"
           style={{ flex:1, background:'var(--bg)', border:'1px solid var(--border2)', borderRadius:8, padding:'7px 12px', color:'#fff', fontFamily:"'Rajdhani',sans-serif", fontSize:14, outline:'none' }}
         />
         <button onClick={() => { onAdd(value); setShowDrop(false) }}
@@ -742,27 +770,65 @@ function PlaceAddInput({ value, onChange, onAdd, onCancel, photoMap }: {
           ✕
         </button>
       </div>
-      {showDrop && filtered.length > 0 && (
+      {showDrop && (hasResults || loading) && (
         <div ref={dropRef} style={{
           position:'absolute', top:'100%', left:0, right:80, zIndex:9000, marginTop:4,
           background:'#1e1e20', border:'1px solid rgba(255,255,255,.12)', borderRadius:10,
-          maxHeight:220, overflowY:'auto', boxShadow:'0 8px 24px rgba(0,0,0,.6)',
+          maxHeight:260, overflowY:'auto', boxShadow:'0 8px 24px rgba(0,0,0,.6)',
         }}>
-          {filtered.map(name => (
-            <div key={name} onClick={() => handleSelect(name)} style={{
-              display:'flex', alignItems:'center', gap:10, padding:'8px 10px', cursor:'pointer',
-              transition:'background .15s',
-            }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,.08)')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-            >
-              {photoMap[name]
-                ? <img src={photoMap[name]} alt="" style={{ width:38, height:38, borderRadius:8, objectFit:'cover', flexShrink:0 }} />
-                : <div style={{ width:38, height:38, borderRadius:8, background:'var(--border)', flexShrink:0 }} />
-              }
-              <span style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, fontWeight:600, color:'#fff', letterSpacing:.3 }}>{name}</span>
+          {/* Local curated matches */}
+          {localMatches.length > 0 && (
+            <>
+              <div style={{ padding:'6px 10px 2px', fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, letterSpacing:2, textTransform:'uppercase', color:'rgba(255,255,255,.35)' }}>
+                Top Places
+              </div>
+              {localMatches.map(name => (
+                <div key={name} onClick={() => handleSelect(name)} style={{
+                  display:'flex', alignItems:'center', gap:10, padding:'6px 10px', cursor:'pointer',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,.08)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                >
+                  {photoMap[name]
+                    ? <img src={photoMap[name]} alt="" style={{ width:34, height:34, borderRadius:8, objectFit:'cover', flexShrink:0 }} />
+                    : <div style={{ width:34, height:34, borderRadius:8, background:'var(--border)', flexShrink:0 }} />
+                  }
+                  <span style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, fontWeight:600, color:'#fff', letterSpacing:.3 }}>{name}</span>
+                </div>
+              ))}
+            </>
+          )}
+
+          {/* Google Places autocomplete results */}
+          {suggestions.length > 0 && (
+            <>
+              <div style={{ padding:'8px 10px 2px', fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, letterSpacing:2, textTransform:'uppercase', color:'rgba(255,255,255,.35)', borderTop: localMatches.length > 0 ? '1px solid rgba(255,255,255,.08)' : 'none' }}>
+                Search Results
+              </div>
+              {suggestions.map(s => (
+                <div key={s.placeId} onClick={() => handleSelect(s.name)} style={{
+                  display:'flex', alignItems:'center', gap:10, padding:'6px 10px', cursor:'pointer',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,.08)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                >
+                  <div style={{ width:34, height:34, borderRadius:8, background:'rgba(64,224,208,.1)', border:'1px solid rgba(64,224,208,.2)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, fontSize:14, color:'rgba(64,224,208,.7)' }}>
+                    📍
+                  </div>
+                  <div style={{ minWidth:0 }}>
+                    <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, fontWeight:600, color:'#fff', letterSpacing:.3, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{s.name}</div>
+                    {s.description && <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:11, color:'rgba(255,255,255,.4)', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{s.description}</div>}
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
+
+          {loading && suggestions.length === 0 && localMatches.length === 0 && (
+            <div style={{ padding:'12px 10px', fontFamily:"'Rajdhani',sans-serif", fontSize:12, color:'rgba(255,255,255,.4)', textAlign:'center' }}>
+              Searching…
             </div>
-          ))}
+          )}
         </div>
       )}
     </div>
@@ -1785,6 +1851,7 @@ export default function GuestHomePage() {
                           onAdd={(name) => addPlace(si, di, name)}
                           onCancel={() => { setAddingTo(null); setAddVal('') }}
                           photoMap={photoMap}
+                          city={sec.city}
                         />
                       )}
                     </div>
