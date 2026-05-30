@@ -208,7 +208,41 @@ All routes under `(app)/` are protected — redirect to `/login` if unauthentica
 **Status: 🚧 Partial**
 
 - Page exists; user profile display
+- Theme picker (Midnight, Obsidian, Ember, Arctic, Forest, Neon Rave)
 - Edit profile / preferences not yet implemented
+
+---
+
+## 3b · Light Mode (Arctic Theme)
+
+**Status: ✅ Complete**
+
+- Full light mode using the `t-arctic` CSS class on `<body>`
+- Color palette: `gray-50` (`#F9FAFB`) background, white (`#FFFFFF`) card surfaces, `gray-900` (`#111827`) primary text, `gray-500` (`#6B7280`) secondary text
+- Cyan accent (`#40E0D0`) preserved from default theme — all accent buttons use black text for contrast
+- ~270 lines of `body.t-arctic` CSS overrides in `globals.css` covering:
+  - All hardcoded `color: #fff` and `color: var(--bg)` inline styles (via CSS attribute selectors with `!important`)
+  - Top nav, hero, weather, cards, expense, flight, day panels, timeline, modals, AI drawer, footer
+  - Progress bar, date pickers (`color-scheme: light`), onboarding screens
+- `WorldMap` component detects light theme via `MutationObserver` on `body.className` — renders gray country fills (`#D1D5DB`), white controls, light map background
+- Onboarding search dropdown uses `var(--card)` / `var(--text)` / `var(--border)` instead of hardcoded dark colors
+- Hero title accent text (e.g. "2026") has a crisp hard shadow for readability on light backgrounds
+- Google sign-in button always white with dark text (brand-compliant in both themes)
+
+### Theme Toggle (`ThemeToggle` component)
+
+- Fixed-position pill button next to logo in nav area (`☀️ Light` / `🌙 Dark`)
+- Available on every page (rendered in root `layout.tsx`)
+- Persists choice to `localStorage` key `tripzync_theme`
+- Inline `<script>` in `<body>` applies theme before React hydrates (no flash of wrong theme)
+- Hover: border + text animate to accent color
+
+### Guest Trip Save on Sign-Up (`PendingTripSaver` component)
+
+- "Sign Up Free →" button on `/home` saves full trip data (meta + itinerary) to `localStorage` key `tripzync_pending_trip` before redirecting to `/login?callbackUrl=/dashboard`
+- `PendingTripSaver` client component on `/dashboard` detects pending trip after login
+- Auto-calls `saveTrip()` server action → clears localStorage → shows success toast → reloads dashboard
+- Trip appears on dashboard with all cities, places, dates, and itinerary intact
 
 ---
 
@@ -359,6 +393,8 @@ Add these in **GitHub → repo → Settings → Secrets → Actions**:
 | `SignOutButton` | `components/ui/SignOutButton.tsx` | Auth.js sign-out |
 | `QueryProvider` | `components/ui/QueryProvider.tsx` | TanStack Query client wrapper |
 | `Toaster` | `components/ui/Toaster.tsx` | Toast notification system |
+| `ThemeToggle` | `components/ui/ThemeToggle.tsx` | Light/dark mode toggle (☀️/🌙) |
+| `PendingTripSaver` | `components/PendingTripSaver.tsx` | Auto-saves guest trip after sign-up |
 | `DayPanel` | `components/itinerary/DayPanel.tsx` | Day header + hotel banner + timeline |
 | `EventItem` | `components/itinerary/EventItem.tsx` | Single event row (edit/delete) |
 | `EditEventModal` | `components/itinerary/EditEventModal.tsx` | Edit event form modal |
@@ -383,7 +419,7 @@ Add these in **GitHub → repo → Settings → Secrets → Actions**:
 | State | Zustand + TanStack Query | v5 |
 | Map | react-simple-maps + world-atlas | v3.0.0 |
 | AI | Anthropic Claude (Vercel AI SDK) | — |
-| Styling | Global CSS (`globals.css`) | — |
+| Styling | Global CSS (`globals.css`) + theme system (6 themes, light/dark) | — |
 | Validation | Zod | — |
 | Testing | Vitest | — |
 | Deploy | Jelastic (Node 26, PM2, standalone) | Self-hosted cloud server |
