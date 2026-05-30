@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useDeleteEvent } from '@/hooks/useTrip'
 import { useUIStore } from '@/store/uiStore'
+import { useTripStore } from '@/store/tripStore'
 import type { Event } from '@/lib/db/schema'
 
 interface Props {
@@ -14,12 +15,15 @@ interface Props {
 export function EventItem({ tripId, event: ev, isLast }: Props) {
   const deleteEvent   = useDeleteEvent(tripId)
   const openEditEvent = useUIStore(s => s.openEditEvent)
+  const places        = useTripStore(s => s.places)
   const [confirmDel, setConfirmDel] = useState(false)
 
   const isUserEvent = !ev.isKey && !ev.isSakura
   const cls = ev.isKey ? 'key' : ev.isSakura ? 'sakura' : ''
 
   const steps = (ev.steps as Array<{ label: string; col: string }> | null) ?? []
+
+  const place = places[ev.act.toLowerCase()]
 
   return (
     <div className={`event-item ${cls}`}>
@@ -38,6 +42,14 @@ export function EventItem({ tripId, event: ev, isLast }: Props) {
             {ev.fromPlace && <span className="route-stop">{ev.fromPlace}</span>}
             {ev.fromPlace && ev.toPlace && <span className="route-arrow">→</span>}
             {ev.toPlace && <span className="route-stop">{ev.toPlace}</span>}
+          </div>
+        )}
+        {place && (
+          <div className="ev-place-card">
+            <img src={place.image} alt={place.name} className="ev-place-img" />
+            <div className="ev-place-overlay">
+              <span className="ev-place-type">{place.type}</span>
+            </div>
           </div>
         )}
       </div>

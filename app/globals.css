@@ -349,6 +349,13 @@ body {
 .ev-route { display: inline-flex; align-items: center; gap: 3px; margin-top: 4px; font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: .06em; color: #fff; text-transform: uppercase; flex-wrap: wrap; }
 .ev-route .route-stop { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 3px; padding: 1px 5px; color: rgba(255,255,255,.55); font-weight: 600; white-space: nowrap; }
 .ev-route .route-arrow { color: rgba(255,255,255,.6); font-size: 7px; }
+
+/* Event place photo card */
+.ev-place-card { position: relative; margin-top: 6px; border-radius: 8px; overflow: hidden; max-width: 220px; aspect-ratio: 16/10; }
+.ev-place-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .3s; }
+.ev-place-card:hover .ev-place-img { transform: scale(1.05); }
+.ev-place-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 4px 8px; background: linear-gradient(transparent, rgba(0,0,0,.7)); }
+.ev-place-type { font-family: 'Barlow Condensed', sans-serif; font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.8); }
 .ev-badges { display: flex; flex-direction: column; gap: 3px; align-items: flex-end; padding: 10px 0 10px 6px; flex-shrink: 0; }
 .ev-badge { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
 .b-blue    { background: rgba(30,100,200,.18);  color: #6aabf7; }
@@ -372,7 +379,7 @@ body {
 .ev-act-btn.del:hover { background: rgba(232,0,29,.15); color: #f76e6e; border-color: rgba(232,0,29,.35); }
 
 /* Add event bar */
-.add-event-bar { display: flex; flex-direction: column; gap: 4px; padding: 10px 14px; border-top: 1px solid rgba(255,255,255,.04); }
+.add-event-bar { display: flex; flex-direction: column; gap: 4px; padding: 10px 14px; border-top: 1px solid rgba(255,255,255,.04); position: relative; overflow: visible; }
 .ae-row { display: flex; gap: 4px; align-items: center; }
 .ae-input { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); border-radius: 6px; padding: 5px 7px; font-family: 'Noto Sans JP', sans-serif; font-size: 11px; color: #fff; outline: none; transition: border-color .2s; min-width: 0; }
 .ae-input:focus { border-color: rgba(255,255,255,.2); }
@@ -383,6 +390,30 @@ body {
 .ae-input.loc-inp { flex: 1; }
 .btn-ae { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1); color: rgba(255,255,255,.6); border-radius: 6px; padding: 5px 10px; font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; transition: all .2s; white-space: nowrap; flex: none; }
 .btn-ae:hover { background: var(--red); border-color: var(--red); color: #fff; }
+
+/* Place dropdown */
+.ae-dropdown-wrap { position: relative; flex: 1; min-width: 0; }
+.ae-dropdown-wrap .ae-input.act-inp { width: 100%; }
+.ae-dropdown { position: fixed; z-index: 9000; background: #1e1e20; border: 1px solid rgba(255,255,255,.12); border-radius: 8px; max-height: 220px; overflow-y: auto; box-shadow: 0 8px 24px rgba(0,0,0,.6); }
+.ae-dropdown::-webkit-scrollbar { width: 4px; }
+.ae-dropdown::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 2px; }
+.ae-dropdown-item { display: flex; align-items: center; gap: 8px; padding: 6px 8px; cursor: pointer; transition: background .15s; }
+.ae-dropdown-item:hover { background: rgba(255,255,255,.08); }
+.ae-dropdown-img { width: 36px; height: 36px; border-radius: 6px; object-fit: cover; flex-shrink: 0; }
+.ae-dropdown-info { min-width: 0; }
+.ae-dropdown-name { font-family: 'Noto Sans JP', sans-serif; font-size: 11px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ae-dropdown-type { font-family: 'Barlow Condensed', sans-serif; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.4); }
+
+/* City Map */
+.city-map-section { margin-top: 20px; }
+.city-map-loading { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.4); text-align: center; padding: 12px; }
+.city-map-container { border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,.08); }
+.city-map-iframe { width: 100%; height: 300px; border: 0; display: block; filter: invert(90%) hue-rotate(180deg) brightness(1.1) contrast(1.1); }
+.city-map-pins { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.city-map-pin-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); border-radius: 6px; font-family: 'Noto Sans JP', sans-serif; font-size: 10px; color: rgba(255,255,255,.7); text-decoration: none; transition: all .15s; }
+.city-map-pin-chip:hover { background: rgba(64,224,208,.1); border-color: rgba(64,224,208,.3); color: #40E0D0; }
+.pin-dot { width: 6px; height: 6px; border-radius: 50%; background: #E8001D; flex-shrink: 0; }
+
 .empty-day { padding: 24px 14px; text-align: center; }
 .empty-day p { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: .1em; color: #fff; text-transform: uppercase; }
 

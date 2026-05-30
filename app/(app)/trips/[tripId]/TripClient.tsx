@@ -10,6 +10,7 @@ import { EditEventModal } from '@/components/itinerary/EditEventModal'
 import { HotelModal } from '@/components/hotel/HotelModal'
 import { toISO, fmtShort, getDayTitle, detectCurrency, daysBetween } from '@/lib/utils'
 import { EditTripModal } from '@/components/trip/EditTripModal'
+import { CityMap } from '@/components/itinerary/CityMap'
 
 interface Member { userId: string; name: string | null; image: string | null; joinedAt: Date }
 
@@ -80,6 +81,10 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
   }
   const [inviteOpen, setInviteOpen] = useState(false)
 
+  const setPlaces = useTripStore(s => s.setPlaces)
+  const resetPlaces = useTripStore(s => s.resetPlaces)
+  const placesLoaded = useTripStore(s => s.placesLoaded)
+
   // Hydrate store from server-fetched data
   useEffect(() => {
     setTrip(trip)
@@ -87,7 +92,18 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
     setEvents(events)
     setExpenses(expenses)
     setFlights(flights)
+    resetPlaces()
   }, [trip.id]) // eslint-disable-line
+
+  // Fetch places for this city once — feeds dropdown + photo cards
+  useEffect(() => {
+    const city = trip.destCity ?? trip.destination
+    if (!city || placesLoaded) return
+    fetch(`/api/places?country=${encodeURIComponent(city)}`)
+      .then(r => r.json())
+      .then(d => setPlaces(d.places ?? []))
+      .catch(() => setPlaces([]))
+  }, [trip.id, placesLoaded]) // eslint-disable-line
 
   const storeEvents = useTripStore(s => s.events)
   const storeExpenses = useTripStore(s => s.expenses)
@@ -245,6 +261,12 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
                 <AddEventBar tripId={trip.id} date={day.date} dayIndex={i} />
               </div>
             ))}
+
+            {/* City Map — shows pins for events on the active day */}
+            <CityMap
+              city={trip.destCity ?? trip.destination ?? ''}
+              events={activeDay?.events ?? []}
+            />
           </main>
         </div>
       </div>

@@ -8,6 +8,13 @@ import type { Trip, Hotel, Event, Expense, Flight } from '@/lib/db/schema'
 // This mirrors what was in tripState / localStorage.
 // On load it hydrates from the server; mutations are optimistic.
 
+export interface PlaceInfo {
+  name: string
+  type: string
+  image: string
+  rank: number
+}
+
 interface TripStore {
   // Active trip
   trip: Trip | null
@@ -15,6 +22,10 @@ interface TripStore {
   events: Event[]     // flat list, keyed by date on render
   expenses: Expense[]
   flights: Flight[]
+
+  // Places cache (keyed by lowercase place name)
+  places: Record<string, PlaceInfo>
+  placesLoaded: boolean
 
   // UI state
   activeDayIndex: number
@@ -26,6 +37,8 @@ interface TripStore {
   setEvents: (events: Event[]) => void
   setExpenses: (expenses: Expense[]) => void
   setFlights: (flights: Flight[]) => void
+  setPlaces: (places: PlaceInfo[]) => void
+  resetPlaces: () => void
   setActiveDayIndex: (i: number) => void
 
   // Optimistic event mutations
@@ -49,6 +62,8 @@ export const useTripStore = create<TripStore>()(
       events: [],
       expenses: [],
       flights: [],
+      places: {},
+      placesLoaded: false,
       activeDayIndex: 0,
       isSidebarOpen: false,
 
@@ -57,6 +72,11 @@ export const useTripStore = create<TripStore>()(
       setEvents:   (events)   => set({ events }),
       setExpenses: (expenses) => set({ expenses }),
       setFlights:  (flights)  => set({ flights }),
+      setPlaces:   (list)     => set({
+        placesLoaded: true,
+        places: Object.fromEntries(list.map(p => [p.name.toLowerCase(), p])),
+      }),
+      resetPlaces: ()         => set({ places: {}, placesLoaded: false }),
       setActiveDayIndex: (i)  => set({ activeDayIndex: i }),
 
       addEventOptimistic: (event) =>
