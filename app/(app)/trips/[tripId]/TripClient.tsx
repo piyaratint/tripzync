@@ -64,11 +64,27 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
   const [hotelModalOpen, setHotelModalOpen] = useState(false)
   const [editTripOpen, setEditTripOpen] = useState(false)
   const [showPetals, setShowPetals] = useState(true)
+  const [isPrinting, setIsPrinting] = useState(false)
 
   useEffect(() => {
     const saved = localStorage.getItem('tripzync-petals')
     if (saved !== null) setShowPetals(saved === 'true')
   }, [])
+
+  // Print all days: wait for React to render all panels, then trigger print
+  useEffect(() => {
+    if (!isPrinting) return
+    // React has re-rendered with all panels visible — now print
+    const timer = setTimeout(() => {
+      window.print()
+      const restore = () => {
+        setIsPrinting(false)
+        window.removeEventListener('afterprint', restore)
+      }
+      window.addEventListener('afterprint', restore)
+    }, 200)
+    return () => clearTimeout(timer)
+  }, [isPrinting])
 
   function togglePetals() {
     setShowPetals(prev => {
@@ -153,31 +169,7 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
                   }}>👥 Invite</button>
                 )}
                 <button className="print-btn" onClick={() => {
-                  // Remove hidden class from all day panels so they're all visible for print
-                  const hiddenDays = document.querySelectorAll<HTMLElement>('.day-panel-hidden')
-                  hiddenDays.forEach(el => el.classList.remove('day-panel-hidden'))
-                  // Show all flight panes
-                  const hiddenFlightPanes = document.querySelectorAll<HTMLElement>('.fl-pane:not(.active)')
-                  hiddenFlightPanes.forEach(el => el.classList.add('active'))
-                  // Add print class to body for any extra print-only styles
-                  document.body.classList.add('printing')
-
-                  // Small delay to let DOM update before print dialog
-                  setTimeout(() => {
-                    window.print()
-
-                    // Restore after print
-                    const restore = () => {
-                      document.body.classList.remove('printing')
-                      // Re-hide non-active day panels by re-adding the class
-                      document.querySelectorAll<HTMLElement>('.day-panel').forEach((el, i) => {
-                        if (i !== activeDayIndex) el.classList.add('day-panel-hidden')
-                      })
-                      hiddenFlightPanes.forEach(el => el.classList.remove('active'))
-                      window.removeEventListener('afterprint', restore)
-                    }
-                    window.addEventListener('afterprint', restore)
-                  }, 100)
+                  setIsPrinting(true)
                 }} style={{
                   background: 'none', border: '1px solid rgba(255,255,255,.15)',
                   borderRadius: 6, padding: '4px 10px', color: '#fff',
@@ -257,7 +249,7 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
             {itinerary.map((day, i) => (
               <div
                 key={day.date}
-                className={`day-panel${day.date === toISO(new Date()) ? ' is-today' : ''}${i !== activeDayIndex ? ' day-panel-hidden' : ''}`}
+                className={`day-panel${day.date === toISO(new Date()) ? ' is-today' : ''}${!isPrinting && i !== activeDayIndex ? ' day-panel-hidden' : ''}`}
               >
                 <DayPanel
                   tripId={trip.id}
