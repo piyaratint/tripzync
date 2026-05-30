@@ -15,41 +15,50 @@ interface CoordResult {
 }
 
 // Fetch lat/lng for a single place from Google Places API (New).
-// Uses text search: "{place name} {city}" — returns only location field (cheapest SKU).
+// Tries the place name alone first (works for well-known places like "Newport Beach").
+// Falls back to "{name}, {city}" for less specific names.
 async function fetchCoordsFromGoogle(
   name: string,
   city: string,
   apiKey: string
 ): Promise<{ lat: number; lng: number; placeId: string } | null> {
-  try {
-    const res = await fetch('https://places.googleapis.com/v1/places:searchText', {
-      method: 'POST',
-      headers: {
-        'Content-Type':     'application/json',
-        'X-Goog-Api-Key':   apiKey,
-        'X-Goog-FieldMask': 'places.id,places.location',
-      },
-      body: JSON.stringify({
-        textQuery:      `${name} ${city}`,
-        maxResultCount: 1,
-        languageCode:   'en',
-      }),
-      cache: 'no-store',
-    })
-
-    if (!res.ok) return null
-    const data = await res.json()
-    const place = data.places?.[0]
-    if (!place?.location) return null
-
-    return {
-      lat:     place.location.latitude,
-      lng:     place.location.longitude,
-      placeId: place.id ?? '',
+  async function search(query: string) {
+    try {
+      const res = await fetch('https://places.googleapis.com/v1/places:searchText', {
+        method: 'POST',
+        headers: {
+          'Content-Type':     'application/json',
+          'X-Goog-Api-Key':   apiKey,
+          'X-Goog-FieldMask': 'places.id,places.location',
+        },
+        body: JSON.stringify({
+          textQuery:      query,
+          maxResultCount: 1,
+          languageCode:   'en',
+        }),
+        cache: 'no-store',
+      })
+      if (!res.ok) return null
+      const data = await res.json()
+      const place = data.places?.[0]
+      if (!place?.location) return null
+      return {
+        lat:     place.location.latitude,
+        lng:     place.location.longitude,
+        placeId: place.id ?? '',
+      }
+    } catch {
+      return null
     }
-  } catch {
-    return null
   }
+
+  // Try name alone first — avoids "Newport Beach Los Angeles" → wrong pin
+  const result = await search(name)
+  if (result) return result
+
+  // Fallback: append city for less well-known places
+  if (city) return search(`${name}, ${city}`)
+  return null
 }
 
 // POST /api/place-coords
@@ -70,8 +79,11 @@ export async function POST(req: NextRequest) {
 
   const result: Record<string, CoordResult> = {}
 
+  // Cache key includes city to avoid "Newport Beach" in LA vs the actual city
+  const makeKey = (name: string, city: string) => `${name.toLowerCase()}|${city.toLowerCase()}`
+
   // Normalise keys for DB lookup
-  const nameKeys = places.map(p => p.name.toLowerCase())
+  const nameKeys = places.map(p => makeKey(p.name, p.city))
 
   // Step 1 — fetch all cached rows in one DB query
   const cached = await db
@@ -90,7 +102,7 @@ export async function POST(req: NextRequest) {
 
   // Step 2 — find which places are missing from cache
   const cachedKeys = new Set(cached.map(r => r.nameKey))
-  const missing = places.filter(p => !cachedKeys.has(p.name.toLowerCase()))
+  const missing = places.filter(p => !cachedKeys.has(makeKey(p.name, p.city)))
 
   if (missing.length > 0) {
     const apiKey = process.env.GOOGLE_PLACES_API_KEY
@@ -107,7 +119,7 @@ export async function POST(req: NextRequest) {
       const toInsert = fetched
         .filter(f => f.coords !== null)
         .map(f => ({
-          nameKey:  f.place.name.toLowerCase(),
+          nameKey:  makeKey(f.place.name, f.place.city),
           name:     f.place.name,
           lat:      String(f.coords!.lat),
           lng:      String(f.coords!.lng),
