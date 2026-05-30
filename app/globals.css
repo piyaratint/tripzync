@@ -514,8 +514,8 @@ body {
 
 /* ── PRINT / PDF ── */
 @media print {
-  /* White background throughout */
-  *, *::before, *::after { color-adjust: exact; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  /* White background throughout — kill all animations and force full opacity */
+  *, *::before, *::after { color-adjust: exact; -webkit-print-color-adjust: exact; print-color-adjust: exact; animation: none !important; transition: none !important; opacity: 1 !important; }
 
   :root {
     --bg: #fff;
@@ -584,8 +584,8 @@ body {
   /* Show all day panels when printing */
   .day-panel-hidden { display: block !important; visibility: visible !important; height: auto !important; overflow: visible !important; }
 
-  /* Day panel */
-  .day-panel { background: #fafafa !important; border: 1px solid #ddd !important; margin-bottom: 16px !important; page-break-inside: avoid; display: block !important; visibility: visible !important; }
+  /* Day panel — disable animations so all panels render at full opacity */
+  .day-panel { background: #fafafa !important; border: 1px solid #ddd !important; margin-bottom: 16px !important; page-break-inside: avoid; display: block !important; visibility: visible !important; animation: none !important; opacity: 1 !important; }
 
   /* Ensure main column shows all content */
   .main-col { overflow: visible !important; max-height: none !important; }
