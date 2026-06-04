@@ -3,7 +3,8 @@
 import { useState, useRef, useEffect } from 'react'
 
 const DAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
 interface Props {
   value: string
@@ -74,7 +75,7 @@ export function DatePicker({ value, onChange, min, max, placeholder = 'Select da
   function formatDisplay(v: string) {
     if (!v) return ''
     const d = parseDate(v)
-    return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`
+    return `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]} ${d.getFullYear()}`
   }
 
   const cells: { date: Date; current: boolean }[] = []
