@@ -152,131 +152,131 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
       <div className="page">
         <div className="page-inner">
 
-          {/* ── HERO SECTION ── */}
-          <header className="hero">
-            <div className="hero-title-wrap">
-              <div className="hero-title">{trip.title1}</div>
-              <div className="hero-title"><em className="em">{trip.title2}</em></div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 24, marginBottom: 16 }}>
-              <p className="hero-subtitle" style={{ margin: 0, flex: 1 }}>{trip.subtitle}</p>
-              <div className="hotel-chip" onClick={() => setHotelModalOpen(true)} style={{ cursor: 'pointer', flexShrink: 0 }}>
-                <div className="meta-label">Basecamp</div>
-                <div className="meta-val">
-                  {storeHotels.length > 0 ? storeHotels[0].name : 'Set hotel'}
-                </div>
-                <div className="edit-hint">tap to edit</div>
+          {/* ── SIDEBAR (left column) ── */}
+          <aside className="sidebar">
+            <header className="hero">
+              <div className="hero-title-wrap">
+                <div className="hero-title">{trip.title1}</div>
+                <div className="hero-title"><em className="em">{trip.title2}</em></div>
               </div>
-            </div>
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
-              {isOwner && (
-                <button onClick={() => setEditTripOpen(true)} style={{
+              <div style={{ display: 'flex', alignItems: 'flex-end', gap: 24, marginBottom: 16 }}>
+                <p className="hero-subtitle" style={{ margin: 0, flex: 1 }}>{trip.subtitle}</p>
+                <div className="hotel-chip" onClick={() => setHotelModalOpen(true)} style={{ cursor: 'pointer', flexShrink: 0 }}>
+                  <div className="meta-label">Basecamp</div>
+                  <div className="meta-val">
+                    {storeHotels.length > 0 ? storeHotels[0].name : 'Set hotel'}
+                  </div>
+                  <div className="edit-hint">tap to edit</div>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+                {isOwner && (
+                  <button onClick={() => setEditTripOpen(true)} style={{
+                    background: 'none', border: '1px solid rgba(255,255,255,.15)',
+                    borderRadius: 6, padding: '4px 10px', color: '#fff',
+                    fontFamily: "'Barlow Condensed'", fontSize: 10,
+                    letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer',
+                  }}>✏️ Edit Trip</button>
+                )}
+                {isOwner && (
+                  <button onClick={() => setInviteOpen(true)} style={{
+                    background: 'none', border: '1px solid rgba(168,85,247,.35)',
+                    borderRadius: 6, padding: '4px 10px', color: 'rgba(168,85,247,.8)',
+                    fontFamily: "'Barlow Condensed'", fontSize: 10,
+                    letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer',
+                  }}>👥 Invite</button>
+                )}
+                <button className="print-btn" onClick={() => {
+                  setIsPrinting(true)
+                }} style={{
                   background: 'none', border: '1px solid rgba(255,255,255,.15)',
                   borderRadius: 6, padding: '4px 10px', color: '#fff',
                   fontFamily: "'Barlow Condensed'", fontSize: 10,
                   letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer',
-                }}>✏️ Edit Trip</button>
-              )}
-              {isOwner && (
-                <button onClick={() => setInviteOpen(true)} style={{
-                  background: 'none', border: '1px solid rgba(168,85,247,.35)',
-                  borderRadius: 6, padding: '4px 10px', color: 'rgba(168,85,247,.8)',
+                }}>🖨 Print / PDF</button>
+                <button onClick={togglePetals} title={showPetals ? 'Hide particles' : 'Show particles'} style={{
+                  background: showPetals ? 'rgba(64,224,208,.1)' : 'none',
+                  border: `1px solid ${showPetals ? 'rgba(64,224,208,.35)' : 'rgba(255,255,255,.15)'}`,
+                  borderRadius: 6, padding: '4px 10px',
+                  color: showPetals ? 'rgba(64,224,208,.9)' : 'rgba(255,255,255,.4)',
                   fontFamily: "'Barlow Condensed'", fontSize: 10,
                   letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer',
-                }}>👥 Invite</button>
-              )}
-              <button className="print-btn" onClick={() => {
-                setIsPrinting(true)
-              }} style={{
-                background: 'none', border: '1px solid rgba(255,255,255,.15)',
-                borderRadius: 6, padding: '4px 10px', color: '#fff',
-                fontFamily: "'Barlow Condensed'", fontSize: 10,
-                letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer',
-              }}>🖨 Print / PDF</button>
-              <button onClick={togglePetals} title={showPetals ? 'Hide particles' : 'Show particles'} style={{
-                background: showPetals ? 'rgba(64,224,208,.1)' : 'none',
-                border: `1px solid ${showPetals ? 'rgba(64,224,208,.35)' : 'rgba(255,255,255,.15)'}`,
-                borderRadius: 6, padding: '4px 10px',
-                color: showPetals ? 'rgba(64,224,208,.9)' : 'rgba(255,255,255,.4)',
-                fontFamily: "'Barlow Condensed'", fontSize: 10,
-                letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer',
-              }}>✦ Particles</button>
-              {!isOwner && (
-                <span style={{
-                  display: 'inline-block', border: '1px solid rgba(168,85,247,.25)',
-                  borderRadius: 6, padding: '4px 10px', color: 'rgba(168,85,247,.6)',
-                  fontFamily: "'Barlow Condensed'", fontSize: 10,
-                  letterSpacing: '.12em', textTransform: 'uppercase',
-                }}>👥 Shared Trip</span>
-              )}
-            </div>
-            <div className="hero-meta">
-              <div className="meta-item">
-                <span className="meta-label">Destination</span>
-                <span className="meta-val">{trip.destCity ?? trip.destination}</span>
-              </div>
-              <div className="meta-item">
-                <span className="meta-label">Duration</span>
-                <span className="meta-val">{daysBetween(trip.startDate, trip.endDate)} Days</span>
-              </div>
-              <div className="meta-item">
-                <span className="meta-label">Dates</span>
-                <span className="meta-val">{fmtShort(trip.startDate)} – {fmtShort(trip.endDate)}</span>
-              </div>
-            </div>
-          </header>
-
-          {/* ── MY ACCOMMODATION ── */}
-          <div className="card my-accom-card">
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-              <div className="card-title" style={{ marginBottom: 0 }}>My Accommodation</div>
-              {myAccom && !accomEditing && (
-                <button
-                  onClick={() => { setAccomForm({ name: myAccom.name, address: myAccom.address }); setAccomEditing(true) }}
-                  style={{ background: 'none', border: '1px solid rgba(255,255,255,.12)', borderRadius: 6, padding: '3px 9px', color: 'rgba(255,255,255,.4)', fontFamily: "'Barlow Condensed'", fontSize: 9, letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer' }}
-                >
-                  Edit
-                </button>
-              )}
-            </div>
-
-            {myAccom && !accomEditing ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div className="accom-pin-icon" />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <a
-                    href={myAccom.mapsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ color: '#fff', textDecoration: 'none', fontFamily: "'Barlow Condensed'", fontSize: 15, fontWeight: 700 }}
-                  >
-                    {myAccom.name}
-                  </a>
-                  {myAccom.address && (
-                    <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 11, color: 'rgba(255,255,255,.45)', marginTop: 2 }}>
-                      {myAccom.address}
-                    </div>
-                  )}
-                </div>
-                <a href={myAccom.mapsUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 18, textDecoration: 'none', flexShrink: 0 }} title="View on Google Maps">
-                  📍
-                </a>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {!accomEditing && (
-                  <p style={{ fontFamily: "'Barlow Condensed'", fontSize: 11, letterSpacing: '.08em', color: 'rgba(255,255,255,.4)', textTransform: 'uppercase', margin: 0 }}>
-                    Already booked your own hotel? Add it here
-                  </p>
+                }}>✦ Particles</button>
+                {!isOwner && (
+                  <span style={{
+                    display: 'inline-block', border: '1px solid rgba(168,85,247,.25)',
+                    borderRadius: 6, padding: '4px 10px', color: 'rgba(168,85,247,.6)',
+                    fontFamily: "'Barlow Condensed'", fontSize: 10,
+                    letterSpacing: '.12em', textTransform: 'uppercase',
+                  }}>👥 Shared Trip</span>
                 )}
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              </div>
+              <div className="hero-meta">
+                <div className="meta-item">
+                  <span className="meta-label">Destination</span>
+                  <span className="meta-val">{trip.destCity ?? trip.destination}</span>
+                </div>
+                <div className="meta-item">
+                  <span className="meta-label">Duration</span>
+                  <span className="meta-val">{daysBetween(trip.startDate, trip.endDate)} Days</span>
+                </div>
+                <div className="meta-item">
+                  <span className="meta-label">Dates</span>
+                  <span className="meta-val">{fmtShort(trip.startDate)} – {fmtShort(trip.endDate)}</span>
+                </div>
+              </div>
+            </header>
+
+            {/* My Accommodation */}
+            <div className="card my-accom-card">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                <div className="card-title" style={{ marginBottom: 0 }}>My Accommodation</div>
+                {myAccom && !accomEditing && (
+                  <button
+                    onClick={() => { setAccomForm({ name: myAccom.name, address: myAccom.address }); setAccomEditing(true) }}
+                    style={{ background: 'none', border: '1px solid rgba(255,255,255,.12)', borderRadius: 6, padding: '3px 9px', color: 'rgba(255,255,255,.4)', fontFamily: "'Barlow Condensed'", fontSize: 9, letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer' }}
+                  >
+                    Edit
+                  </button>
+                )}
+              </div>
+
+              {myAccom && !accomEditing ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div className="accom-pin-icon" />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <a
+                      href={myAccom.mapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: '#fff', textDecoration: 'none', fontFamily: "'Barlow Condensed'", fontSize: 15, fontWeight: 700 }}
+                    >
+                      {myAccom.name}
+                    </a>
+                    {myAccom.address && (
+                      <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 11, color: 'rgba(255,255,255,.45)', marginTop: 2 }}>
+                        {myAccom.address}
+                      </div>
+                    )}
+                  </div>
+                  <a href={myAccom.mapsUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 18, textDecoration: 'none', flexShrink: 0 }} title="View on Google Maps">
+                    📍
+                  </a>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {!accomEditing && (
+                    <p style={{ fontFamily: "'Barlow Condensed'", fontSize: 11, letterSpacing: '.08em', color: 'rgba(255,255,255,.4)', textTransform: 'uppercase', margin: 0 }}>
+                      Already booked your own hotel? Add it here
+                    </p>
+                  )}
                   <input
                     className="fl-input"
                     placeholder="Hotel / Airbnb name"
                     value={accomForm.name}
                     onChange={e => setAccomForm(f => ({ ...f, name: e.target.value }))}
                     onKeyDown={e => e.key === 'Enter' && saveAccom()}
-                    style={{ flex: 2, minWidth: 140 }}
+                    style={{ width: '100%' }}
                   />
                   <input
                     className="fl-input"
@@ -284,88 +284,90 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
                     value={accomForm.address}
                     onChange={e => setAccomForm(f => ({ ...f, address: e.target.value }))}
                     onKeyDown={e => e.key === 'Enter' && saveAccom()}
-                    style={{ flex: 3, minWidth: 140 }}
+                    style={{ width: '100%' }}
                   />
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <button
+                      className="btn-fl-save"
+                      onClick={saveAccom}
+                      disabled={!accomForm.name.trim()}
+                      style={{ opacity: accomForm.name.trim() ? 1 : .4 }}
+                    >
+                      Save
+                    </button>
+                    {accomEditing && (
+                      <>
+                        <button
+                          onClick={() => setAccomEditing(false)}
+                          style={{ background: 'none', border: '1px solid rgba(255,255,255,.12)', borderRadius: 6, padding: '5px 12px', color: '#fff', fontFamily: "'Barlow Condensed'", fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer' }}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={removeAccom}
+                          style={{ background: 'none', border: '1px solid rgba(232,0,29,.3)', borderRadius: 6, padding: '5px 12px', color: 'rgba(232,0,29,.6)', fontFamily: "'Barlow Condensed'", fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer' }}
+                        >
+                          Remove
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
-                <div style={{ display: 'flex', gap: 6 }}>
-                  <button
-                    className="btn-fl-save"
-                    onClick={saveAccom}
-                    disabled={!accomForm.name.trim()}
-                    style={{ opacity: accomForm.name.trim() ? 1 : .4 }}
-                  >
-                    Save
-                  </button>
-                  {accomEditing && (
-                    <>
-                      <button
-                        onClick={() => setAccomEditing(false)}
-                        style={{ background: 'none', border: '1px solid rgba(255,255,255,.12)', borderRadius: 6, padding: '5px 12px', color: '#fff', fontFamily: "'Barlow Condensed'", fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer' }}
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        onClick={removeAccom}
-                        style={{ background: 'none', border: '1px solid rgba(232,0,29,.3)', borderRadius: 6, padding: '5px 12px', color: 'rgba(232,0,29,.6)', fontFamily: "'Barlow Condensed'", fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer' }}
-                      >
-                        Remove
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* ── FLIGHT INFO ── */}
-          <FlightCard tripId={trip.id} flights={storeFlights} />
-
-          {/* ── WEATHER ── */}
-          <WeatherWidget city={trip.destCity ?? ''} />
-
-          {/* ── TRIP SCHEDULE ── */}
-          <div className="section-head" style={{ marginTop: 0 }}>
-            <div className="section-line" />
-            <span className="section-label">Trip Schedule</span>
-            <div className="section-line" />
-          </div>
-
-          {/* Day tabs */}
-          <div className="tabs-row">
-            {itinerary.map((day, i) => (
-              <button
-                key={day.date}
-                className={`tab-btn${i === activeDayIndex ? ' active' : ''}`}
-                onClick={() => setActiveDayIndex(i)}
-              >
-                {day.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Day panels — all rendered, inactive ones hidden via CSS (visible on print) */}
-          {itinerary.map((day, i) => (
-            <div
-              key={day.date}
-              className={`day-panel${day.date === toISO(new Date()) ? ' is-today' : ''}${!isPrinting && i !== activeDayIndex ? ' day-panel-hidden' : ''}`}
-            >
-              <DayPanel
-                tripId={trip.id}
-                day={day}
-                startDate={trip.startDate}
-                endDate={trip.endDate}
-              />
-              <AddEventBar tripId={trip.id} date={day.date} dayIndex={i} />
+              )}
             </div>
-          ))}
 
-          {/* City Map — shows pins for all events + hotels */}
-          <CityMap
-            city={trip.destCity ?? trip.destination ?? ''}
-            events={itinerary.flatMap(day => day.events)}
-            hotels={storeHotels}
-            myAccommodation={myAccom}
-          />
+            {/* Flight Card */}
+            <FlightCard tripId={trip.id} flights={storeFlights} />
+          </aside>
+
+          {/* ── MAIN COLUMN (right) ── */}
+          <main className="main-col">
+            {/* Weather widget */}
+            <WeatherWidget city={trip.destCity ?? ''} />
+
+            <div className="section-head" style={{ marginTop: 0 }}>
+              <div className="section-line" />
+              <span className="section-label">Trip Schedule</span>
+              <div className="section-line" />
+            </div>
+
+            {/* Day tabs */}
+            <div className="tabs-row">
+              {itinerary.map((day, i) => (
+                <button
+                  key={day.date}
+                  className={`tab-btn${i === activeDayIndex ? ' active' : ''}`}
+                  onClick={() => setActiveDayIndex(i)}
+                >
+                  {day.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Day panels */}
+            {itinerary.map((day, i) => (
+              <div
+                key={day.date}
+                className={`day-panel${day.date === toISO(new Date()) ? ' is-today' : ''}${!isPrinting && i !== activeDayIndex ? ' day-panel-hidden' : ''}`}
+              >
+                <DayPanel
+                  tripId={trip.id}
+                  day={day}
+                  startDate={trip.startDate}
+                  endDate={trip.endDate}
+                />
+                <AddEventBar tripId={trip.id} date={day.date} dayIndex={i} />
+              </div>
+            ))}
+
+            {/* City Map */}
+            <CityMap
+              city={trip.destCity ?? trip.destination ?? ''}
+              events={itinerary.flatMap(day => day.events)}
+              hotels={storeHotels}
+              myAccommodation={myAccom}
+            />
+          </main>
         </div>
       </div>
 

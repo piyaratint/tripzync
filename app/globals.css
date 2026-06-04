@@ -104,8 +104,12 @@ body {
 @media (max-width: 480px) { .top-nav-name { display: none; } }
 
 /* ── PAGE LAYOUT ── */
-.page { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 0 32px 80px; }
-.page-inner { display: flex; flex-direction: column; gap: 14px; }
+.page { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 0 32px 80px; }
+.page-inner { display: grid; grid-template-columns: 340px 1fr; gap: 32px; align-items: start; }
+.sidebar { display: flex; flex-direction: column; gap: 14px; padding-bottom: 24px; }
+.main-col { display: flex; flex-direction: column; gap: 0; min-width: 0; padding-top: 40px; }
+.sidebar .hero { padding: 40px 0 24px; margin-bottom: 0; border-bottom: none; }
+.main-col .section-head { margin-top: 0; }
 
 /* ── HERO ── */
 .hero { padding: 48px 0 36px; border-bottom: 1px solid var(--border); margin-bottom: 32px; animation: fadeUp .6s ease both; }
@@ -603,7 +607,9 @@ body.t-arctic .dp-footer { border-top-color: var(--border); }
 
   /* Full-width single column — remove all scroll/height constraints */
   .page { max-width: 100%; padding: 0 16px !important; }
-  .page-inner { display: block !important; gap: 0 !important; }
+  .page-inner { grid-template-columns: 1fr !important; gap: 0 !important; display: block !important; }
+  .sidebar { position: static !important; max-height: none !important; overflow: visible !important; }
+  .main-col { padding-top: 12px !important; overflow: visible !important; }
 
   /* Remove fixed positioning that can cause blank print */
   .top-nav, .ob-nav, .ob-progress { position: static !important; }
@@ -684,9 +690,11 @@ body.t-arctic .dp-footer { border-top-color: var(--border); }
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {
   .page { padding: 0 14px 100px; }
-  .hero { padding: 24px 0 16px; }
+  .page-inner { grid-template-columns: 1fr; gap: 0; }
+  .sidebar .hero { padding: 24px 0 16px; }
   .hero-title { font-size: clamp(44px, 14vw, 70px); }
   .hero-subtitle { font-size: 11px; }
+  .main-col { padding-top: 0; }
 
   /* Trip header meta row — wrap on mobile */
   .hero-meta { flex-wrap: wrap; gap: 10px; }
@@ -730,7 +738,9 @@ body.t-arctic .dp-footer { border-top-color: var(--border); }
 /* ── LANDSCAPE MOBILE: single-column scrollable layout ── */
 @media (orientation: landscape) and (max-height: 600px) {
   .page { padding: 0 14px 100px; }
-  .hero { padding: 24px 0 16px; }
+  .page-inner { grid-template-columns: 1fr; gap: 0; }
+  .sidebar .hero { padding: 24px 0 16px; }
+  .main-col { padding-top: 0; }
   .hero-title { font-size: clamp(44px, 10vw, 70px); }
   .hero-subtitle { font-size: 11px; }
   .hero-meta { flex-wrap: wrap; gap: 10px; }
