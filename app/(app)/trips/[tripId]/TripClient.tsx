@@ -5,7 +5,6 @@ import { useTripStore } from '@/store/tripStore'
 import type { Trip, Hotel, Event, Expense, Flight } from '@/lib/db/schema'
 import { DayPanel } from '@/components/itinerary/DayPanel'
 import { AddEventBar } from '@/components/itinerary/AddEventBar'
-import { ExpenseLog } from '@/components/expense/ExpenseLog'
 import { EditEventModal } from '@/components/itinerary/EditEventModal'
 import { HotelModal } from '@/components/hotel/HotelModal'
 import { toISO, fmtShort, getDayTitle, detectCurrency, daysBetween } from '@/lib/utils'
@@ -65,11 +64,18 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
   const [editTripOpen, setEditTripOpen] = useState(false)
   const [showPetals, setShowPetals] = useState(true)
   const [isPrinting, setIsPrinting] = useState(false)
+  const [myAccom, setMyAccom] = useState<{ name: string; address: string; mapsUrl: string } | null>(null)
+  const [accomEditing, setAccomEditing] = useState(false)
+  const [accomForm, setAccomForm] = useState({ name: '', address: '' })
 
   useEffect(() => {
     const saved = localStorage.getItem('tripzync-petals')
     if (saved !== null) setShowPetals(saved === 'true')
-  }, [])
+    const savedAccom = localStorage.getItem(`tripzync-accom-${trip.id}`)
+    if (savedAccom) {
+      try { setMyAccom(JSON.parse(savedAccom)) } catch {}
+    }
+  }, [trip.id])
 
   // Print all days: wait for React to render all panels, then trigger print
   useEffect(() => {
@@ -95,6 +101,21 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
       return next
     })
   }
+  function saveAccom() {
+    if (!accomForm.name.trim()) return
+    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(accomForm.name.trim() + (accomForm.address.trim() ? ' ' + accomForm.address.trim() : ''))}`
+    const data = { name: accomForm.name.trim(), address: accomForm.address.trim(), mapsUrl }
+    setMyAccom(data)
+    localStorage.setItem(`tripzync-accom-${trip.id}`, JSON.stringify(data))
+    setAccomEditing(false)
+  }
+
+  function removeAccom() {
+    setMyAccom(null)
+    localStorage.removeItem(`tripzync-accom-${trip.id}`)
+    setAccomEditing(false)
+  }
+
   const [inviteOpen, setInviteOpen] = useState(false)
 
   const setPlaces = useTripStore(s => s.setPlaces)
@@ -117,14 +138,11 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
   }, [trip.id]) // eslint-disable-line
 
   const storeEvents = useTripStore(s => s.events)
-  const storeExpenses = useTripStore(s => s.expenses)
   const storeHotels = useTripStore(s => s.hotels)
   const storeFlights = useTripStore(s => s.flights)
 
   const itinerary = buildItinerary(trip, storeHotels, storeEvents)
-  const activeDay = itinerary[activeDayIndex] ?? itinerary[0]
   const currency = detectCurrency(trip.destCity ?? trip.destination ?? '') || { symbol: '¥', code: 'JPY' }
-  const expenseTotal = storeExpenses.reduce((sum, e) => sum + parseFloat(String(e.amount)), 0)
 
   return (
     <>
@@ -134,139 +152,220 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
       <div className="page">
         <div className="page-inner">
 
-          {/* ── SIDEBAR ── */}
-          <aside className="sidebar">
-            <header className="hero">
-              <div className="hero-title-wrap">
-                <div className="hero-title">{trip.title1}</div>
-                <div className="hero-title"><em className="em">{trip.title2}</em></div>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'flex-end', gap: 24, marginBottom: 16 }}>
-                <p className="hero-subtitle" style={{ margin: 0, flex: 1 }}>{trip.subtitle}</p>
-                <div className="hotel-chip" onClick={() => setHotelModalOpen(true)} style={{ cursor: 'pointer', flexShrink: 0 }}>
-                  <div className="meta-label">Basecamp</div>
-                  <div className="meta-val">
-                    {storeHotels.length > 0 ? storeHotels[0].name : 'Set hotel'}
-                  </div>
-                  <div className="edit-hint">tap to edit</div>
+          {/* ── HERO SECTION ── */}
+          <header className="hero">
+            <div className="hero-title-wrap">
+              <div className="hero-title">{trip.title1}</div>
+              <div className="hero-title"><em className="em">{trip.title2}</em></div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 24, marginBottom: 16 }}>
+              <p className="hero-subtitle" style={{ margin: 0, flex: 1 }}>{trip.subtitle}</p>
+              <div className="hotel-chip" onClick={() => setHotelModalOpen(true)} style={{ cursor: 'pointer', flexShrink: 0 }}>
+                <div className="meta-label">Basecamp</div>
+                <div className="meta-val">
+                  {storeHotels.length > 0 ? storeHotels[0].name : 'Set hotel'}
                 </div>
+                <div className="edit-hint">tap to edit</div>
               </div>
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
-                {isOwner && (
-                  <button onClick={() => setEditTripOpen(true)} style={{
-                    background: 'none', border: '1px solid rgba(255,255,255,.15)',
-                    borderRadius: 6, padding: '4px 10px', color: '#fff',
-                    fontFamily: "'Barlow Condensed'", fontSize: 10,
-                    letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer',
-                  }}>✏️ Edit Trip</button>
-                )}
-                {isOwner && (
-                  <button onClick={() => setInviteOpen(true)} style={{
-                    background: 'none', border: '1px solid rgba(168,85,247,.35)',
-                    borderRadius: 6, padding: '4px 10px', color: 'rgba(168,85,247,.8)',
-                    fontFamily: "'Barlow Condensed'", fontSize: 10,
-                    letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer',
-                  }}>👥 Invite</button>
-                )}
-                <button className="print-btn" onClick={() => {
-                  setIsPrinting(true)
-                }} style={{
+            </div>
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }}>
+              {isOwner && (
+                <button onClick={() => setEditTripOpen(true)} style={{
                   background: 'none', border: '1px solid rgba(255,255,255,.15)',
                   borderRadius: 6, padding: '4px 10px', color: '#fff',
                   fontFamily: "'Barlow Condensed'", fontSize: 10,
                   letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer',
-                }}>🖨 Print / PDF</button>
-                <button onClick={togglePetals} title={showPetals ? 'Hide particles' : 'Show particles'} style={{
-                  background: showPetals ? 'rgba(64,224,208,.1)' : 'none',
-                  border: `1px solid ${showPetals ? 'rgba(64,224,208,.35)' : 'rgba(255,255,255,.15)'}`,
-                  borderRadius: 6, padding: '4px 10px',
-                  color: showPetals ? 'rgba(64,224,208,.9)' : 'rgba(255,255,255,.4)',
+                }}>✏️ Edit Trip</button>
+              )}
+              {isOwner && (
+                <button onClick={() => setInviteOpen(true)} style={{
+                  background: 'none', border: '1px solid rgba(168,85,247,.35)',
+                  borderRadius: 6, padding: '4px 10px', color: 'rgba(168,85,247,.8)',
                   fontFamily: "'Barlow Condensed'", fontSize: 10,
                   letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer',
-                }}>✦ Particles</button>
-                {!isOwner && (
-                  <span style={{
-                    display: 'inline-block', border: '1px solid rgba(168,85,247,.25)',
-                    borderRadius: 6, padding: '4px 10px', color: 'rgba(168,85,247,.6)',
-                    fontFamily: "'Barlow Condensed'", fontSize: 10,
-                    letterSpacing: '.12em', textTransform: 'uppercase',
-                  }}>👥 Shared Trip</span>
-                )}
-              </div>
-              <div className="hero-meta">
-                <div className="meta-item">
-                  <span className="meta-label">Destination</span>
-                  <span className="meta-val">{trip.destCity ?? trip.destination}</span>
-                </div>
-                <div className="meta-item">
-                  <span className="meta-label">Duration</span>
-                  <span className="meta-val">{daysBetween(trip.startDate, trip.endDate)} Days</span>
-                </div>
-                <div className="meta-item">
-                  <span className="meta-label">Dates</span>
-                  <span className="meta-val">{fmtShort(trip.startDate)} – {fmtShort(trip.endDate)}</span>
-                </div>
-              </div>
-            </header>
-
-            {/* Expense Log */}
-            <ExpenseLog
-              tripId={trip.id}
-              currency={currency}
-              expenses={storeExpenses}
-              total={expenseTotal}
-            />
-
-            {/* Flight Card */}
-            <FlightCard tripId={trip.id} flights={storeFlights} />
-          </aside>
-
-          {/* ── MAIN COLUMN ── */}
-          <main className="main-col">
-            {/* Weather widget — client rendered */}
-            <WeatherWidget city={trip.destCity ?? ''} />
-
-            <div className="section-head" style={{ marginTop: 0 }}>
-              <div className="section-line" />
-              <span className="section-label">Trip Schedule</span>
-              <div className="section-line" />
+                }}>👥 Invite</button>
+              )}
+              <button className="print-btn" onClick={() => {
+                setIsPrinting(true)
+              }} style={{
+                background: 'none', border: '1px solid rgba(255,255,255,.15)',
+                borderRadius: 6, padding: '4px 10px', color: '#fff',
+                fontFamily: "'Barlow Condensed'", fontSize: 10,
+                letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer',
+              }}>🖨 Print / PDF</button>
+              <button onClick={togglePetals} title={showPetals ? 'Hide particles' : 'Show particles'} style={{
+                background: showPetals ? 'rgba(64,224,208,.1)' : 'none',
+                border: `1px solid ${showPetals ? 'rgba(64,224,208,.35)' : 'rgba(255,255,255,.15)'}`,
+                borderRadius: 6, padding: '4px 10px',
+                color: showPetals ? 'rgba(64,224,208,.9)' : 'rgba(255,255,255,.4)',
+                fontFamily: "'Barlow Condensed'", fontSize: 10,
+                letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer',
+              }}>✦ Particles</button>
+              {!isOwner && (
+                <span style={{
+                  display: 'inline-block', border: '1px solid rgba(168,85,247,.25)',
+                  borderRadius: 6, padding: '4px 10px', color: 'rgba(168,85,247,.6)',
+                  fontFamily: "'Barlow Condensed'", fontSize: 10,
+                  letterSpacing: '.12em', textTransform: 'uppercase',
+                }}>👥 Shared Trip</span>
+              )}
             </div>
+            <div className="hero-meta">
+              <div className="meta-item">
+                <span className="meta-label">Destination</span>
+                <span className="meta-val">{trip.destCity ?? trip.destination}</span>
+              </div>
+              <div className="meta-item">
+                <span className="meta-label">Duration</span>
+                <span className="meta-val">{daysBetween(trip.startDate, trip.endDate)} Days</span>
+              </div>
+              <div className="meta-item">
+                <span className="meta-label">Dates</span>
+                <span className="meta-val">{fmtShort(trip.startDate)} – {fmtShort(trip.endDate)}</span>
+              </div>
+            </div>
+          </header>
 
-            {/* Day tabs */}
-            <div className="tabs-row">
-              {itinerary.map((day, i) => (
+          {/* ── MY ACCOMMODATION ── */}
+          <div className="card my-accom-card">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+              <div className="card-title" style={{ marginBottom: 0 }}>My Accommodation</div>
+              {myAccom && !accomEditing && (
                 <button
-                  key={day.date}
-                  className={`tab-btn${i === activeDayIndex ? ' active' : ''}`}
-                  onClick={() => setActiveDayIndex(i)}
+                  onClick={() => { setAccomForm({ name: myAccom.name, address: myAccom.address }); setAccomEditing(true) }}
+                  style={{ background: 'none', border: '1px solid rgba(255,255,255,.12)', borderRadius: 6, padding: '3px 9px', color: 'rgba(255,255,255,.4)', fontFamily: "'Barlow Condensed'", fontSize: 9, letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer' }}
                 >
-                  {day.label}
+                  Edit
                 </button>
-              ))}
+              )}
             </div>
 
-            {/* Day panels — all rendered, inactive ones hidden via CSS (visible on print) */}
-            {itinerary.map((day, i) => (
-              <div
-                key={day.date}
-                className={`day-panel${day.date === toISO(new Date()) ? ' is-today' : ''}${!isPrinting && i !== activeDayIndex ? ' day-panel-hidden' : ''}`}
-              >
-                <DayPanel
-                  tripId={trip.id}
-                  day={day}
-                  startDate={trip.startDate}
-                  endDate={trip.endDate}
-                />
-                <AddEventBar tripId={trip.id} date={day.date} dayIndex={i} />
+            {myAccom && !accomEditing ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div className="accom-pin-icon" />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <a
+                    href={myAccom.mapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: '#fff', textDecoration: 'none', fontFamily: "'Barlow Condensed'", fontSize: 15, fontWeight: 700 }}
+                  >
+                    {myAccom.name}
+                  </a>
+                  {myAccom.address && (
+                    <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 11, color: 'rgba(255,255,255,.45)', marginTop: 2 }}>
+                      {myAccom.address}
+                    </div>
+                  )}
+                </div>
+                <a href={myAccom.mapsUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 18, textDecoration: 'none', flexShrink: 0 }} title="View on Google Maps">
+                  📍
+                </a>
               </div>
-            ))}
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {!accomEditing && (
+                  <p style={{ fontFamily: "'Barlow Condensed'", fontSize: 11, letterSpacing: '.08em', color: 'rgba(255,255,255,.4)', textTransform: 'uppercase', margin: 0 }}>
+                    Already booked your own hotel? Add it here
+                  </p>
+                )}
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                  <input
+                    className="fl-input"
+                    placeholder="Hotel / Airbnb name"
+                    value={accomForm.name}
+                    onChange={e => setAccomForm(f => ({ ...f, name: e.target.value }))}
+                    onKeyDown={e => e.key === 'Enter' && saveAccom()}
+                    style={{ flex: 2, minWidth: 140 }}
+                  />
+                  <input
+                    className="fl-input"
+                    placeholder="Address (optional)"
+                    value={accomForm.address}
+                    onChange={e => setAccomForm(f => ({ ...f, address: e.target.value }))}
+                    onKeyDown={e => e.key === 'Enter' && saveAccom()}
+                    style={{ flex: 3, minWidth: 140 }}
+                  />
+                </div>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <button
+                    className="btn-fl-save"
+                    onClick={saveAccom}
+                    disabled={!accomForm.name.trim()}
+                    style={{ opacity: accomForm.name.trim() ? 1 : .4 }}
+                  >
+                    Save
+                  </button>
+                  {accomEditing && (
+                    <>
+                      <button
+                        onClick={() => setAccomEditing(false)}
+                        style={{ background: 'none', border: '1px solid rgba(255,255,255,.12)', borderRadius: 6, padding: '5px 12px', color: '#fff', fontFamily: "'Barlow Condensed'", fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer' }}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={removeAccom}
+                        style={{ background: 'none', border: '1px solid rgba(232,0,29,.3)', borderRadius: 6, padding: '5px 12px', color: 'rgba(232,0,29,.6)', fontFamily: "'Barlow Condensed'", fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer' }}
+                      >
+                        Remove
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
 
-            {/* City Map — shows pins for all events across the whole trip */}
-            <CityMap
-              city={trip.destCity ?? trip.destination ?? ''}
-              events={itinerary.flatMap(day => day.events)}
-            />
-          </main>
+          {/* ── FLIGHT INFO ── */}
+          <FlightCard tripId={trip.id} flights={storeFlights} />
+
+          {/* ── WEATHER ── */}
+          <WeatherWidget city={trip.destCity ?? ''} />
+
+          {/* ── TRIP SCHEDULE ── */}
+          <div className="section-head" style={{ marginTop: 0 }}>
+            <div className="section-line" />
+            <span className="section-label">Trip Schedule</span>
+            <div className="section-line" />
+          </div>
+
+          {/* Day tabs */}
+          <div className="tabs-row">
+            {itinerary.map((day, i) => (
+              <button
+                key={day.date}
+                className={`tab-btn${i === activeDayIndex ? ' active' : ''}`}
+                onClick={() => setActiveDayIndex(i)}
+              >
+                {day.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Day panels — all rendered, inactive ones hidden via CSS (visible on print) */}
+          {itinerary.map((day, i) => (
+            <div
+              key={day.date}
+              className={`day-panel${day.date === toISO(new Date()) ? ' is-today' : ''}${!isPrinting && i !== activeDayIndex ? ' day-panel-hidden' : ''}`}
+            >
+              <DayPanel
+                tripId={trip.id}
+                day={day}
+                startDate={trip.startDate}
+                endDate={trip.endDate}
+              />
+              <AddEventBar tripId={trip.id} date={day.date} dayIndex={i} />
+            </div>
+          ))}
+
+          {/* City Map — shows pins for all events + hotels */}
+          <CityMap
+            city={trip.destCity ?? trip.destination ?? ''}
+            events={itinerary.flatMap(day => day.events)}
+            hotels={storeHotels}
+            myAccommodation={myAccom}
+          />
         </div>
       </div>
 

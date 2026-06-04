@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import type { Event } from '@/lib/db/schema'
+import type { Event, Hotel } from '@/lib/db/schema'
 
 interface Coord {
   lat: number
@@ -9,12 +9,20 @@ interface Coord {
   mapsUrl: string
 }
 
+interface MyAccom {
+  name: string
+  address: string
+  mapsUrl: string
+}
+
 interface Props {
   city: string
   events: Event[]
+  hotels?: Hotel[]
+  myAccommodation?: MyAccom | null
 }
 
-export function CityMap({ city, events }: Props) {
+export function CityMap({ city, events, hotels = [], myAccommodation }: Props) {
   const [coords, setCoords] = useState<Record<string, Coord>>({})
   const [loading, setLoading] = useState(false)
 
@@ -22,10 +30,18 @@ export function CityMap({ city, events }: Props) {
     .flatMap(e => [e.act, e.fromPlace, e.toPlace].filter(Boolean) as string[])
     .filter((v, i, a) => a.indexOf(v) === i)
 
-  useEffect(() => {
-    if (!placeNames.length || !city) return
+  const hotelNames = hotels.map(h => h.name).filter((v, i, a) => a.indexOf(v) === i)
+  const accomName = myAccommodation?.name
+  const allPlaceNames = [...new Set([
+    ...placeNames,
+    ...hotelNames,
+    ...(accomName ? [accomName + (myAccommodation?.address ? ' ' + myAccommodation.address : '')] : []),
+  ])]
 
-    const places = placeNames.map(name => ({ name, city }))
+  useEffect(() => {
+    if (!allPlaceNames.length || !city) return
+
+    const places = allPlaceNames.map(name => ({ name, city }))
     setLoading(true)
     fetch('/api/place-coords', {
       method: 'POST',
@@ -36,25 +52,36 @@ export function CityMap({ city, events }: Props) {
       .then(d => setCoords(d.coords ?? {}))
       .catch(() => {})
       .finally(() => setLoading(false))
-  }, [placeNames.join(','), city])
+  }, [allPlaceNames.join(','), city])
 
-  const pins = placeNames
+  const eventPins = placeNames
     .filter(name => coords[name])
-    .map(name => ({ name, ...coords[name] }))
+    .map(name => ({ name, ...coords[name], type: 'event' as const }))
 
-  if (!pins.length && !loading) return null
+  const hotelPins = hotelNames
+    .filter(name => coords[name])
+    .map(name => ({ name, ...coords[name], type: 'hotel' as const }))
 
-  const center = pins.length > 0
-    ? { lat: pins.reduce((s, p) => s + p.lat, 0) / pins.length, lng: pins.reduce((s, p) => s + p.lng, 0) / pins.length }
+  const accomKey = accomName ? accomName + (myAccommodation?.address ? ' ' + myAccommodation.address : '') : ''
+  const accomPins = accomKey && coords[accomKey]
+    ? [{ name: myAccommodation!.name, ...coords[accomKey], mapsUrl: myAccommodation!.mapsUrl, type: 'myaccom' as const }]
+    : []
+
+  const allPins = [...accomPins, ...hotelPins, ...eventPins]
+
+  if (!allPins.length && !loading) return null
+
+  const center = allPins.length > 0
+    ? { lat: allPins.reduce((s, p) => s + p.lat, 0) / allPins.length, lng: allPins.reduce((s, p) => s + p.lng, 0) / allPins.length }
     : null
 
-  const mapQuery = pins.length === 1
-    ? encodeURIComponent(pins[0].name + ' ' + city)
+  const mapQuery = allPins.length === 1
+    ? encodeURIComponent(allPins[0].name + ' ' + city)
     : center
       ? `${center.lat},${center.lng}`
       : encodeURIComponent(city)
 
-  const zoom = pins.length === 1 ? 15 : pins.length <= 3 ? 13 : 12
+  const zoom = allPins.length === 1 ? 15 : allPins.length <= 3 ? 13 : 12
 
   return (
     <div className="city-map-section">
@@ -76,9 +103,33 @@ export function CityMap({ city, events }: Props) {
         />
       </div>
 
-      {pins.length > 0 && (
+      {allPins.length > 0 && (
         <div className="city-map-pins">
-          {pins.map(p => (
+          {accomPins.map(p => (
+            <a
+              key={'accom-' + p.name}
+              className="city-map-pin-chip accom-pin"
+              href={p.mapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span className="pin-dot pin-dot-accom" />
+              {p.name}
+            </a>
+          ))}
+          {hotelPins.map(p => (
+            <a
+              key={'hotel-' + p.name}
+              className="city-map-pin-chip hotel-pin"
+              href={p.mapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span className="pin-dot pin-dot-hotel" />
+              {p.name}
+            </a>
+          ))}
+          {eventPins.map(p => (
             <a
               key={p.name}
               className="city-map-pin-chip"

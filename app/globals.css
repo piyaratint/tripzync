@@ -105,14 +105,7 @@ body {
 
 /* ── PAGE LAYOUT ── */
 .page { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 0 32px 80px; }
-.page-inner { display: flex; flex-direction: column; gap: 0; }
-.sidebar { position: static; display: flex; flex-direction: column; gap: 14px; padding-bottom: 24px; }
-.main-col { display: flex; flex-direction: column; gap: 0; min-width: 0; padding-top: 0; }
-.sidebar .hero { padding: 40px 0 24px; margin-bottom: 0; border-bottom: none; }
-.sidebar .weather-full { grid-column: auto; }
-.sidebar .cards-grid { grid-template-columns: 1fr 1fr; margin-bottom: 0; gap: 12px; }
-.sidebar .card-expense, .sidebar .card { margin-bottom: 0; }
-.main-col .section-head { margin-top: 0; }
+.page-inner { display: flex; flex-direction: column; gap: 14px; }
 
 /* ── HERO ── */
 .hero { padding: 48px 0 36px; border-bottom: 1px solid var(--border); margin-bottom: 32px; animation: fadeUp .6s ease both; }
@@ -135,6 +128,19 @@ body {
 .hotel-chip:hover { border-color: rgba(255,255,255,.2); }
 .hotel-chip .meta-val { font-size: 13px; line-height: 1.5; color: #fff; }
 .hotel-chip .edit-hint { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; color: #fff; letter-spacing: .12em; text-transform: uppercase; margin-top: 2px; }
+
+/* ── MY ACCOMMODATION CARD ── */
+.my-accom-card { background: rgba(255,255,255,.03); border: 1px solid var(--border); border-radius: 18px; padding: 14px 16px; animation: fadeUp .6s .08s ease both; }
+.accom-pin-icon { width: 28px; height: 28px; border-radius: 50% 50% 50% 0; background: linear-gradient(135deg, #4285F4, #34A853); transform: rotate(-45deg); flex-shrink: 0; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 2px 8px rgba(66,133,244,.4); }
+.accom-pin-icon::after { content: ''; position: absolute; width: 10px; height: 10px; background: #fff; border-radius: 50%; transform: rotate(45deg); }
+
+/* Hotel & accommodation map pin dots */
+.pin-dot-hotel { background: #4285F4 !important; box-shadow: 0 0 4px rgba(66,133,244,.5); }
+.pin-dot-accom { background: #34A853 !important; box-shadow: 0 0 4px rgba(52,168,83,.5); }
+.city-map-pin-chip.hotel-pin { border-color: rgba(66,133,244,.3); }
+.city-map-pin-chip.hotel-pin:hover { background: rgba(66,133,244,.1); border-color: rgba(66,133,244,.5); color: #4285F4; }
+.city-map-pin-chip.accom-pin { border-color: rgba(52,168,83,.3); }
+.city-map-pin-chip.accom-pin:hover { background: rgba(52,168,83,.1); border-color: rgba(52,168,83,.5); color: #34A853; }
 
 /* ── MODAL ── */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.8); z-index: 8000; align-items: flex-start; justify-content: center; padding: 20px; overflow-y: auto; }
@@ -547,19 +553,21 @@ body {
   .theme-toggle,
   .city-map-section,
   .top-nav,
-  .ob-nav { display: none !important; }
+  .ob-nav,
+  .my-accom-card button { display: none !important; }
 
   /* Hide most buttons but keep structural content visible */
   button:not(.tab-btn):not(.fl-tab) { display: none !important; }
 
   /* Full-width single column — remove all scroll/height constraints */
   .page { max-width: 100%; padding: 0 16px !important; }
-  .page-inner { grid-template-columns: 1fr !important; gap: 0 !important; display: block !important; }
-  .sidebar { position: static !important; max-height: none !important; overflow: visible !important; }
-  .main-col { padding-top: 12px !important; overflow: visible !important; }
+  .page-inner { display: block !important; gap: 0 !important; }
 
   /* Remove fixed positioning that can cause blank print */
   .top-nav, .ob-nav, .ob-progress { position: static !important; }
+
+  /* My accommodation — print-friendly */
+  .my-accom-card { background: #fafafa !important; border: 1px solid #ddd !important; }
 
   /* Hero */
   .hero { border-bottom: 2px solid #ddd !important; padding: 16px 0 12px !important; margin-bottom: 16px !important; }
@@ -586,10 +594,6 @@ body {
 
   /* Day panel — disable animations so all panels render at full opacity */
   .day-panel { background: #fafafa !important; border: 1px solid #ddd !important; margin-bottom: 16px !important; page-break-inside: avoid; display: block !important; visibility: visible !important; animation: none !important; opacity: 1 !important; }
-
-  /* Ensure main column shows all content */
-  .main-col { overflow: visible !important; max-height: none !important; }
-  .sidebar { overflow: visible !important; max-height: none !important; }
   .day-panel-head { background: #f0f0f0 !important; border-bottom: 1px solid #ddd !important; }
   .day-date { color: #888 !important; }
   .day-title { color: #111 !important; }
@@ -638,10 +642,9 @@ body {
 /* ── RESPONSIVE ── */
 @media (max-width: 768px) {
   .page { padding: 0 14px 100px; }
-  .sidebar .hero { padding: 24px 0 16px; }
+  .hero { padding: 24px 0 16px; }
   .hero-title { font-size: clamp(44px, 14vw, 70px); }
   .hero-subtitle { font-size: 11px; }
-  .sidebar .cards-grid { grid-template-columns: 1fr; }
 
   /* Trip header meta row — wrap on mobile */
   .hero-meta { flex-wrap: wrap; gap: 10px; }
@@ -684,14 +687,10 @@ body {
 
 /* ── LANDSCAPE MOBILE: single-column scrollable layout ── */
 @media (orientation: landscape) and (max-height: 600px) {
-  /* Force single column like portrait mobile */
   .page { padding: 0 14px 100px; }
-  .page-inner { grid-template-columns: 1fr; gap: 0; }
-  .sidebar { position: static; }
-  .sidebar .hero { padding: 24px 0 16px; }
+  .hero { padding: 24px 0 16px; }
   .hero-title { font-size: clamp(44px, 10vw, 70px); }
   .hero-subtitle { font-size: 11px; }
-  .cards-grid { grid-template-columns: 1fr; }
   .hero-meta { flex-wrap: wrap; gap: 10px; }
   .tabs-row { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; flex-wrap: nowrap; }
   .tab-btn { flex-shrink: 0; }
@@ -1373,6 +1372,9 @@ body.t-arctic .invite-members-label { color: #6B7280; }
 
 /* Empty day */
 body.t-arctic .empty-day p { color: #6B7280; }
+
+/* My accommodation */
+body.t-arctic .my-accom-card { background: rgba(0,0,0,.02); }
 
 /* City map */
 body.t-arctic .city-map-iframe { filter: none; }
