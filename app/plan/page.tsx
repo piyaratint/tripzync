@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { TripZyncLogo } from '@/components/TripZyncLogo'
+import { DatePicker } from '@/components/ui/DatePicker'
 
 const todayStr = new Date().toISOString().split('T')[0]
 
@@ -135,22 +136,20 @@ export default function PlanPage() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div>
               <label style={labelStyle}>Start Date</label>
-              <input
-                type="date"
-                style={inputStyle}
+              <DatePicker
                 value={form.startDate}
                 min={todayStr}
-                onChange={e => setForm(f => ({ ...f, startDate: e.target.value }))}
+                onChange={v => setForm(f => ({ ...f, startDate: v }))}
+                placeholder="Pick start date"
               />
             </div>
             <div>
               <label style={labelStyle}>End Date</label>
-              <input
-                type="date"
-                style={inputStyle}
+              <DatePicker
                 value={form.endDate}
                 min={form.startDate || todayStr}
-                onChange={e => setForm(f => ({ ...f, endDate: e.target.value }))}
+                onChange={v => setForm(f => ({ ...f, endDate: v }))}
+                placeholder="Pick end date"
               />
             </div>
           </div>

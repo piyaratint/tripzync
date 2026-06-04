@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import dynamic from 'next/dynamic'
 import { TripZyncLogo } from '@/components/TripZyncLogo'
+import { DatePicker } from '@/components/ui/DatePicker'
 
 const WorldMap = dynamic(
   () => import('@/components/WorldMap').then(m => ({ default: m.WorldMap })),
@@ -916,24 +917,22 @@ export default function LandingPage() {
               <label style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, letterSpacing:'.16em', textTransform:'uppercase' as const, color:'var(--text, #fff)', marginBottom:6, display:'block' }}>
                 Start Date
               </label>
-              <input
-                type="date"
-                style={{ width:'100%', background:'var(--card)', border:'1px solid var(--border)', borderRadius:10, padding:'12px 16px', color:'var(--text, #fff)', fontFamily:'inherit', fontSize:15, outline:'none', boxSizing:'border-box' as const }}
+              <DatePicker
                 value={startDate}
                 min={todayStr}
-                onChange={e => setStartDate(e.target.value)}
+                onChange={setStartDate}
+                placeholder="Pick start date"
               />
             </div>
             <div>
               <label style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, letterSpacing:'.16em', textTransform:'uppercase' as const, color:'var(--text, #fff)', marginBottom:6, display:'block' }}>
                 End Date
               </label>
-              <input
-                type="date"
-                style={{ width:'100%', background:'var(--card)', border:'1px solid var(--border)', borderRadius:10, padding:'12px 16px', color:'var(--text, #fff)', fontFamily:'inherit', fontSize:15, outline:'none', boxSizing:'border-box' as const }}
+              <DatePicker
                 value={endDate}
                 min={startDate || todayStr}
-                onChange={e => setEndDate(e.target.value)}
+                onChange={setEndDate}
+                placeholder="Pick end date"
               />
             </div>
 

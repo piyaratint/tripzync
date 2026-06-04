@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useTripStore } from '@/store/tripStore'
 import { useAddHotel, useDeleteHotel } from '@/hooks/useHotels'
+import { DatePicker } from '@/components/ui/DatePicker'
 
 interface Props {
   tripId: string
@@ -162,13 +163,12 @@ export function HotelModal({ tripId, startDate, endDate, open, onClose }: Props)
 
           <div>
             <label style={labelStyle}>Check-in Date *</label>
-            <input
-              type="date"
-              style={inputStyle}
+            <DatePicker
               value={fromDate}
               min={startDate}
               max={endDate}
-              onChange={e => setFromDate(e.target.value)}
+              onChange={setFromDate}
+              placeholder="Pick check-in date"
             />
           </div>
 

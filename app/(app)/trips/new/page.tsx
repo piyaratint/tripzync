@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { DatePicker } from '@/components/ui/DatePicker'
 
 const todayStr = new Date().toISOString().split('T')[0]
 
@@ -124,13 +125,21 @@ export default function NewTripPage() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
           <div>
             <label style={labelStyle}>Start Date *</label>
-            <input type="date" style={inputStyle} value={form.startDate} min={todayStr}
-              onChange={e => setForm(f => ({ ...f, startDate: e.target.value }))} />
+            <DatePicker
+              value={form.startDate}
+              min={todayStr}
+              onChange={v => setForm(f => ({ ...f, startDate: v }))}
+              placeholder="Pick start date"
+            />
           </div>
           <div>
             <label style={labelStyle}>End Date *</label>
-            <input type="date" style={inputStyle} value={form.endDate} min={form.startDate || todayStr}
-              onChange={e => setForm(f => ({ ...f, endDate: e.target.value }))} />
+            <DatePicker
+              value={form.endDate}
+              min={form.startDate || todayStr}
+              onChange={v => setForm(f => ({ ...f, endDate: v }))}
+              placeholder="Pick end date"
+            />
           </div>
         </div>
 

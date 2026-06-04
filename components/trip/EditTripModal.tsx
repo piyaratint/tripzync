@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTripStore } from '@/store/tripStore'
+import { DatePicker } from '@/components/ui/DatePicker'
 
 interface Props {
   open: boolean
@@ -155,13 +156,20 @@ export function EditTripModal({ open, onClose }: Props) {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <div>
             <label style={labelStyle}>Start Date</label>
-            <input type="date" style={inputStyle} value={form.startDate}
-              onChange={e => setForm(f => ({ ...f, startDate: e.target.value }))} />
+            <DatePicker
+              value={form.startDate}
+              onChange={v => setForm(f => ({ ...f, startDate: v }))}
+              placeholder="Pick start date"
+            />
           </div>
           <div>
             <label style={labelStyle}>End Date</label>
-            <input type="date" style={inputStyle} value={form.endDate}
-              onChange={e => setForm(f => ({ ...f, endDate: e.target.value }))} />
+            <DatePicker
+              value={form.endDate}
+              min={form.startDate}
+              onChange={v => setForm(f => ({ ...f, endDate: v }))}
+              placeholder="Pick end date"
+            />
           </div>
         </div>
 
