@@ -185,7 +185,7 @@ body {
 .dp-placeholder { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 500; color: rgba(255,255,255,.3); letter-spacing: .08em; text-transform: uppercase; }
 .dp-icon { font-size: 16px; flex-shrink: 0; opacity: .4; transition: opacity .2s; }
 .dp-trigger:hover .dp-icon { opacity: .7; }
-.dp-dropdown { position: absolute; top: calc(100% + 8px); left: 0; z-index: 9500; width: 340px; background: var(--card2); border: 1px solid var(--border2); border-radius: 18px; padding: 20px; box-shadow: 0 16px 48px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.04); animation: fadeUp .2s ease; backdrop-filter: blur(12px); }
+.dp-dropdown { position: absolute; top: calc(100% + 8px); left: 0; z-index: 9500; width: 340px; background: var(--card2); border: 1px solid var(--border2); border-radius: 18px; padding: 20px; box-shadow: 0 16px 48px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.04); animation: fadeUp .2s ease; backdrop-filter: blur(12px); overflow: hidden; }
 .dp-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
 .dp-nav { background: rgba(255,255,255,.04); border: 1px solid var(--border); color: var(--text, #fff); width: 36px; height: 36px; border-radius: 10px; cursor: pointer; font-size: 18px; font-weight: 700; display: flex; align-items: center; justify-content: center; transition: all .2s; }
 .dp-nav:hover { border-color: var(--accent); background: rgba(64,224,208,.08); color: var(--accent); }
@@ -193,11 +193,11 @@ body {
 .dp-day-names { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin-bottom: 6px; }
 .dp-day-name { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: .14em; color: var(--muted); text-align: center; padding: 6px 0; text-transform: uppercase; opacity: .5; }
 .dp-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
-.dp-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; border-radius: 10px; cursor: pointer; border: 1.5px solid transparent; background: none; color: var(--text, rgba(255,255,255,.75)); transition: all .15s; }
+.dp-cell { width: 100%; height: 36px; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; border-radius: 10px; cursor: pointer; border: 1.5px solid transparent; background: none; color: var(--text, rgba(255,255,255,.75)); transition: all .15s; }
 .dp-cell:hover:not(.dp-disabled):not(.dp-selected) { background: rgba(64,224,208,.06); border-color: rgba(64,224,208,.15); color: #fff; }
 .dp-cell.dp-other { color: rgba(255,255,255,.15); }
 .dp-cell.dp-disabled { color: rgba(255,255,255,.08); cursor: not-allowed; }
-.dp-cell.dp-selected { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 900; font-style: italic; font-size: 16px; box-shadow: 0 2px 8px rgba(64,224,208,.35); }
+.dp-cell.dp-selected { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 900; box-shadow: 0 2px 8px rgba(64,224,208,.35); }
 .dp-cell.dp-today { border-color: var(--accent); color: var(--accent); font-weight: 900; }
 .dp-footer { display: flex; justify-content: center; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
 .dp-today-btn { background: rgba(64,224,208,.06); border: 1px solid rgba(64,224,208,.2); border-radius: 8px; padding: 6px 20px; font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); cursor: pointer; transition: all .2s; }
