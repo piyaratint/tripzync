@@ -377,6 +377,34 @@ const PARTICLES = Array.from({ length: 20 }, (_, i) => ({
   color: i % 3 === 0 ? 'var(--accent)' : i % 3 === 1 ? 'var(--hi)' : 'rgba(255,255,255,.3)',
 }))
 
+// ── SAMPLE DASHBOARD (static demo data — shown pre-signup to inspire trip planning) ──
+const SAMPLE_TRIP = {
+  city: 'Tokyo', dates: '24 SEP – 30 SEP 2026',
+  forecast: [
+    { name: 'Sun', icon: '☀️', hi: 27, lo: 20, today: false },
+    { name: 'Mon', icon: '🌤', hi: 26, lo: 19, today: false },
+    { name: 'Tue', icon: '⛅', hi: 25, lo: 19, today: true },
+    { name: 'Wed', icon: '⛅', hi: 24, lo: 18, today: false },
+    { name: 'Thu', icon: '☁️', hi: 23, lo: 18, today: false },
+    { name: 'Fri', icon: '🌤', hi: 25, lo: 19, today: false },
+    { name: 'Sat', icon: '☀️', hi: 27, lo: 20, today: false },
+  ],
+  flight: { from: 'BKK', to: 'NRT', airline: 'Thai Airways', num: 'TG 641', depTime: '08:30', arrTime: '16:10' },
+  hotels: [
+    { name: 'JW Marriott Hotel Tokyo', nights: '24–26' },
+    { name: 'The Ritz-Carlton Tokyo', nights: '26–28' },
+    { name: 'Park Hyatt Tokyo', nights: '28–30' },
+  ],
+  days: [
+    { tag: 'DAY 1', name: 'Senso-ji & Skytree', sub: 'Asakusa', img: 'https://images.unsplash.com/photo-1573455494060-c5595004fb6c?auto=format&fit=crop&w=500&q=80' },
+    { tag: 'DAY 2', name: 'Tokyo Disneyland', sub: 'Urayasu', img: 'https://images.unsplash.com/photo-1624253321171-1be53e12f5f4?auto=format&fit=crop&w=500&q=80' },
+    { tag: 'DAY 3', name: 'Shibuya & Meiji Shrine', sub: 'Shibuya', img: 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=500&q=80' },
+    { tag: 'DAY 4', name: 'Mount Fuji Day Trip', sub: 'Kawaguchiko', img: 'https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?auto=format&fit=crop&w=500&q=80' },
+  ],
+  toDo: ['Cross the Shibuya Scramble at dusk', 'Ride the elevator up Tokyo Skytree', 'Watch a sumo practice session', 'Kayak Lake Kawaguchiko at sunrise', 'Explore TeamLab Planets'],
+  toEat: ['Sushi breakfast at Toyosu Market', 'Bowl of ramen at Ichiran', 'Omakase counter in Ginza', 'Wagyu yakiniku night out', 'Konbini snack crawl'],
+}
+
 // ── COMPONENT ─────────────────────────────────────────────────────────────────
 export default function LandingPage() {
   const [screen,         setScreen]        = useState<Screen>('hero')
@@ -642,47 +670,107 @@ export default function LandingPage() {
         <button className="ob-nav-link" style={{ background:'none', border:'none', cursor:'pointer' }} onClick={() => setScreen('hero')}>← Back</button>
       </nav>
 
-      <div className="ob-hero-content" style={{ alignItems:'center', textAlign:'center' }}>
-        <div className="ob-badge"><span className="ob-badge-dot" />Choose how to get started</div>
-        <h2 className="ob-headline" style={{ fontSize:'clamp(28px,6vw,52px)', marginBottom:8 }}>
-          HOW DO YOU<br />WANT TO <span className="ob-em">PLAN?</span>
-        </h2>
-        <p className="ob-subtext" style={{ marginBottom:32 }}>Sign up for the full experience or explore as a guest</p>
+      <div className="ob-sample-wrap">
+        <div style={{ textAlign:'center', marginBottom: 40 }}>
+          <div className="ob-badge" style={{ justifyContent:'center' }}><span className="ob-badge-dot" />This is what TripZync builds for you</div>
+          <h2 className="ob-headline" style={{ fontSize:'clamp(28px,5vw,46px)', marginBottom:8 }}>
+            EVERY TRIP, <span className="ob-em">BEAUTIFULLY</span> PLANNED
+          </h2>
+          <p className="ob-subtext" style={{ marginBottom:0 }}>Flights, hotels, day-by-day plans, weather — synced in one dashboard</p>
+        </div>
 
-        <div style={{ display:'flex', gap:20, flexWrap:'wrap', justifyContent:'center' }}>
+        {/* ── Sample dashboard preview ── */}
+        <div className="ob-sample-frame">
+          <div className="ob-sample-badge"><span className="ob-sample-badge-dot" />Sample Itinerary</div>
 
-          {/* Sign up card */}
-          <div style={{ background:'rgba(64,224,208,.07)', border:'2px solid var(--accent)', borderRadius:18, padding:'32px 28px', width:230, cursor:'pointer', textAlign:'left', transition:'transform .15s' }}
-            onClick={() => { window.location.href = '/login?callbackUrl=%2F%3Fscreen%3Dmap' }}>
-            <div style={{ fontSize:40, marginBottom:14 }}>🔐</div>
-            <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:24, fontWeight:900, textTransform:'uppercase', color:'#fff', marginBottom:8 }}>Sign Up</div>
-            <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, color:'rgba(255,255,255,.7)', lineHeight:1.5 }}>
-              Save your trip, access from any device, personalised recommendations.
+          <div className="ob-sample-dash">
+            {/* Trip title */}
+            <div className="ob-sample-card ob-sample-title-card">
+              <div className="ob-sample-title-eyebrow">Destination</div>
+              <div className="ob-sample-title-city">{SAMPLE_TRIP.city}</div>
+              <div className="ob-sample-title-dates">{SAMPLE_TRIP.dates}</div>
             </div>
-            <div style={{ marginTop:18, fontFamily:"'Barlow Condensed',sans-serif", fontSize:11, fontWeight:700, letterSpacing:2, textTransform:'uppercase', color:'var(--accent)', display:'flex', alignItems:'center', gap:8 }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" style={{ flexShrink:0 }}>
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-              </svg>
-              GOOGLE SIGN IN →
+
+            {/* Forecast */}
+            <div className="ob-sample-card ob-sample-forecast-card">
+              <div className="ob-sample-forecast-head">7-Day Forecast</div>
+              <div className="ob-sample-forecast-days">
+                {SAMPLE_TRIP.forecast.map(d => (
+                  <div key={d.name} className={`ob-sample-wx-day${d.today ? ' today' : ''}`}>
+                    <div className="ob-sample-wx-name">{d.today ? 'Today' : d.name}</div>
+                    <div className="ob-sample-wx-icon">{d.icon}</div>
+                    <div className="ob-sample-wx-hi">{d.hi}°</div>
+                    <div className="ob-sample-wx-lo">{d.lo}°</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Flight + Hotel (left stack) */}
+            <div className="ob-sample-side">
+              <div className="ob-sample-card ob-sample-flight-card">
+                <div className="ob-sample-card-label">✈ Flight</div>
+                <div className="ob-sample-flight-route">
+                  <div className="ob-sample-flight-port">{SAMPLE_TRIP.flight.from}</div>
+                  <span className="ob-sample-flight-plane">✈</span>
+                  <div className="ob-sample-flight-port">{SAMPLE_TRIP.flight.to}</div>
+                </div>
+                <div className="ob-sample-flight-time">{SAMPLE_TRIP.flight.depTime} → {SAMPLE_TRIP.flight.arrTime}</div>
+                <span className="ob-sample-flight-chip">{SAMPLE_TRIP.flight.airline} · {SAMPLE_TRIP.flight.num}</span>
+              </div>
+              <div className="ob-sample-card ob-sample-hotel-card">
+                <div className="ob-sample-card-label">🏨 Hotels</div>
+                {SAMPLE_TRIP.hotels.map(h => (
+                  <div key={h.name} className="ob-sample-hotel-row">
+                    <span className="ob-sample-hotel-check">✓</span>
+                    <span className="ob-sample-hotel-name">{h.name}</span>
+                    <span className="ob-sample-hotel-nights">{h.nights}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Day cards */}
+            {SAMPLE_TRIP.days.map(d => (
+              <div key={d.tag} className="ob-sample-card ob-sample-day-card">
+                <img className="ob-sample-day-img" src={d.img} alt={d.name} loading="lazy" />
+                <div className="ob-sample-day-gradient" />
+                <div className="ob-sample-day-tag">{d.tag}</div>
+                <div className="ob-sample-day-body">
+                  <div className="ob-sample-day-name">{d.name}</div>
+                  <div className="ob-sample-day-sub">{d.sub}</div>
+                </div>
+              </div>
+            ))}
+
+            {/* What to do / What to eat */}
+            <div className="ob-sample-card ob-sample-note-card do">
+              <div className="ob-sample-note-head">✦ What To Do</div>
+              <ul className="ob-sample-note-list">
+                {SAMPLE_TRIP.toDo.map(item => <li key={item}>{item}</li>)}
+              </ul>
+            </div>
+            <div className="ob-sample-card ob-sample-note-card eat">
+              <div className="ob-sample-note-head">✦ What To Eat</div>
+              <ul className="ob-sample-note-list">
+                {SAMPLE_TRIP.toEat.map(item => <li key={item}>{item}</li>)}
+              </ul>
             </div>
           </div>
+        </div>
 
-          {/* Guest card */}
-          <div style={{ background:'rgba(255,255,255,.03)', border:'1px solid rgba(255,255,255,.14)', borderRadius:18, padding:'32px 28px', width:230, cursor:'pointer', textAlign:'left', transition:'transform .15s' }}
-            onClick={() => setShowGuestModal(true)}>
-            <div style={{ fontSize:40, marginBottom:14 }}>👤</div>
-            <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:24, fontWeight:900, textTransform:'uppercase', color:'#fff', marginBottom:8 }}>Guest Mode</div>
-            <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, color:'rgba(255,255,255,.7)', lineHeight:1.5 }}>
-              Plan without signing up. Your trip stays on this device only.
-            </div>
-            <div style={{ marginTop:18, fontFamily:"'Barlow Condensed',sans-serif", fontSize:11, fontWeight:700, letterSpacing:2, textTransform:'uppercase', color:'rgba(255,255,255,.45)' }}>
-              CONTINUE AS GUEST →
-            </div>
+        {/* ── CTA under the dashboard ── */}
+        <div className="ob-sample-cta">
+          <p className="ob-sample-cta-lead">Sign up free and we'll build a dashboard like this for your next trip</p>
+          <div className="ob-sample-cta-buttons">
+            <button className="ob-cta-btn" style={{ padding:'16px 44px', fontSize:15 }}
+              onClick={() => { window.location.href = '/login?callbackUrl=%2F%3Fscreen%3Dmap' }}>
+              SIGN UP FREE →
+            </button>
+            <button className="ob-sample-guest-link" onClick={() => setShowGuestModal(true)}>
+              Continue as Guest
+            </button>
           </div>
-
         </div>
       </div>
     </div>

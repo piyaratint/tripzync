@@ -1167,6 +1167,109 @@ body.t-arctic .dp-footer { border-top-color: var(--border); }
   padding: 32px; text-align: center; margin-bottom: 40px;
 }
 
+/* ── SAMPLE DASHBOARD (onboarding "how do you want to plan" replacement) ── */
+.ob-sample-wrap { position: relative; z-index: 1; width: 100%; max-width: 1180px; padding: 96px 32px 64px; }
+.ob-sample-frame {
+  position: relative; border-radius: 24px; padding: 28px;
+  background: linear-gradient(180deg, rgba(255,255,255,.025), rgba(255,255,255,.008));
+  border: 1px solid var(--border2);
+  box-shadow: 0 0 0 1px rgba(64,224,208,.05), 0 30px 80px -20px rgba(0,0,0,.6), 0 0 60px -20px rgba(64,224,208,.12);
+}
+.ob-sample-badge {
+  position: absolute; top: -14px; left: 28px;
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--bg); border: 1px solid rgba(64,224,208,.35);
+  border-radius: 20px; padding: 6px 14px;
+  font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--accent);
+}
+.ob-sample-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: ob-blink 2s ease-in-out infinite; }
+
+.ob-sample-dash {
+  display: grid;
+  grid-template-columns: 240px repeat(4, minmax(150px, 1fr));
+  grid-template-rows: auto auto auto;
+  gap: 14px;
+}
+.ob-sample-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 16px; overflow: hidden; position: relative;
+}
+
+/* row 1 — trip title + forecast */
+.ob-sample-title-card { grid-column: 1 / 2; grid-row: 1; padding: 18px 20px; display: flex; flex-direction: column; justify-content: center; }
+.ob-sample-title-eyebrow { font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); margin-bottom: 6px; }
+.ob-sample-title-city { font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif; font-size: 34px; letter-spacing: 2px; color: var(--white); line-height: 1; }
+.ob-sample-title-dates { font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1px; color: var(--accent); margin-top: 6px; }
+
+.ob-sample-forecast-card { grid-column: 2 / 6; grid-row: 1; padding: 16px 20px; display: flex; flex-direction: column; justify-content: center; gap: 10px; }
+.ob-sample-forecast-head { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--dim); }
+.ob-sample-forecast-days { display: flex; gap: 8px; }
+.ob-sample-wx-day { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); border-radius: 10px; padding: 8px 4px; }
+.ob-sample-wx-day.today { background: rgba(64,224,208,.08); border-color: rgba(64,224,208,.3); }
+.ob-sample-wx-name { font-family: 'Barlow Condensed', sans-serif; font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--dim); }
+.ob-sample-wx-icon { font-size: 16px; line-height: 1; }
+.ob-sample-wx-hi { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; color: var(--white); }
+.ob-sample-wx-lo { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; color: var(--dim); }
+
+/* row 2 — left stack (flight + hotel) + day cards */
+.ob-sample-side { grid-column: 1 / 2; grid-row: 2; display: flex; flex-direction: column; gap: 14px; }
+.ob-sample-flight-card, .ob-sample-hotel-card { padding: 16px; }
+.ob-sample-card-label { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--dim); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.ob-sample-flight-route { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.ob-sample-flight-port { font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif; font-size: 26px; letter-spacing: 1px; color: var(--white); line-height: 1; }
+.ob-sample-flight-plane { color: var(--accent); font-size: 13px; opacity: .7; }
+.ob-sample-flight-time { font-family: 'Rajdhani', sans-serif; font-size: 11px; color: var(--dim); margin-top: 3px; }
+.ob-sample-flight-chip { display: inline-block; margin-top: 12px; font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 1px; background: rgba(64,224,208,.1); color: var(--accent); border: 1px solid rgba(64,224,208,.25); border-radius: 4px; padding: 3px 8px; }
+.ob-sample-hotel-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+.ob-sample-hotel-row + .ob-sample-hotel-row { border-top: 1px solid var(--border); }
+.ob-sample-hotel-check { width: 15px; height: 15px; border-radius: 4px; background: rgba(64,224,208,.15); border: 1px solid var(--accent); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 9px; flex-shrink: 0; }
+.ob-sample-hotel-name { font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 700; color: var(--white); flex: 1; }
+.ob-sample-hotel-nights { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--dim); white-space: nowrap; }
+
+.ob-sample-day-card { grid-row: 2; aspect-ratio: unset; min-height: 340px; display: flex; flex-direction: column; justify-content: flex-end; cursor: default; }
+.ob-sample-day-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ob-sample-day-gradient { position: absolute; inset: 0; background: linear-gradient(to top, rgba(7,8,15,.95) 0%, rgba(7,8,15,.35) 55%, transparent 100%); }
+.ob-sample-day-tag { position: relative; z-index: 1; align-self: flex-start; margin: 12px; font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 2px; background: var(--hi); color: #000; padding: 3px 9px; border-radius: 4px; }
+.ob-sample-day-body { position: relative; z-index: 1; padding: 0 14px 14px; }
+.ob-sample-day-name { font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif; font-size: 19px; letter-spacing: 1px; color: #fff; line-height: 1.05; }
+.ob-sample-day-sub { font-family: 'Rajdhani', sans-serif; font-size: 11px; color: rgba(255,255,255,.7); letter-spacing: .5px; margin-top: 2px; }
+
+/* row 3 — notes */
+.ob-sample-note-card { grid-row: 3; padding: 18px 20px; }
+.ob-sample-note-card.do   { grid-column: 1 / 4; }
+.ob-sample-note-card.eat  { grid-column: 4 / 6; }
+.ob-sample-note-head { display: flex; align-items: center; gap: 8px; font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif; font-size: 18px; letter-spacing: 2px; color: var(--accent); margin-bottom: 12px; }
+.ob-sample-note-list { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+.ob-sample-note-list li { display: flex; align-items: baseline; gap: 9px; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 600; color: rgba(255,255,255,.85); line-height: 1.4; }
+.ob-sample-note-list li::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); flex-shrink: 0; transform: translateY(-3px); }
+
+/* CTA under the dashboard */
+.ob-sample-cta { text-align: center; margin-top: 40px; }
+.ob-sample-cta-lead { font-family: 'Rajdhani', sans-serif; font-size: 15px; color: var(--dim); letter-spacing: 1px; margin-bottom: 18px; }
+.ob-sample-cta-buttons { display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap; }
+.ob-sample-guest-link { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); background: none; border: 1px solid var(--border); border-radius: 8px; padding: 15px 28px; cursor: pointer; transition: color .2s, border-color .2s; }
+.ob-sample-guest-link:hover { color: var(--text); border-color: var(--border2); }
+
+@media (max-width: 900px) {
+  .ob-sample-dash { grid-template-columns: repeat(2, 1fr); }
+  .ob-sample-title-card { grid-column: 1 / 3; grid-row: 1; }
+  .ob-sample-forecast-card { grid-column: 1 / 3; grid-row: 2; }
+  .ob-sample-forecast-days { overflow-x: auto; }
+  .ob-sample-side { grid-column: 1 / 3; grid-row: 3; flex-direction: row; }
+  .ob-sample-side > * { flex: 1; }
+  .ob-sample-day-card:nth-of-type(1) { grid-column: 1 / 2; }
+  .ob-sample-day-card { grid-row: auto; min-height: 220px; }
+  .ob-sample-note-card.do, .ob-sample-note-card.eat { grid-column: 1 / 3; }
+}
+@media (max-width: 560px) {
+  .ob-sample-wrap { padding: 88px 16px 48px; }
+  .ob-sample-frame { padding: 16px; }
+  .ob-sample-dash { grid-template-columns: 1fr; }
+  .ob-sample-title-card, .ob-sample-forecast-card, .ob-sample-side, .ob-sample-day-card, .ob-sample-note-card.do, .ob-sample-note-card.eat { grid-column: 1 / 2; }
+  .ob-sample-side { flex-direction: column; }
+}
+
 /* ── LEAFLET OVERRIDES ── */
 .leaflet-container { background: var(--bg) !important; }
 .leaflet-control-attribution { display: none !important; }
