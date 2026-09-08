@@ -368,12 +368,23 @@ const HOTEL_PROGRAMS = [
   { id: 'none',     name: 'No Membership',   tiers: 'Best available deals',       emoji: '🌐', logo: ''                   },
 ]
 
+// Deterministic PRNG (mulberry32) so server- and client-rendered particles match — using
+// Math.random() here would differ between SSR and hydration and trigger a hydration mismatch.
+function seededRandom(seed: number) {
+  return () => {
+    seed |= 0; seed = (seed + 0x6D2B79F5) | 0
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed)
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
+const particleRandom = seededRandom(42)
 const PARTICLES = Array.from({ length: 20 }, (_, i) => ({
   id: i,
-  size:  Math.random() * 4 + 2,
-  left:  Math.random() * 100,
-  delay: Math.random() * 12,
-  dur:   Math.random() * 8 + 10,
+  size:  particleRandom() * 4 + 2,
+  left:  particleRandom() * 100,
+  delay: particleRandom() * 12,
+  dur:   particleRandom() * 8 + 10,
   color: i % 3 === 0 ? 'var(--accent)' : i % 3 === 1 ? 'var(--hi)' : 'rgba(255,255,255,.3)',
 }))
 
@@ -672,11 +683,11 @@ export default function LandingPage() {
 
       <div className="ob-sample-wrap">
         <div style={{ textAlign:'center', marginBottom: 40 }}>
-          <div className="ob-badge" style={{ justifyContent:'center' }}><span className="ob-badge-dot" />This is what TripZync builds for you</div>
+          <div className="ob-badge" style={{ justifyContent:'center' }}><span className="ob-badge-dot" />Your next trip, already taking shape</div>
           <h2 className="ob-headline" style={{ fontSize:'clamp(28px,5vw,46px)', marginBottom:8 }}>
-            EVERY TRIP, <span className="ob-em">BEAUTIFULLY</span> PLANNED
+            IMAGINE <span className="ob-em">YOUR TRIP</span>, THIS BEAUTIFULLY PLANNED
           </h2>
-          <p className="ob-subtext" style={{ marginBottom:0 }}>Flights, hotels, day-by-day plans, weather — synced in one dashboard</p>
+          <p className="ob-subtext" style={{ marginBottom:0 }}>One free account and it's yours to build</p>
         </div>
 
         {/* ── Sample dashboard preview ── */}
@@ -761,14 +772,14 @@ export default function LandingPage() {
 
         {/* ── CTA under the dashboard ── */}
         <div className="ob-sample-cta">
-          <p className="ob-sample-cta-lead">Sign up free and we'll build a dashboard like this for your next trip</p>
+          <p className="ob-sample-cta-lead">Ready to plan your own?</p>
           <div className="ob-sample-cta-buttons">
             <button className="ob-cta-btn" style={{ padding:'16px 44px', fontSize:15 }}
               onClick={() => { window.location.href = '/login?callbackUrl=%2F%3Fscreen%3Dmap' }}>
-              SIGN UP FREE →
+              PLAN MY TRIP →
             </button>
             <button className="ob-sample-guest-link" onClick={() => setShowGuestModal(true)}>
-              Continue as Guest
+              Just browsing → Continue as Guest
             </button>
           </div>
         </div>
