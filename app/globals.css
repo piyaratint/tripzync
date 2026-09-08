@@ -1176,14 +1176,20 @@ body.t-arctic .dp-footer { border-top-color: var(--border); }
   box-shadow: 0 0 0 1px rgba(64,224,208,.05), 0 30px 80px -20px rgba(0,0,0,.6), 0 0 60px -20px rgba(64,224,208,.12);
 }
 .ob-sample-badge {
-  position: absolute; top: -14px; left: 28px;
-  display: inline-flex; align-items: center; gap: 7px;
-  background: var(--bg); border: 1px solid rgba(64,224,208,.35);
-  border-radius: 20px; padding: 6px 14px;
-  font-family: 'Space Mono', monospace; font-size: 9px; letter-spacing: 3px;
-  text-transform: uppercase; color: var(--accent);
+  position: absolute; top: -18px; left: 28px; z-index: 3;
+  display: inline-flex; align-items: center; gap: 8px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none; border-radius: 20px; padding: 9px 20px;
+  font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--bg);
+  box-shadow: 0 6px 24px rgba(64,224,208,.45), 0 0 0 4px var(--bg);
+  animation: ob-sample-badge-pulse 2.4s ease-in-out infinite;
 }
-.ob-sample-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: ob-blink 2s ease-in-out infinite; }
+.ob-sample-badge-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--bg); animation: ob-blink 2s ease-in-out infinite; }
+@keyframes ob-sample-badge-pulse {
+  0%, 100% { box-shadow: 0 6px 24px rgba(64,224,208,.45), 0 0 0 4px var(--bg); }
+  50%      { box-shadow: 0 6px 32px rgba(64,224,208,.75), 0 0 0 4px var(--bg); }
+}
 
 .ob-sample-dash {
   display: grid;
