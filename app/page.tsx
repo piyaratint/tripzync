@@ -445,8 +445,8 @@ function buildSampleTrip() {
     toEat: [
       { text: 'Sushi breakfast at Toyosu Market', img: 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=400&q=80' },
       { text: 'Bowl of ramen at Ichiran', img: 'https://images.unsplash.com/photo-1557872943-16a5ac26437e?auto=format&fit=crop&w=400&q=80' },
-      { text: 'Omakase counter in Ginza', img: 'https://images.unsplash.com/photo-1611143669185-af224c5e3252?auto=format&fit=crop&w=400&q=80' },
-      { text: 'Wagyu yakiniku night out', img: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=400&q=80' },
+      { text: 'Omakase counter in Ginza', img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Chef_Ishikawa_Cutting_Fish_(12007739074).jpg?width=400' },
+      { text: 'Wagyu yakiniku night out', img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Gyu-kaku_yakiniku_restaurant_(20).jpg?width=400' },
       { text: 'Konbini snack crawl', img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Hot_drinks_in_Japanese_Convenience_Store_(13539630815).jpg?width=400' },
     ],
   }
