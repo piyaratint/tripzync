@@ -24,7 +24,7 @@ const WorldMap = dynamic(
 )
 
 // ── TYPES ────────────────────────────────────────────────────────────────────
-type Screen = 'hero' | 'mode-select' | 'map' | 'places' | 'hotels' | 'duration'
+type Screen = 'hero' | 'map' | 'places' | 'hotels' | 'duration'
 
 interface Place {
   name: string
@@ -432,11 +432,15 @@ function buildSampleTrip() {
       { name: 'The Ritz-Carlton Tokyo', nights: fmtHotelRange(addDays(start, 2), addDays(start, 4)) },
       { name: 'Park Hyatt Tokyo', nights: fmtHotelRange(addDays(start, 4), end) },
     ],
+    // One card per calendar day of the trip, matching SAMPLE_TRIP_NIGHTS + 1 days.
     days: [
       { tag: 'DAY 1', name: 'Senso-ji & Skytree', sub: 'Asakusa', img: 'https://images.unsplash.com/photo-1573455494060-c5595004fb6c?auto=format&fit=crop&w=500&q=80' },
       { tag: 'DAY 2', name: 'Tokyo Disneyland', sub: 'Urayasu', img: 'https://images.unsplash.com/photo-1624253321171-1be53e12f5f4?auto=format&fit=crop&w=500&q=80' },
       { tag: 'DAY 3', name: 'Shibuya & Meiji Shrine', sub: 'Shibuya', img: 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=500&q=80' },
       { tag: 'DAY 4', name: 'Mount Fuji Day Trip', sub: 'Kawaguchiko', img: 'https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?auto=format&fit=crop&w=500&q=80' },
+      { tag: 'DAY 5', name: 'TeamLab Planets', sub: 'Odaiba', img: 'https://commons.wikimedia.org/wiki/Special:FilePath/At_teamLab_Planets_(48277798316).jpg?width=500' },
+      { tag: 'DAY 6', name: 'Harajuku & Omotesando', sub: 'Shibuya', img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Takeshita_Street_in_December_2018.jpg?width=500' },
+      { tag: 'DAY 7', name: 'Ginza Send-off Stroll', sub: 'Chuo', img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Street_at_Ginza_Tokyo.jpg?width=500' },
     ],
     toEat: [
       { text: 'Sushi breakfast at Toyosu Market', img: 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=400&q=80' },
@@ -470,6 +474,7 @@ export default function LandingPage() {
   const [liveSuggestions, setLiveSuggestions] = useState<{ name: string; description: string; placeId: string }[]>([])
   const [resolvedISOByCity, setResolvedISOByCity] = useState<Record<string, string>>({})
   const searchRef = useRef<HTMLDivElement>(null)
+  const sampleDashRef = useRef<HTMLDivElement>(null)
 
   // Live, worldwide destination search — the static COUNTRY_CITIES list only covers a
   // curated set of countries/cities, so anything outside it comes from Google Places.
@@ -642,6 +647,7 @@ export default function LandingPage() {
 
   // ── RENDER: HERO ──────────────────────────────────────────────────────────
   if (screen === 'hero') return (
+    <>
     <div className="ob-screen">
       <div className="ob-grid-bg" />
       <div className="ob-particles">
@@ -672,16 +678,14 @@ export default function LandingPage() {
           TO DISCOVER
         </h1>
         <p className="ob-subtext">Plan smarter · Travel deeper · Live the route</p>
-        <button className="ob-cta-btn" onClick={() => setScreen('mode-select')}>
+        <button className="ob-cta-btn" onClick={() => sampleDashRef.current?.scrollIntoView({ behavior: 'smooth' })}>
           START PLANNING →
         </button>
       </div>
     </div>
-  )
 
-  // ── RENDER: MODE SELECT ───────────────────────────────────────────────────
-  if (screen === 'mode-select') return (
-    <div className="ob-screen">
+    {/* ── SAMPLE DASHBOARD — same scroll, no click gate ── */}
+    <div className="ob-screen" style={{ justifyContent: 'flex-start' }} ref={sampleDashRef}>
       <div className="ob-grid-bg" />
       <div className="ob-particles" style={{ opacity:.4 }}>
         {PARTICLES.slice(0, 10).map(p => (
@@ -709,11 +713,6 @@ export default function LandingPage() {
           </div>
         </div>
       )}
-
-      <nav className="ob-nav">
-        <TripZyncLogo href="/" />
-        <button className="ob-nav-link" style={{ background:'none', border:'none', cursor:'pointer' }} onClick={() => setScreen('hero')}>← Back</button>
-      </nav>
 
       <div className="ob-sample-wrap">
         <div style={{ textAlign:'center', marginBottom: 40 }}>
@@ -776,17 +775,22 @@ export default function LandingPage() {
             </div>
 
             {/* Day cards */}
-            {SAMPLE_TRIP.days.map(d => (
-              <div key={d.tag} className="ob-sample-card ob-sample-day-card">
-                <img className="ob-sample-day-img" src={d.img} alt={d.name} loading="lazy" />
-                <div className="ob-sample-day-gradient" />
-                <div className="ob-sample-day-tag">{d.tag}</div>
-                <div className="ob-sample-day-body">
-                  <div className="ob-sample-day-name">{d.name}</div>
-                  <div className="ob-sample-day-sub">{d.sub}</div>
-                </div>
+            <div className="ob-sample-days-wrap">
+              <div className="ob-sample-days-scroll">
+                {SAMPLE_TRIP.days.map(d => (
+                  <div key={d.tag} className="ob-sample-card ob-sample-day-card">
+                    <img className="ob-sample-day-img" src={d.img} alt={d.name} loading="lazy" />
+                    <div className="ob-sample-day-gradient" />
+                    <div className="ob-sample-day-tag">{d.tag}</div>
+                    <div className="ob-sample-day-body">
+                      <div className="ob-sample-day-name">{d.name}</div>
+                      <div className="ob-sample-day-sub">{d.sub}</div>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+              <div className="ob-sample-days-fade" />
+            </div>
 
             {/* What to eat — full-width photo strip (day cards above already cover "what to do") */}
             <div className="ob-sample-card ob-sample-note-card eat">
@@ -825,6 +829,7 @@ export default function LandingPage() {
         </div>
       </div>
     </div>
+    </>
   )
 
   // ── RENDER: MAP (city search + world map) ────────────────────────────────
@@ -1037,7 +1042,7 @@ export default function LandingPage() {
       </div>
 
       <div className="ob-progress">
-        <button className="ob-step-back" onClick={() => setScreen('mode-select')}>← Back</button>
+        <button className="ob-step-back" onClick={() => setScreen('hero')}>← Back</button>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <div className="ob-steps">
             <div className="ob-step-dot done" />
