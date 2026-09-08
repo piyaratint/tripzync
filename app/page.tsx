@@ -475,6 +475,7 @@ export default function LandingPage() {
   const [resolvedISOByCity, setResolvedISOByCity] = useState<Record<string, string>>({})
   const searchRef = useRef<HTMLDivElement>(null)
   const sampleDashRef = useRef<HTMLDivElement>(null)
+  const daysScrollRef = useRef<HTMLDivElement>(null)
 
   // Live, worldwide destination search — the static COUNTRY_CITIES list only covers a
   // curated set of countries/cities, so anything outside it comes from Google Places.
@@ -776,7 +777,7 @@ export default function LandingPage() {
 
             {/* Day cards */}
             <div className="ob-sample-days-wrap">
-              <div className="ob-sample-days-scroll">
+              <div className="ob-sample-days-scroll" ref={daysScrollRef}>
                 {SAMPLE_TRIP.days.map(d => (
                   <div key={d.tag} className="ob-sample-card ob-sample-day-card">
                     <img className="ob-sample-day-img" src={d.img} alt={d.name} loading="lazy" />
@@ -790,6 +791,18 @@ export default function LandingPage() {
                 ))}
               </div>
               <div className="ob-sample-days-fade" />
+              <button
+                type="button"
+                className="ob-sample-days-arrow left"
+                aria-label="Scroll to earlier days"
+                onClick={() => daysScrollRef.current?.scrollBy({ left: -320, behavior: 'smooth' })}
+              >‹</button>
+              <button
+                type="button"
+                className="ob-sample-days-arrow right"
+                aria-label="Scroll to more days"
+                onClick={() => daysScrollRef.current?.scrollBy({ left: 320, behavior: 'smooth' })}
+              >›</button>
             </div>
 
             {/* What to eat — full-width photo strip (day cards above already cover "what to do") */}
