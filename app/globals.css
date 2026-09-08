@@ -1235,14 +1235,14 @@ body.t-arctic .dp-footer { border-top-color: var(--border); }
 .ob-sample-day-name { font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif; font-size: 19px; letter-spacing: 1px; color: #fff; line-height: 1.05; }
 .ob-sample-day-sub { font-family: 'Rajdhani', sans-serif; font-size: 11px; color: rgba(255,255,255,.7); letter-spacing: .5px; margin-top: 2px; }
 
-/* row 3 — notes */
-.ob-sample-note-card { grid-row: 3; padding: 18px 20px; }
-.ob-sample-note-card.do   { grid-column: 1 / 4; }
-.ob-sample-note-card.eat  { grid-column: 4 / 6; }
+/* row 3 — What To Eat (full-width photo strip; day cards above already cover "what to do") */
+.ob-sample-note-card.eat { grid-column: 1 / 6; grid-row: 3; padding: 18px 20px; }
 .ob-sample-note-head { display: flex; align-items: center; gap: 8px; font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif; font-size: 18px; letter-spacing: 2px; color: var(--accent); margin-bottom: 12px; }
-.ob-sample-note-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-.ob-sample-note-list li { display: flex; align-items: center; gap: 11px; font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 600; color: rgba(255,255,255,.85); line-height: 1.3; }
-.ob-sample-note-thumb { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; flex-shrink: 0; background: var(--card2); border: 1px solid var(--border); }
+.ob-sample-eat-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 14px; }
+.ob-sample-eat-card { position: relative; border-radius: 14px; overflow: hidden; min-height: 220px; display: flex; flex-direction: column; justify-content: flex-end; background: var(--card2); }
+.ob-sample-eat-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ob-sample-eat-gradient { position: absolute; inset: 0; background: linear-gradient(to top, rgba(7,8,15,.94) 0%, rgba(7,8,15,.2) 55%, transparent 100%); }
+.ob-sample-eat-name { position: relative; z-index: 1; padding: 12px; font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 700; color: #fff; line-height: 1.3; }
 
 /* CTA under the dashboard */
 .ob-sample-cta { text-align: center; margin-top: 40px; }
@@ -1260,14 +1260,15 @@ body.t-arctic .dp-footer { border-top-color: var(--border); }
   .ob-sample-side > * { flex: 1; }
   .ob-sample-day-card:nth-of-type(1) { grid-column: 1 / 2; }
   .ob-sample-day-card { grid-row: auto; min-height: 220px; }
-  .ob-sample-note-card.do, .ob-sample-note-card.eat { grid-column: 1 / 3; }
+  .ob-sample-note-card.eat { grid-column: 1 / 3; grid-row: auto; }
 }
 @media (max-width: 560px) {
   .ob-sample-wrap { padding: 88px 16px 48px; }
   .ob-sample-frame { padding: 16px; }
   .ob-sample-dash { grid-template-columns: 1fr; }
-  .ob-sample-title-card, .ob-sample-forecast-card, .ob-sample-side, .ob-sample-day-card, .ob-sample-note-card.do, .ob-sample-note-card.eat { grid-column: 1 / 2; }
+  .ob-sample-title-card, .ob-sample-forecast-card, .ob-sample-side, .ob-sample-day-card, .ob-sample-note-card.eat { grid-column: 1 / 2; }
   .ob-sample-side { flex-direction: column; }
+  .ob-sample-eat-strip { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); }
 }
 
 /* ── LEAFLET OVERRIDES ── */

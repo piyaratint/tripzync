@@ -438,19 +438,12 @@ function buildSampleTrip() {
       { tag: 'DAY 3', name: 'Shibuya & Meiji Shrine', sub: 'Shibuya', img: 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=500&q=80' },
       { tag: 'DAY 4', name: 'Mount Fuji Day Trip', sub: 'Kawaguchiko', img: 'https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?auto=format&fit=crop&w=500&q=80' },
     ],
-    toDo: [
-      { text: 'Cross the Shibuya Scramble at dusk', img: 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=120&q=80' },
-      { text: 'Ride the elevator up Tokyo Skytree', img: 'https://images.unsplash.com/photo-1573455494060-c5595004fb6c?auto=format&fit=crop&w=120&q=80' },
-      { text: 'Watch a sumo practice session', img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Sumo_Wrestling_-_Tokyo.jpg?width=120' },
-      { text: 'Kayak Lake Kawaguchiko at sunrise', img: 'https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?auto=format&fit=crop&w=120&q=80' },
-      { text: 'Explore TeamLab Planets', img: 'https://commons.wikimedia.org/wiki/Special:FilePath/At_teamLab_Planets_(48277798316).jpg?width=120' },
-    ],
     toEat: [
-      { text: 'Sushi breakfast at Toyosu Market', img: 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=120&q=80' },
-      { text: 'Bowl of ramen at Ichiran', img: 'https://images.unsplash.com/photo-1557872943-16a5ac26437e?auto=format&fit=crop&w=120&q=80' },
-      { text: 'Omakase counter in Ginza', img: 'https://images.unsplash.com/photo-1611143669185-af224c5e3252?auto=format&fit=crop&w=120&q=80' },
-      { text: 'Wagyu yakiniku night out', img: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=120&q=80' },
-      { text: 'Konbini snack crawl', img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Hot_drinks_in_Japanese_Convenience_Store_(13539630815).jpg?width=120' },
+      { text: 'Sushi breakfast at Toyosu Market', img: 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=400&q=80' },
+      { text: 'Bowl of ramen at Ichiran', img: 'https://images.unsplash.com/photo-1557872943-16a5ac26437e?auto=format&fit=crop&w=400&q=80' },
+      { text: 'Omakase counter in Ginza', img: 'https://images.unsplash.com/photo-1611143669185-af224c5e3252?auto=format&fit=crop&w=400&q=80' },
+      { text: 'Wagyu yakiniku night out', img: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=400&q=80' },
+      { text: 'Konbini snack crawl', img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Hot_drinks_in_Japanese_Convenience_Store_(13539630815).jpg?width=400' },
     ],
   }
 }
@@ -795,40 +788,24 @@ export default function LandingPage() {
               </div>
             ))}
 
-            {/* What to do / What to eat */}
-            <div className="ob-sample-card ob-sample-note-card do">
-              <div className="ob-sample-note-head">✦ What To Do</div>
-              <ul className="ob-sample-note-list">
-                {SAMPLE_TRIP.toDo.map(item => (
-                  <li key={item.text}>
-                    <img
-                      className="ob-sample-note-thumb"
-                      src={item.img}
-                      alt=""
-                      loading="lazy"
-                      onError={e => { (e.target as HTMLImageElement).src = IMG_FALLBACK }}
-                    />
-                    {item.text}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {/* What to eat — full-width photo strip (day cards above already cover "what to do") */}
             <div className="ob-sample-card ob-sample-note-card eat">
               <div className="ob-sample-note-head">✦ What To Eat</div>
-              <ul className="ob-sample-note-list">
+              <div className="ob-sample-eat-strip">
                 {SAMPLE_TRIP.toEat.map(item => (
-                  <li key={item.text}>
+                  <div key={item.text} className="ob-sample-eat-card">
                     <img
-                      className="ob-sample-note-thumb"
+                      className="ob-sample-eat-img"
                       src={item.img}
-                      alt=""
+                      alt={item.text}
                       loading="lazy"
                       onError={e => { (e.target as HTMLImageElement).src = IMG_FALLBACK }}
                     />
-                    {item.text}
-                  </li>
+                    <div className="ob-sample-eat-gradient" />
+                    <div className="ob-sample-eat-name">{item.text}</div>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
           </div>
         </div>
