@@ -388,33 +388,74 @@ const PARTICLES = Array.from({ length: 20 }, (_, i) => ({
   color: i % 3 === 0 ? 'var(--accent)' : i % 3 === 1 ? 'var(--hi)' : 'rgba(255,255,255,.3)',
 }))
 
-// ── SAMPLE DASHBOARD (static demo data — shown pre-signup to inspire trip planning) ──
-const SAMPLE_TRIP = {
-  city: 'Tokyo', dates: '24 SEP – 30 SEP 2026',
-  forecast: [
-    { name: 'Sun', icon: '☀️', hi: 27, lo: 20, today: false },
-    { name: 'Mon', icon: '🌤', hi: 26, lo: 19, today: false },
-    { name: 'Tue', icon: '⛅', hi: 25, lo: 19, today: true },
-    { name: 'Wed', icon: '⛅', hi: 24, lo: 18, today: false },
-    { name: 'Thu', icon: '☁️', hi: 23, lo: 18, today: false },
-    { name: 'Fri', icon: '🌤', hi: 25, lo: 19, today: false },
-    { name: 'Sat', icon: '☀️', hi: 27, lo: 20, today: false },
-  ],
-  flight: { from: 'BKK', to: 'NRT', airline: 'Thai Airways', num: 'TG 641', depTime: '08:30', arrTime: '16:10' },
-  hotels: [
-    { name: 'JW Marriott Hotel Tokyo', nights: '24–26' },
-    { name: 'The Ritz-Carlton Tokyo', nights: '26–28' },
-    { name: 'Park Hyatt Tokyo', nights: '28–30' },
-  ],
-  days: [
-    { tag: 'DAY 1', name: 'Senso-ji & Skytree', sub: 'Asakusa', img: 'https://images.unsplash.com/photo-1573455494060-c5595004fb6c?auto=format&fit=crop&w=500&q=80' },
-    { tag: 'DAY 2', name: 'Tokyo Disneyland', sub: 'Urayasu', img: 'https://images.unsplash.com/photo-1624253321171-1be53e12f5f4?auto=format&fit=crop&w=500&q=80' },
-    { tag: 'DAY 3', name: 'Shibuya & Meiji Shrine', sub: 'Shibuya', img: 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=500&q=80' },
-    { tag: 'DAY 4', name: 'Mount Fuji Day Trip', sub: 'Kawaguchiko', img: 'https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?auto=format&fit=crop&w=500&q=80' },
-  ],
-  toDo: ['Cross the Shibuya Scramble at dusk', 'Ride the elevator up Tokyo Skytree', 'Watch a sumo practice session', 'Kayak Lake Kawaguchiko at sunrise', 'Explore TeamLab Planets'],
-  toEat: ['Sushi breakfast at Toyosu Market', 'Bowl of ramen at Ichiran', 'Omakase counter in Ginza', 'Wagyu yakiniku night out', 'Konbini snack crawl'],
+// ── SAMPLE DASHBOARD (demo data — shown pre-signup to inspire trip planning) ──
+// Dates are computed from today rather than hardcoded, so the sample never looks
+// stale/past-dated. Lead time (~10 weeks) matches the average international leisure
+// booking window (~73-80 days out per 2025 travel-industry booking data).
+const SAMPLE_LEAD_DAYS = 70
+const SAMPLE_TRIP_NIGHTS = 6
+const MONTH_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+const DOW_ABBR = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+const IMG_FALLBACK = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=200&q=80'
+
+function addDays(base: Date, days: number) {
+  const d = new Date(base)
+  d.setDate(d.getDate() + days)
+  return d
 }
+function fmtDayMonthUpper(d: Date) { return `${d.getDate()} ${MONTH_ABBR[d.getMonth()].toUpperCase()}` }
+function fmtHotelRange(a: Date, b: Date) {
+  return a.getMonth() === b.getMonth()
+    ? `${a.getDate()}–${b.getDate()} ${MONTH_ABBR[a.getMonth()]}`
+    : `${a.getDate()} ${MONTH_ABBR[a.getMonth()]} – ${b.getDate()} ${MONTH_ABBR[b.getMonth()]}`
+}
+
+function buildSampleTrip() {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const start = addDays(today, SAMPLE_LEAD_DAYS)
+  const end = addDays(start, SAMPLE_TRIP_NIGHTS)
+  const stayIcons = ['☀️', '🌤', '⛅', '⛅', '☁️', '🌤', '☀️']
+  const stayHi = [27, 26, 25, 24, 23, 25, 27]
+  const stayLo = [20, 19, 19, 18, 18, 19, 20]
+
+  return {
+    city: 'Tokyo',
+    dates: `${fmtDayMonthUpper(start)} – ${fmtDayMonthUpper(end)} ${end.getFullYear()}`,
+    forecast: Array.from({ length: 7 }, (_, i) => ({
+      name: DOW_ABBR[addDays(today, i).getDay()],
+      icon: stayIcons[i], hi: stayHi[i], lo: stayLo[i], today: i === 0,
+    })),
+    flight: { from: 'BKK', to: 'NRT', airline: 'Thai Airways', num: 'TG 641', depTime: '08:30', arrTime: '16:10' },
+    hotels: [
+      { name: 'JW Marriott Hotel Tokyo', nights: fmtHotelRange(start, addDays(start, 2)) },
+      { name: 'The Ritz-Carlton Tokyo', nights: fmtHotelRange(addDays(start, 2), addDays(start, 4)) },
+      { name: 'Park Hyatt Tokyo', nights: fmtHotelRange(addDays(start, 4), end) },
+    ],
+    days: [
+      { tag: 'DAY 1', name: 'Senso-ji & Skytree', sub: 'Asakusa', img: 'https://images.unsplash.com/photo-1573455494060-c5595004fb6c?auto=format&fit=crop&w=500&q=80' },
+      { tag: 'DAY 2', name: 'Tokyo Disneyland', sub: 'Urayasu', img: 'https://images.unsplash.com/photo-1624253321171-1be53e12f5f4?auto=format&fit=crop&w=500&q=80' },
+      { tag: 'DAY 3', name: 'Shibuya & Meiji Shrine', sub: 'Shibuya', img: 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=500&q=80' },
+      { tag: 'DAY 4', name: 'Mount Fuji Day Trip', sub: 'Kawaguchiko', img: 'https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?auto=format&fit=crop&w=500&q=80' },
+    ],
+    toDo: [
+      { text: 'Cross the Shibuya Scramble at dusk', img: 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=120&q=80' },
+      { text: 'Ride the elevator up Tokyo Skytree', img: 'https://images.unsplash.com/photo-1573455494060-c5595004fb6c?auto=format&fit=crop&w=120&q=80' },
+      { text: 'Watch a sumo practice session', img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Sumo_Wrestling_-_Tokyo.jpg?width=120' },
+      { text: 'Kayak Lake Kawaguchiko at sunrise', img: 'https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?auto=format&fit=crop&w=120&q=80' },
+      { text: 'Explore TeamLab Planets', img: 'https://commons.wikimedia.org/wiki/Special:FilePath/At_teamLab_Planets_(48277798316).jpg?width=120' },
+    ],
+    toEat: [
+      { text: 'Sushi breakfast at Toyosu Market', img: 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&w=120&q=80' },
+      { text: 'Bowl of ramen at Ichiran', img: 'https://images.unsplash.com/photo-1557872943-16a5ac26437e?auto=format&fit=crop&w=120&q=80' },
+      { text: 'Omakase counter in Ginza', img: 'https://images.unsplash.com/photo-1611143669185-af224c5e3252?auto=format&fit=crop&w=120&q=80' },
+      { text: 'Wagyu yakiniku night out', img: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=120&q=80' },
+      { text: 'Konbini snack crawl', img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Hot_drinks_in_Japanese_Convenience_Store_(13539630815).jpg?width=120' },
+    ],
+  }
+}
+
+const SAMPLE_TRIP = buildSampleTrip()
 
 // ── COMPONENT ─────────────────────────────────────────────────────────────────
 export default function LandingPage() {
@@ -758,13 +799,35 @@ export default function LandingPage() {
             <div className="ob-sample-card ob-sample-note-card do">
               <div className="ob-sample-note-head">✦ What To Do</div>
               <ul className="ob-sample-note-list">
-                {SAMPLE_TRIP.toDo.map(item => <li key={item}>{item}</li>)}
+                {SAMPLE_TRIP.toDo.map(item => (
+                  <li key={item.text}>
+                    <img
+                      className="ob-sample-note-thumb"
+                      src={item.img}
+                      alt=""
+                      loading="lazy"
+                      onError={e => { (e.target as HTMLImageElement).src = IMG_FALLBACK }}
+                    />
+                    {item.text}
+                  </li>
+                ))}
               </ul>
             </div>
             <div className="ob-sample-card ob-sample-note-card eat">
               <div className="ob-sample-note-head">✦ What To Eat</div>
               <ul className="ob-sample-note-list">
-                {SAMPLE_TRIP.toEat.map(item => <li key={item}>{item}</li>)}
+                {SAMPLE_TRIP.toEat.map(item => (
+                  <li key={item.text}>
+                    <img
+                      className="ob-sample-note-thumb"
+                      src={item.img}
+                      alt=""
+                      loading="lazy"
+                      onError={e => { (e.target as HTMLImageElement).src = IMG_FALLBACK }}
+                    />
+                    {item.text}
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
