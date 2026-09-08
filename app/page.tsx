@@ -83,6 +83,9 @@ const ISO_NAME: Record<string, string> = {
   COL:'Colombia',CHL:'Chile',PER:'Peru',ECU:'Ecuador',BOL:'Bolivia',
   VEN:'Venezuela',CUB:'Cuba',JAM:'Jamaica',CRI:'Costa Rica',PAN:'Panama',
   URY:'Uruguay',PRY:'Paraguay',GTM:'Guatemala',
+  HND:'Honduras',NIC:'Nicaragua',SLV:'El Salvador',DOM:'Dominican Republic',
+  HTI:'Haiti',TTO:'Trinidad and Tobago',GUY:'Guyana',BLZ:'Belize',
+  BRB:'Barbados',LCA:'Saint Lucia',VCT:'Saint Vincent and the Grenadines',GRD:'Grenada',
   GBR:'United Kingdom',FRA:'France',DEU:'Germany',ITA:'Italy',ESP:'Spain',
   NLD:'Netherlands',CHE:'Switzerland',AUT:'Austria',PRT:'Portugal',GRC:'Greece',
   NOR:'Norway',SWE:'Sweden',DNK:'Denmark',POL:'Poland',CZE:'Czech Republic',
@@ -90,18 +93,55 @@ const ISO_NAME: Record<string, string> = {
   BGR:'Bulgaria',HRV:'Croatia',SVK:'Slovakia',SVN:'Slovenia',SRB:'Serbia',
   RUS:'Russia',UKR:'Ukraine',LTU:'Lithuania',LVA:'Latvia',EST:'Estonia',
   LUX:'Luxembourg',MLT:'Malta',ISL:'Iceland',CYP:'Cyprus',
+  BLR:'Belarus',MDA:'Moldova',ALB:'Albania',MKD:'North Macedonia',
+  BIH:'Bosnia and Herzegovina',MNE:'Montenegro',AND:'Andorra',MCO:'Monaco',
+  SMR:'San Marino',LIE:'Liechtenstein',
   ZAF:'South Africa',EGY:'Egypt',MAR:'Morocco',KEN:'Kenya',TZA:'Tanzania',
   NGA:'Nigeria',GHA:'Ghana',ETH:'Ethiopia',SEN:'Senegal',RWA:'Rwanda',
   BWA:'Botswana',ZWE:'Zimbabwe',UGA:'Uganda',TUN:'Tunisia',DZA:'Algeria',
   MOZ:'Mozambique',NAM:'Namibia',MDG:'Madagascar',MUS:'Mauritius',
+  MWI:'Malawi',ZMB:'Zambia',LBY:'Libya',SDN:'Sudan',AGO:'Angola',
+  CMR:'Cameroon',CIV:'Ivory Coast',MLI:'Mali',BFA:'Burkina Faso',
+  LSO:'Lesotho',SWZ:'Eswatini',
   ARE:'UAE',SAU:'Saudi Arabia',TUR:'Turkey',IRN:'Iran',JOR:'Jordan',
   QAT:'Qatar',KWT:'Kuwait',ISR:'Israel',LBN:'Lebanon',BHR:'Bahrain',
-  OMN:'Oman',GEO:'Georgia',
+  OMN:'Oman',GEO:'Georgia',IRQ:'Iraq',ARM:'Armenia',AZE:'Azerbaijan',
   JPN:'Japan',CHN:'China',IND:'India',THA:'Thailand',IDN:'Indonesia',
   KOR:'South Korea',VNM:'Vietnam',MYS:'Malaysia',SGP:'Singapore',PHL:'Philippines',
   KHM:'Cambodia',LKA:'Sri Lanka',NPL:'Nepal',MMR:'Myanmar',LAO:'Laos',
   MNG:'Mongolia',BTN:'Bhutan',MDV:'Maldives',BGD:'Bangladesh',PAK:'Pakistan',
+  KAZ:'Kazakhstan',UZB:'Uzbekistan',TJK:'Tajikistan',KGZ:'Kyrgyzstan',TKM:'Turkmenistan',
   AUS:'Australia',NZL:'New Zealand',FJI:'Fiji',PNG:'Papua New Guinea',
+  SLB:'Solomon Islands',VUT:'Vanuatu',WSM:'Samoa',TON:'Tonga',PLW:'Palau',FSM:'Micronesia',
+}
+
+// Country display name (lowercased) → ISO A3, for resolving live Places results.
+// Google Places often returns a different label than our ISO_NAME (e.g. "USA" not
+// "United States", "Czechia" not "Czech Republic") — aliases below cover the common ones.
+const COUNTRY_NAME_TO_ISO: Record<string, string> = {
+  ...Object.fromEntries(Object.entries(ISO_NAME).map(([iso, name]) => [name.toLowerCase(), iso])),
+  usa: 'USA', 'united states of america': 'USA',
+  uk: 'GBR',
+  uae: 'ARE', 'united arab emirates': 'ARE',
+  czechia: 'CZE',
+  'ivory coast': 'CIV', "côte d'ivoire": 'CIV', 'cote d\'ivoire': 'CIV',
+  'macedonia': 'MKD',
+  'myanmar (burma)': 'MMR', burma: 'MMR',
+  swaziland: 'SWZ',
+  'republic of korea': 'KOR',
+  türkiye: 'TUR',
+}
+// Best-effort: match a Places "description" string (e.g. "Texas, USA") to a known ISO A3
+function resolveIsoFromDescription(description: string): string {
+  const parts = description.split(',').map(p => p.trim().toLowerCase())
+  for (const part of parts.reverse()) {
+    if (COUNTRY_NAME_TO_ISO[part]) return COUNTRY_NAME_TO_ISO[part]
+  }
+  const lower = description.toLowerCase()
+  for (const [name, iso] of Object.entries(COUNTRY_NAME_TO_ISO)) {
+    if (lower.includes(name)) return iso
+  }
+  return ''
 }
 
 // Continent → ISOs for panel list
@@ -158,6 +198,17 @@ const COUNTRY_CITIES: Record<string, string[]> = {
   LKA: ['Colombo','Kandy','Galle','Sigiriya','Ella'],
   NPL: ['Kathmandu','Pokhara','Chitwan','Lumbini'],
   MDV: ['Malé','Maafushi','Baa Atoll'],
+  MMR: ['Yangon','Bagan','Mandalay','Inle Lake'],
+  LAO: ['Vientiane','Luang Prabang','Vang Vieng'],
+  MNG: ['Ulaanbaatar','Gobi Desert'],
+  BTN: ['Thimphu','Paro','Punakha'],
+  BGD: ['Dhaka','Cox\'s Bazar','Sylhet'],
+  PAK: ['Karachi','Lahore','Islamabad','Hunza Valley'],
+  KAZ: ['Almaty','Astana'],
+  UZB: ['Samarkand','Tashkent','Bukhara'],
+  TJK: ['Dushanbe','Pamir Highway'],
+  KGZ: ['Bishkek','Issyk-Kul'],
+  TKM: ['Ashgabat','Darvaza Gas Crater'],
   // Europe
   GBR: ['London','Edinburgh','Manchester','Liverpool','Bath','Oxford','Cambridge','York'],
   FRA: ['Paris','Nice','Lyon','Marseille','Bordeaux','Strasbourg','Cannes','Annecy'],
@@ -172,13 +223,39 @@ const COUNTRY_CITIES: Record<string, string[]> = {
   NOR: ['Oslo','Bergen','Tromsø','Flåm','Stavanger'],
   SWE: ['Stockholm','Gothenburg','Malmö','Kiruna'],
   DNK: ['Copenhagen','Aarhus','Odense'],
+  FIN: ['Helsinki','Rovaniemi','Turku','Lapland'],
   POL: ['Warsaw','Krakow','Gdansk','Wroclaw'],
   CZE: ['Prague','Cesky Krumlov','Brno'],
+  BEL: ['Brussels','Bruges','Ghent','Antwerp'],
   IRL: ['Dublin','Galway','Cork','Killarney'],
   HUN: ['Budapest','Eger','Pécs'],
   ISL: ['Reykjavik','Akureyri','Vik'],
+  ROU: ['Bucharest','Brasov','Sibiu','Transylvania'],
+  BGR: ['Sofia','Plovdiv','Varna','Veliko Tarnovo'],
+  HRV: ['Dubrovnik','Split','Zagreb','Hvar','Plitvice Lakes'],
+  SVK: ['Bratislava','Košice','High Tatras'],
+  SVN: ['Ljubljana','Lake Bled','Piran'],
+  SRB: ['Belgrade','Novi Sad'],
+  RUS: ['Moscow','Saint Petersburg','Kazan','Sochi'],
+  UKR: ['Kyiv','Lviv','Odesa'],
+  LTU: ['Vilnius','Kaunas','Klaipėda'],
+  LVA: ['Riga','Jurmala'],
+  EST: ['Tallinn','Tartu'],
+  LUX: ['Luxembourg City'],
+  MLT: ['Valletta','Gozo','Sliema'],
+  CYP: ['Larnaca','Paphos','Nicosia','Ayia Napa'],
+  BLR: ['Minsk','Brest'],
+  MDA: ['Chișinău','Orheiul Vechi'],
+  ALB: ['Tirana','Saranda','Berat'],
+  MKD: ['Skopje','Ohrid'],
+  BIH: ['Sarajevo','Mostar'],
+  MNE: ['Kotor','Budva','Podgorica'],
+  AND: ['Andorra la Vella'],
+  MCO: ['Monte Carlo'],
+  SMR: ['San Marino City'],
+  LIE: ['Vaduz'],
   // Americas
-  USA: ['New York','Los Angeles','Las Vegas','Miami','Chicago','San Francisco','Hawaii','New Orleans','Washington DC','Seattle'],
+  USA: ['New York','Los Angeles','Las Vegas','Miami','Orlando','Chicago','San Francisco','Hawaii','New Orleans','Washington DC','Seattle'],
   CAN: ['Toronto','Vancouver','Montreal','Quebec City','Banff','Calgary'],
   MEX: ['Mexico City','Cancun','Playa del Carmen','Guadalajara','Oaxaca','Tulum','Los Cabos'],
   BRA: ['Rio de Janeiro','São Paulo','Salvador','Manaus','Florianópolis','Iguazu Falls'],
@@ -188,6 +265,26 @@ const COUNTRY_CITIES: Record<string, string[]> = {
   PER: ['Lima','Cusco','Machu Picchu','Arequipa','Lake Titicaca'],
   CRI: ['San José','Manuel Antonio','Arenal','Monteverde'],
   CUB: ['Havana','Varadero','Trinidad','Cienfuegos'],
+  ECU: ['Quito','Guayaquil','Cuenca','Galápagos Islands','Baños'],
+  BOL: ['La Paz','Uyuni Salt Flats','Sucre','Santa Cruz','Potosí'],
+  VEN: ['Caracas','Los Roques','Mérida','Canaima'],
+  JAM: ['Kingston','Montego Bay','Negril','Ocho Rios'],
+  PAN: ['Panama City','Bocas del Toro','San Blas Islands','Boquete'],
+  URY: ['Montevideo','Punta del Este','Colonia del Sacramento'],
+  PRY: ['Asunción','Ciudad del Este','Encarnación'],
+  GTM: ['Antigua','Guatemala City','Lake Atitlán','Tikal'],
+  HND: ['Roatán','Tegucigalpa','Copán','Utila'],
+  NIC: ['Granada','Managua','San Juan del Sur','Ometepe Island'],
+  SLV: ['San Salvador','El Tunco','Santa Ana','Suchitoto'],
+  DOM: ['Punta Cana','Santo Domingo','Puerto Plata','Samaná'],
+  HTI: ['Port-au-Prince','Cap-Haïtien','Jacmel'],
+  TTO: ['Port of Spain','Tobago'],
+  GUY: ['Georgetown','Kaieteur Falls'],
+  BLZ: ['Belize City','Ambergris Caye','Caye Caulker','San Ignacio'],
+  BRB: ['Bridgetown'],
+  LCA: ['Castries','Soufrière'],
+  VCT: ['Kingstown','Bequia'],
+  GRD: ['St. George\'s','Grand Anse'],
   // Africa
   ZAF: ['Cape Town','Johannesburg','Durban','Kruger','Garden Route','Stellenbosch'],
   EGY: ['Cairo','Luxor','Aswan','Sharm el-Sheikh','Alexandria','Hurghada'],
@@ -197,6 +294,28 @@ const COUNTRY_CITIES: Record<string, string[]> = {
   MUS: ['Port Louis','Grand Baie','Black River'],
   RWA: ['Kigali','Volcanoes NP'],
   GHA: ['Accra','Cape Coast','Kumasi'],
+  NGA: ['Lagos','Abuja','Port Harcourt'],
+  ETH: ['Addis Ababa','Lalibela','Gondar'],
+  SEN: ['Dakar','Saint-Louis','Gorée Island'],
+  BWA: ['Gaborone','Okavango Delta','Chobe'],
+  ZWE: ['Victoria Falls','Harare','Hwange'],
+  UGA: ['Kampala','Bwindi','Jinja'],
+  TUN: ['Tunis','Sousse','Djerba','Sidi Bou Said'],
+  DZA: ['Algiers','Oran','Constantine'],
+  MOZ: ['Maputo','Bazaruto Archipelago'],
+  NAM: ['Windhoek','Sossusvlei','Etosha'],
+  MDG: ['Antananarivo','Nosy Be'],
+  MWI: ['Lilongwe','Lake Malawi'],
+  ZMB: ['Lusaka','Livingstone','South Luangwa'],
+  LBY: ['Tripoli','Benghazi'],
+  SDN: ['Khartoum'],
+  AGO: ['Luanda'],
+  CMR: ['Yaoundé','Douala'],
+  CIV: ['Abidjan','Yamoussoukro'],
+  MLI: ['Bamako','Timbuktu'],
+  BFA: ['Ouagadougou'],
+  LSO: ['Maseru'],
+  SWZ: ['Mbabane','Ezulwini Valley'],
   // Middle East
   ARE: ['Dubai','Abu Dhabi','Sharjah'],
   SAU: ['Riyadh','Jeddah','AlUla'],
@@ -206,10 +325,24 @@ const COUNTRY_CITIES: Record<string, string[]> = {
   ISR: ['Tel Aviv','Jerusalem','Haifa','Eilat'],
   OMN: ['Muscat','Salalah','Nizwa'],
   GEO: ['Tbilisi','Batumi','Kazbegi','Sighnaghi'],
+  IRN: ['Tehran','Isfahan','Shiraz','Yazd'],
+  KWT: ['Kuwait City'],
+  LBN: ['Beirut','Byblos','Baalbek'],
+  BHR: ['Manama'],
+  IRQ: ['Baghdad','Erbil'],
+  ARM: ['Yerevan','Lake Sevan'],
+  AZE: ['Baku','Gabala'],
   // Oceania
   AUS: ['Sydney','Melbourne','Brisbane','Perth','Cairns','Gold Coast','Adelaide','Uluru'],
   NZL: ['Auckland','Queenstown','Christchurch','Wellington','Rotorua','Milford Sound'],
   FJI: ['Nadi','Suva','Yasawa Islands','Coral Coast'],
+  PNG: ['Port Moresby','Tufi'],
+  SLB: ['Honiara'],
+  VUT: ['Port Vila'],
+  WSM: ['Apia'],
+  TON: ['Nukuʻalofa'],
+  PLW: ['Koror'],
+  FSM: ['Pohnpei','Chuuk'],
 }
 
 // Reverse lookup: city name → ISO A3
@@ -261,7 +394,23 @@ export default function LandingPage() {
   // ── City search state ──────────────────────────────────────────────────────
   const [searchQuery,   setSearchQuery]   = useState('')
   const [showDropdown,  setShowDropdown]  = useState(false)
+  const [liveSuggestions, setLiveSuggestions] = useState<{ name: string; description: string; placeId: string }[]>([])
+  const [resolvedISOByCity, setResolvedISOByCity] = useState<Record<string, string>>({})
   const searchRef = useRef<HTMLDivElement>(null)
+
+  // Live, worldwide destination search — the static COUNTRY_CITIES list only covers a
+  // curated set of countries/cities, so anything outside it comes from Google Places.
+  useEffect(() => {
+    if (searchQuery.trim().length < 2) { setLiveSuggestions([]); return }
+    const controller = new AbortController()
+    const t = setTimeout(() => {
+      fetch(`/api/place-autocomplete?q=${encodeURIComponent(searchQuery)}&types=cities`, { signal: controller.signal })
+        .then(r => r.json())
+        .then(data => setLiveSuggestions(data.suggestions || []))
+        .catch(() => {})
+    }, 300)
+    return () => { clearTimeout(t); controller.abort() }
+  }, [searchQuery])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -380,25 +529,36 @@ export default function LandingPage() {
                      o.countryName.toLowerCase().includes(searchQuery.toLowerCase()))
         .slice(0, 8)
 
+  // Live Places results not already covered by the curated list above, worldwide fallback
+  const knownCityNames = new Set(filteredCities.map(o => o.city.toLowerCase()))
+  const liveOnlySuggestions = liveSuggestions
+    .filter(s => s.name && !knownCityNames.has(s.name.toLowerCase()) && !selectedCities.includes(s.name))
+    .slice(0, 6)
+
   const handleCitySelect = (city: string, iso: string) => {
     if (!selectedCities.includes(city)) {
       setSelectedCities(prev => [...prev, city])
-      if (!selectedISOs.includes(iso)) {
-        setSelectedISOs(prev => [...prev, iso])
+      if (iso) {
+        if (!selectedISOs.includes(iso)) setSelectedISOs(prev => [...prev, iso])
+        if (!CITY_TO_ISO[city]) setResolvedISOByCity(prev => ({ ...prev, [city]: iso }))
+        if (!continent) setContinent(ISO_CONTINENT[iso] || '')
       }
-      if (!continent) setContinent(ISO_CONTINENT[iso] || '')
     }
     setSearchQuery('')
     setShowDropdown(false)
   }
 
+  const handleLiveCitySelect = (suggestion: { name: string; description: string }) => {
+    handleCitySelect(suggestion.name, resolveIsoFromDescription(suggestion.description))
+  }
+
   const handleCityRemove = (city: string) => {
-    const iso = CITY_TO_ISO[city]
+    const iso = CITY_TO_ISO[city] || resolvedISOByCity[city]
     const newCities = selectedCities.filter(c => c !== city)
     setSelectedCities(newCities)
     // Remove ISO if no remaining cities from that country
     if (iso) {
-      const stillHas = newCities.some(c => CITY_TO_ISO[c] === iso)
+      const stillHas = newCities.some(c => (CITY_TO_ISO[c] || resolvedISOByCity[c]) === iso)
       if (!stillHas) {
         setSelectedISOs(prev => prev.filter(i => i !== iso))
       }
@@ -579,7 +739,7 @@ export default function LandingPage() {
           </div>
 
           {/* ── Dropdown ── */}
-          {showDropdown && filteredCities.length > 0 && (
+          {showDropdown && (filteredCities.length > 0 || liveOnlySuggestions.length > 0) && (
             <div style={{
               position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50,
               background: 'var(--card)',
@@ -587,6 +747,7 @@ export default function LandingPage() {
               borderTop: '1px solid var(--border)',
               borderRadius: '0 0 12px 12px',
               overflow: 'hidden',
+              maxHeight: 320, overflowY: 'auto',
               boxShadow: '0 12px 40px rgba(0,0,0,0.15)',
             }}>
               {filteredCities.map((opt, idx) => (
@@ -598,7 +759,7 @@ export default function LandingPage() {
                     width: '100%', display: 'flex', alignItems: 'center',
                     gap: 12, padding: '11px 16px', background: 'none', border: 'none',
                     cursor: 'pointer', textAlign: 'left',
-                    borderBottom: idx < filteredCities.length - 1
+                    borderBottom: (idx < filteredCities.length - 1 || liveOnlySuggestions.length > 0)
                       ? '1px solid var(--border)' : 'none',
                     transition: 'background 0.12s',
                   }}
@@ -622,11 +783,41 @@ export default function LandingPage() {
                   )}
                 </button>
               ))}
+              {liveOnlySuggestions.map((s, idx) => (
+                <button
+                  key={s.placeId || s.name}
+                  onMouseDown={e => e.preventDefault()}
+                  onClick={() => handleLiveCitySelect(s)}
+                  style={{
+                    width: '100%', display: 'flex', alignItems: 'center',
+                    gap: 12, padding: '11px 16px', background: 'none', border: 'none',
+                    cursor: 'pointer', textAlign: 'left',
+                    borderBottom: idx < liveOnlySuggestions.length - 1
+                      ? '1px solid var(--border)' : 'none',
+                    transition: 'background 0.12s',
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'rgba(64,224,208,0.08)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'none')}
+                >
+                  <span style={{ fontSize: 16 }}>🌍</span>
+                  <div>
+                    <div style={{
+                      fontFamily: "'Rajdhani', sans-serif", fontSize: 15,
+                      fontWeight: 600, color: 'var(--text, #fff)',
+                    }}>{s.name}</div>
+                    <div style={{
+                      fontFamily: "'Space Mono', monospace", fontSize: 9,
+                      letterSpacing: '0.1em', color: 'var(--muted, rgba(255,255,255,0.4))',
+                      textTransform: 'uppercase', marginTop: 1,
+                    }}>{s.description}</div>
+                  </div>
+                </button>
+              ))}
             </div>
           )}
 
           {/* No results */}
-          {showDropdown && searchQuery.length > 1 && filteredCities.length === 0 && (
+          {showDropdown && searchQuery.length > 1 && filteredCities.length === 0 && liveOnlySuggestions.length === 0 && (
             <div style={{
               position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50,
               background: '#0D1528', border: '1.5px solid rgba(64,224,208,0.2)',

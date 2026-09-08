@@ -1,6 +1,7 @@
 # TripZync® — Product Requirements & Implementation Status
 
-> Last updated: 2026-05-31  
+> Spec version: **v1.1** (previous: v1.0, 2026-05-31) — see [CHANGELOG.md](./CHANGELOG.md) for the full version history  
+> Last updated: 2026-08-28 (audited against HEAD `f126f60`, 2026-06-04 — no commits since)  
 > Production URL: https://tripzync-fresh.vercel.app (Vercel — being migrated)  
 > Target deploy: Jelastic cloud server (Node 26, PM2, standalone build)  
 > Repository: private GitHub repo (macOS Keychain credentials)
@@ -86,7 +87,7 @@ ISO_NUM                  // ISO A3 → TopoJSON numeric code mapping
 
 **Status: ✅ Complete**
 
-- Date range picker (start date → end date)
+- Date range picker (start date → end date) via the custom `DatePicker` dropdown component (`components/ui/DatePicker.tsx`) — a dark-themed floating calendar matching the design system, replacing the previous native `<input type="date">`
 - Validation: end date must be ≥ start date
 - On submit: saves full trip data to localStorage → redirect to `/home`
 - **Back-navigation support:** landing on `/?screen=duration` restores all state (cities, places, hotels, dates) from localStorage so the user can continue editing without losing selections
@@ -148,7 +149,7 @@ Accessible from the homepage nav and from Step 04 back-navigation.
 Purpose: let the user update their trip dates or jump to any step to change selections.
 
 - **Destination field removed** — destination shown as a read-only chip (city/cities from localStorage)
-- Dates pre-filled from `tripzync_onboarding` localStorage on mount
+- Dates pre-filled from `tripzync_onboarding` localStorage on mount, editable via the same custom `DatePicker` dropdown
 - Duration badge recalculates live
 - Loyalty programme summary shown as gold pills (read-only)
 - **Quick-edit links:** Edit Cities (`/?screen=map`) · Edit Places (`/?screen=places`) · Edit Hotels (`/?screen=hotels`) · Edit Dates (`/?screen=duration`)
@@ -170,31 +171,40 @@ All routes under `(app)/` are protected — redirect to `/login` if unauthentica
 
 - Lists all trips for the authenticated user (soft-deleted trips excluded)
 - Trip cards with destination, date range, cover colour
-- "New Trip" CTA links back to onboarding (`/`)
+- "+ New Trip" CTA links to the dedicated trip-creation page (`/trips/new`), not back to onboarding
+
+### New Trip Creation (`/trips/new`)
+
+**Status: ✅ Complete**
+
+- Standalone form for creating additional trips without repeating full onboarding: title, subtitle, destination, dates (via `DatePicker`), currency
+- Pre-fills destination and places from `tripzync_onboarding` localStorage if present
+- Used both from the Dashboard "+ New Trip" CTA and reachable independently
 
 ### Trip Itinerary (`/trips/[tripId]`)
 
 **Status: ✅ Complete**
 
+- **Unified single-column layout** — sidebar/main-column split removed; everything (hero, accommodation, flights, weather, places, map, timeline) scrolls as one page
+- **My Accommodation card** — for users who booked their own hotel/Airbnb outside the loyalty-brand hotel picks; shows name + address, editable inline, links out to Google Maps; rendered as a **green pin** on the City Map (loyalty-brand hotel picks remain **blue pins**)
+- **Flight info panel** — moved from the old sidebar into the main flow, directly below the hero (above weather)
 - Day-by-day timeline (`DayPanel` + `EventItem`)
 - Add / edit / delete events (`AddEventBar`, `EditEventModal`)
 - **Place dropdown** — AddEventBar shows searchable dropdown of curated places for the destination city (fetched from `/api/places` via Zustand store); dropdown uses `createPortal` to escape `overflow:hidden` clipping
 - **Place photo cards** — events matching a known place show a photo card with type label (e.g. Temple, Park) in the timeline (`EventItem`)
-- **City Map** — embedded Google Maps iframe below the schedule showing pins for the active day's events; pins fetched from `/api/place-coords`; clickable pin chips link to Google Maps
+- **City Map** — embedded Google Maps iframe below the schedule showing pins for the active day's events, hotel picks, and My Accommodation; pins fetched from `/api/place-coords`; clickable pin chips link to Google Maps
 - Hotel banner per day
 - Key event flagging (`isKey`) and seasonal flags (`isSakura`)
 - Sort order drag handles
-- Flight info panel (outbound + return flights)
 - Optimistic UI via Zustand + TanStack Query
 
 ### Expense Ledger (`/trips/[tripId]/expenses`)
 
-**Status: ✅ Complete**
+**Status: 🚧 Partial — no longer linked from the trip itinerary page**
 
-- Log expenses by category: Dining, Transport, Entertainment, Accommodation, Others
-- Category pill selector (`CategoryPills`)
-- Per-trip totals with currency selector (default JPY)
-- Receipt URL field (Cloudflare R2 placeholder — not yet wired)
+- Route and full functionality still exist (log expenses by category: Dining, Transport, Entertainment, Accommodation, Others; `CategoryPills`; per-trip totals with currency selector; Receipt URL field)
+- As of the June 4 layout rework, `ExpenseLog` was removed from `TripClient.tsx` — the trip page no longer links here
+- Product intent per commit message: gate this behind a future in-app purchase (not yet implemented — currently just unlinked, reachable only by direct URL)
 
 ### Logbook (`/trips/[tripId]/logbook`)
 
@@ -394,6 +404,7 @@ Add these in **GitHub → repo → Settings → Secrets → Actions**:
 | `QueryProvider` | `components/ui/QueryProvider.tsx` | TanStack Query client wrapper |
 | `Toaster` | `components/ui/Toaster.tsx` | Toast notification system |
 | `ThemeToggle` | `components/ui/ThemeToggle.tsx` | Light/dark mode toggle (☀️/🌙) |
+| `DatePicker` | `components/ui/DatePicker.tsx` | Custom dropdown calendar — replaces all native `<input type="date">` across onboarding, `/plan`, `/trips/new`, `EditTripModal`, `HotelModal` |
 | `PendingTripSaver` | `components/PendingTripSaver.tsx` | Auto-saves guest trip after sign-up |
 | `DayPanel` | `components/itinerary/DayPanel.tsx` | Day header + hotel banner + timeline |
 | `EventItem` | `components/itinerary/EventItem.tsx` | Single event row (edit/delete) |

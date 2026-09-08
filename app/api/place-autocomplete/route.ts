@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-// GET /api/place-autocomplete?q=<query>&city=<city>
+// GET /api/place-autocomplete?q=<query>&city=<city>&types=cities
 // Proxies Google Places Autocomplete (New) to return location suggestions.
+// Pass types=cities to bias results toward cities/regions/countries (destination search)
+// rather than arbitrary points of interest (the default, used by the in-trip places search).
 export async function GET(req: NextRequest) {
   const query = req.nextUrl.searchParams.get('q')?.trim()
   if (!query || query.length < 2) {
@@ -9,6 +11,7 @@ export async function GET(req: NextRequest) {
   }
 
   const city = req.nextUrl.searchParams.get('city')?.trim() || ''
+  const types = req.nextUrl.searchParams.get('types')?.trim() || ''
   const apiKey = process.env.GOOGLE_PLACES_API_KEY
   if (!apiKey) {
     return NextResponse.json({ suggestions: [] })
@@ -24,6 +27,9 @@ export async function GET(req: NextRequest) {
       body: JSON.stringify({
         input: `${query} ${city}`,
         languageCode: 'en',
+        ...(types === 'cities' && {
+          includedPrimaryTypes: ['locality', 'administrative_area_level_1', 'administrative_area_level_2', 'country'],
+        }),
       }),
       cache: 'no-store',
     })
