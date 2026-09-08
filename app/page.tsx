@@ -836,7 +836,7 @@ export default function LandingPage() {
               PLAN MY TRIP →
             </button>
             <button className="ob-sample-guest-link" onClick={() => setShowGuestModal(true)}>
-              Just browsing → Continue as Guest
+              Guest
             </button>
           </div>
         </div>
