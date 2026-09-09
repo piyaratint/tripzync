@@ -10,7 +10,7 @@ If you're about to build UI against a shape, or wire an endpoint the UI depends 
 
 ## Pending
 
-_(none — add entries here as `- YYYY-MM-DD [ui|backend] <what changed> — <file>`)_
+- 2026-09-09 [backend] `createTripSchema`/`updateTripSchema` in lib/validations.ts now `.refine()` that `startDate <= endDate` (compared as `YYYY-MM-DD` strings); violating requests to `PATCH /api/trips/[tripId]` (and any caller of `createTripSchema`) now fail with `ZodError` issues containing `{ path: ['endDate'], message: 'Start date must be on or before end date' }`, surfaced by the route as `422 { error: 'Validation failed', issues: [...] }` instead of silently applying the bad dates — UI should show that message next to the End Date field. — lib/validations.ts
 
 ## Resolved
 

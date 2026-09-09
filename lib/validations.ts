@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 // ─── TRIP ─────────────────────────────────────────────────────────────────────
-export const createTripSchema = z.object({
+const tripBaseSchema = z.object({
   title1:      z.string().min(1).max(30),
   title2:      z.string().min(1).max(30),
   subtitle:    z.string().max(120).optional(),
@@ -13,7 +13,25 @@ export const createTripSchema = z.object({
   bgColor:     z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
 })
 
-export const updateTripSchema = createTripSchema.partial()
+// Both startDate and endDate are plain YYYY-MM-DD strings, so lexicographic
+// comparison is equivalent to chronological comparison. When only one of the
+// two dates is present (e.g. a partial update), there is nothing to compare
+// against at the schema level, so we let it pass here.
+function isStartBeforeOrEqualEnd(data: { startDate?: string; endDate?: string }) {
+  if (!data.startDate || !data.endDate) return true
+  return data.startDate <= data.endDate
+}
+
+function dateOrderIssue(): { message: string; path: (string | number)[] } {
+  return {
+    message: 'Start date must be on or before end date',
+    path: ['endDate'],
+  }
+}
+
+export const createTripSchema = tripBaseSchema.refine(isStartBeforeOrEqualEnd, dateOrderIssue)
+
+export const updateTripSchema = tripBaseSchema.partial().refine(isStartBeforeOrEqualEnd, dateOrderIssue)
 
 // ─── EVENT ────────────────────────────────────────────────────────────────────
 export const createEventSchema = z.object({
