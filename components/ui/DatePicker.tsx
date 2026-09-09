@@ -91,6 +91,7 @@ export function DatePicker({ value, onChange, min, max, placeholder = 'Select da
   }
 
   const today = toISO(new Date())
+  const todayDate = parseDate(today)
 
   return (
     <div className={`dp-wrap ${className ?? ''}`} ref={ref} style={style}>
@@ -147,8 +148,8 @@ export function DatePicker({ value, onChange, min, max, placeholder = 'Select da
             <button
               type="button"
               className="dp-today-btn"
-              onClick={() => { const t = new Date(); setViewDate(t); selectDay(t) }}
-              disabled={minDate ? new Date() < minDate : false}
+              onClick={() => { setViewDate(todayDate); selectDay(todayDate) }}
+              disabled={isDisabled(todayDate)}
             >
               Today
             </button>
