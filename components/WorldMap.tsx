@@ -24,6 +24,7 @@ const ISO_NUM: Record<string, string> = {
   MYS:'458',SGP:'702',PHL:'608',KHM:'116',LKA:'144',NPL:'524',MMR:'104',LAO:'418',
   MNG:'496',BTN:'064',MDV:'462',KAZ:'398',UZB:'860',BGD:'050',PAK:'586',
   AUS:'036',NZL:'554',FJI:'242',PNG:'598',
+  TJK:'762',KGZ:'417',TKM:'795',AND:'020',MCO:'492',SMR:'674',LIE:'438',GUY:'328',BLZ:'084',BRB:'052',LCA:'662',VCT:'670',GRD:'308',LSO:'426',SWZ:'748',LBY:'434',SDN:'729',SLB:'090',VUT:'548',WSM:'882',TON:'776',PLW:'585',FSM:'583',
 }
 
 // Country center + scale for zoom-in mode (>2 cities, single country)
@@ -90,6 +91,99 @@ const COUNTRY_ZOOM: Record<string, { center: [number, number]; scale: number }> 
   AUS:{ center:[134,-25.3],  scale:310  },
   NZL:{ center:[172,-42],    scale:1500 },
   FJI:{ center:[177.5,-18],  scale:5000 },
+  ECU:{ center:[-78.5,-1.5], scale:1400 },
+  BOL:{ center:[-65,-17], scale:650 },
+  VEN:{ center:[-66.5,8], scale:900 },
+  JAM:{ center:[-77.3,18.1], scale:4500 },
+  PAN:{ center:[-80.2,8.8], scale:2200 },
+  URY:{ center:[-56,-32.8], scale:1800 },
+  PRY:{ center:[-58,-23.5], scale:1400 },
+  GTM:{ center:[-90.3,15], scale:2200 },
+  HND:{ center:[-86.8,14.8], scale:1800 },
+  NIC:{ center:[-85.3,12.5], scale:2200 },
+  SLV:{ center:[-88.9,13.8], scale:4000 },
+  DOM:{ center:[-70.2,18.9], scale:2200 },
+  HTI:{ center:[-72.5,18.9], scale:2800 },
+  TTO:{ center:[-61.3,10.6], scale:4500 },
+  GUY:{ center:[-58.9,5], scale:1600 },
+  BLZ:{ center:[-88.6,17.2], scale:3200 },
+  BRB:{ center:[-59.6,13.1], scale:9000 },
+  LCA:{ center:[-60.98,13.9], scale:7000 },
+  VCT:{ center:[-61.2,13.2], scale:7000 },
+  GRD:{ center:[-61.7,12.1], scale:8000 },
+  FIN:{ center:[26,64.5], scale:400 },
+  BEL:{ center:[4.6,50.7], scale:3200 },
+  ROU:{ center:[25,46], scale:1000 },
+  BGR:{ center:[25.3,42.7], scale:1400 },
+  HRV:{ center:[16.5,44.7], scale:1600 },
+  SVK:{ center:[19.5,48.7], scale:2200 },
+  SVN:{ center:[14.8,46], scale:4000 },
+  SRB:{ center:[20.8,44.2], scale:1800 },
+  RUS:{ center:[60,61], scale:110 },
+  UKR:{ center:[31,49], scale:700 },
+  BLR:{ center:[28,53.5], scale:1400 },
+  LTU:{ center:[23.9,55.3], scale:2200 },
+  LVA:{ center:[24.6,56.9], scale:2500 },
+  EST:{ center:[25.5,58.7], scale:2500 },
+  MDA:{ center:[28.4,47.2], scale:3000 },
+  ALB:{ center:[20,41.1], scale:2500 },
+  MKD:{ center:[21.7,41.6], scale:3200 },
+  BIH:{ center:[17.9,44.2], scale:2500 },
+  MNE:{ center:[19.2,42.7], scale:3500 },
+  LUX:{ center:[6.13,49.7], scale:7000 },
+  MLT:{ center:[14.4,35.9], scale:9000 },
+  CYP:{ center:[33.2,35], scale:3200 },
+  AND:{ center:[1.55,42.55], scale:9000 },
+  MCO:{ center:[7.42,43.74], scale:20000 },
+  SMR:{ center:[12.45,43.94], scale:14000 },
+  LIE:{ center:[9.55,47.16], scale:9000 },
+  NGA:{ center:[8,9.5], scale:450 },
+  ETH:{ center:[39.5,8.5], scale:650 },
+  SEN:{ center:[-14.5,14.5], scale:1400 },
+  BWA:{ center:[24,-22.5], scale:650 },
+  ZWE:{ center:[29.5,-19], scale:700 },
+  MOZ:{ center:[35,-18], scale:550 },
+  MWI:{ center:[34,-13.5], scale:1200 },
+  ZMB:{ center:[27.8,-13.5], scale:650 },
+  UGA:{ center:[32.3,1.5], scale:1400 },
+  TUN:{ center:[9.8,34.5], scale:1200 },
+  DZA:{ center:[2.6,28], scale:220 },
+  AGO:{ center:[17.8,-12.5], scale:450 },
+  CMR:{ center:[12.5,5.5], scale:650 },
+  CIV:{ center:[-5.5,7.5], scale:1000 },
+  MLI:{ center:[-3,17], scale:400 },
+  BFA:{ center:[-1.7,12.3], scale:1600 },
+  NAM:{ center:[17.5,-22], scale:650 },
+  MDG:{ center:[47,-19], scale:450 },
+  LSO:{ center:[28.2,-29.6], scale:3200 },
+  SWZ:{ center:[31.4,-26.5], scale:5000 },
+  LBY:{ center:[17,26.5], scale:320 },
+  SDN:{ center:[30,15.5], scale:400 },
+  IRN:{ center:[53,32.5], scale:420 },
+  KWT:{ center:[47.7,29.3], scale:5000 },
+  LBN:{ center:[35.85,33.9], scale:3500 },
+  BHR:{ center:[50.55,26.05], scale:9000 },
+  IRQ:{ center:[44,33], scale:450 },
+  ARM:{ center:[45,40.1], scale:2800 },
+  AZE:{ center:[47.5,40.3], scale:1600 },
+  MMR:{ center:[96,20], scale:650 },
+  LAO:{ center:[103,18.5], scale:900 },
+  MNG:{ center:[103.8,46.9], scale:380 },
+  BTN:{ center:[90.4,27.4], scale:3200 },
+  KAZ:{ center:[67,48], scale:220 },
+  UZB:{ center:[64,41.5], scale:650 },
+  BGD:{ center:[90.3,23.7], scale:1300 },
+  PAK:{ center:[70,30], scale:420 },
+  TJK:{ center:[71,38.8], scale:1000 },
+  KGZ:{ center:[74.5,41.5], scale:900 },
+  TKM:{ center:[59,39.5], scale:750 },
+  PNG:{ center:[147,-6.5], scale:420 },
+  SLB:{ center:[160,-9], scale:1600 },
+  VUT:{ center:[167.5,-16.5], scale:2200 },
+  WSM:{ center:[-172,-13.8], scale:5500 },
+  TON:{ center:[-175.2,-21.1], scale:5500 },
+  PLW:{ center:[134.5,7.4], scale:6000 },
+  FSM:{ center:[157,6.9], scale:1600 },
 }
 
 // City → [longitude, latitude]
@@ -196,7 +290,7 @@ const CITY_COORDS: Record<string, [number, number]> = {
   'Reykjavik':[-21.93,64.14],'Akureyri':[-18.11,65.68],'Vik':[-18.99,63.42],
   // USA
   'New York':[-74.01,40.71],'Los Angeles':[-118.24,34.05],'Las Vegas':[-115.14,36.17],
-  'Miami':[-80.19,25.77],'Chicago':[-87.63,41.85],'San Francisco':[-122.42,37.77],
+  'Miami':[-80.19,25.77],'Orlando':[-81.38,28.54],'Chicago':[-87.63,41.85],'San Francisco':[-122.42,37.77],
   'Hawaii':[-157.82,21.31],'New Orleans':[-90.07,29.95],'Washington DC':[-77.04,38.91],
   'Seattle':[-122.33,47.60],
   // Canada
@@ -280,6 +374,168 @@ const CITY_COORDS: Record<string, [number, number]> = {
   // Fiji
   'Nadi':[177.44,-17.80],'Suva':[178.44,-18.14],
   'Yasawa Islands':[177.53,-17.04],'Coral Coast':[177.78,-18.14],
+  // Myanmar
+  'Yangon':[96.16,16.87],'Bagan':[94.86,21.17],'Mandalay':[96.09,21.98],'Inle Lake':[96.91,20.59],
+  // Laos
+  'Vientiane':[102.63,17.97],'Luang Prabang':[102.13,19.89],'Vang Vieng':[102.45,18.92],
+  // Mongolia
+  'Ulaanbaatar':[106.92,47.92],'Gobi Desert':[104.0,42.5],
+  // Bhutan
+  'Thimphu':[89.64,27.47],'Paro':[89.42,27.43],'Punakha':[89.87,27.62],
+  // Bangladesh
+  'Dhaka':[90.41,23.81],'Cox\'s Bazar':[91.98,21.44],'Sylhet':[91.87,24.9],
+  // Pakistan
+  'Karachi':[67.01,24.86],'Lahore':[74.36,31.55],'Islamabad':[73.04,33.72],'Hunza Valley':[74.65,36.32],
+  // Kazakhstan
+  'Almaty':[76.95,43.24],'Astana':[71.43,51.18],
+  // Uzbekistan
+  'Samarkand':[66.97,39.65],'Tashkent':[69.24,41.3],'Bukhara':[64.42,39.77],
+  // Tajikistan
+  'Dushanbe':[68.78,38.56],'Pamir Highway':[72.0,38.3],
+  // Kyrgyzstan
+  'Bishkek':[74.6,42.87],'Issyk-Kul':[77.0,42.4],
+  // Turkmenistan
+  'Ashgabat':[58.38,37.95],'Darvaza Gas Crater':[58.44,40.25],
+  // Finland
+  'Helsinki':[24.94,60.17],'Rovaniemi':[25.72,66.5],'Turku':[22.27,60.45],'Lapland':[27.0,67.5],
+  // Belgium
+  'Brussels':[4.35,50.85],'Bruges':[3.22,51.21],'Ghent':[3.72,51.05],'Antwerp':[4.4,51.22],
+  // Romania
+  'Bucharest':[26.1,44.43],'Brasov':[25.59,45.65],'Sibiu':[24.15,45.79],'Transylvania':[24.5,46.5],
+  // Bulgaria
+  'Sofia':[23.32,42.7],'Plovdiv':[24.75,42.14],'Varna':[27.91,43.21],'Veliko Tarnovo':[25.63,43.08],
+  // Croatia
+  'Dubrovnik':[18.11,42.65],'Split':[16.44,43.51],'Zagreb':[15.98,45.81],'Hvar':[16.44,43.17],'Plitvice Lakes':[15.6,44.86],
+  // Slovakia
+  'Bratislava':[17.11,48.15],'Košice':[21.24,48.72],'High Tatras':[20.0,49.15],
+  // Slovenia
+  'Ljubljana':[14.51,46.06],'Lake Bled':[14.11,46.36],'Piran':[13.57,45.53],
+  // Serbia
+  'Belgrade':[20.46,44.79],'Novi Sad':[19.85,45.27],
+  // Russia
+  'Moscow':[37.62,55.75],'Saint Petersburg':[30.31,59.93],'Kazan':[49.11,55.8],'Sochi':[39.73,43.6],
+  // Ukraine
+  'Kyiv':[30.52,50.45],'Lviv':[24.03,49.84],'Odesa':[30.72,46.48],
+  // Lithuania
+  'Vilnius':[25.28,54.69],'Kaunas':[23.9,54.9],'Klaipėda':[21.14,55.71],
+  // Latvia
+  'Riga':[24.11,56.95],'Jurmala':[23.77,56.97],
+  // Estonia
+  'Tallinn':[24.75,59.44],'Tartu':[26.72,58.38],
+  // Luxembourg
+  'Luxembourg City':[6.13,49.61],
+  // Malta
+  'Valletta':[14.51,35.9],'Gozo':[14.24,36.05],'Sliema':[14.5,35.91],
+  // Cyprus
+  'Larnaca':[33.62,34.92],'Paphos':[32.41,34.78],'Nicosia':[33.36,35.17],'Ayia Napa':[34.0,34.99],
+  // Belarus
+  'Minsk':[27.57,53.9],'Brest':[23.68,52.1],
+  // Moldova
+  'Chișinău':[28.86,47.01],'Orheiul Vechi':[28.98,47.36],
+  // Albania
+  'Tirana':[19.82,41.33],'Saranda':[20.0,39.87],'Berat':[19.95,40.7],
+  // North Macedonia
+  'Skopje':[21.43,42.0],'Ohrid':[20.8,41.12],
+  // Bosnia and Herzegovina
+  'Sarajevo':[18.41,43.86],'Mostar':[17.81,43.34],
+  // Montenegro
+  'Kotor':[18.77,42.42],'Budva':[18.84,42.29],'Podgorica':[19.26,42.44],
+  // Microstates
+  'Andorra la Vella':[1.52,42.51],'Monte Carlo':[7.42,43.74],'San Marino City':[12.45,43.94],'Vaduz':[9.52,47.14],
+  // Ecuador
+  'Quito':[-78.47,-0.23],'Guayaquil':[-79.9,-2.19],'Cuenca':[-79.0,-2.9],'Galápagos Islands':[-90.5,-0.75],'Baños':[-78.42,-1.4],
+  // Bolivia
+  'La Paz':[-68.15,-16.5],'Uyuni Salt Flats':[-67.49,-20.13],'Sucre':[-65.26,-19.03],'Santa Cruz':[-63.18,-17.78],'Potosí':[-65.75,-19.59],
+  // Venezuela
+  'Caracas':[-66.9,10.49],'Los Roques':[-66.67,11.85],'Mérida':[-71.14,8.6],'Canaima':[-62.55,6.24],
+  // Jamaica
+  'Kingston':[-76.79,17.97],'Montego Bay':[-77.92,18.47],'Negril':[-78.35,18.27],'Ocho Rios':[-77.1,18.41],
+  // Panama
+  'Panama City':[-79.52,8.98],'Bocas del Toro':[-82.24,9.34],'San Blas Islands':[-78.9,9.55],'Boquete':[-82.44,8.78],
+  // Uruguay
+  'Montevideo':[-56.19,-34.9],'Punta del Este':[-54.95,-34.97],'Colonia del Sacramento':[-57.84,-34.47],
+  // Paraguay
+  'Asunción':[-57.63,-25.3],'Ciudad del Este':[-54.61,-25.51],'Encarnación':[-55.87,-27.34],
+  // Guatemala
+  'Antigua':[-90.73,14.56],'Guatemala City':[-90.52,14.63],'Lake Atitlán':[-91.2,14.7],'Tikal':[-89.62,17.22],
+  // Honduras
+  'Roatán':[-86.53,16.32],'Tegucigalpa':[-87.19,14.1],'Copán':[-89.14,14.85],'Utila':[-86.9,16.1],
+  // Nicaragua
+  'Managua':[-86.27,12.15],'San Juan del Sur':[-86.53,11.25],'Ometepe Island':[-85.6,11.53],
+  // El Salvador
+  'San Salvador':[-89.2,13.69],'El Tunco':[-89.42,13.49],'Santa Ana':[-89.56,13.99],'Suchitoto':[-89.03,13.94],
+  // Dominican Republic
+  'Punta Cana':[-68.4,18.58],'Santo Domingo':[-69.93,18.49],'Puerto Plata':[-70.69,19.79],'Samaná':[-69.33,19.2],
+  // Haiti
+  'Port-au-Prince':[-72.34,18.59],'Cap-Haïtien':[-72.2,19.76],'Jacmel':[-72.53,18.23],
+  // Trinidad and Tobago
+  'Port of Spain':[-61.52,10.66],'Tobago':[-60.68,11.25],
+  // Guyana
+  'Georgetown':[-58.16,6.8],'Kaieteur Falls':[-59.49,5.17],
+  // Belize
+  'Belize City':[-88.19,17.5],'Ambergris Caye':[-87.97,17.92],'Caye Caulker':[-88.02,17.74],'San Ignacio':[-89.07,17.16],
+  // Caribbean microstates
+  'Bridgetown':[-59.61,13.1],'Castries':[-60.99,14.01],'Soufrière':[-61.06,13.86],
+  'Kingstown':[-61.23,13.16],'Bequia':[-61.25,13.0],
+  'St. George\'s':[-61.75,12.06],'Grand Anse':[-61.76,12.02],
+  // Nigeria
+  'Lagos':[3.38,6.52],'Abuja':[7.49,9.08],'Port Harcourt':[7.01,4.82],
+  // Ethiopia
+  'Addis Ababa':[38.75,9.03],'Lalibela':[39.04,12.03],'Gondar':[37.47,12.6],
+  // Senegal
+  'Dakar':[-17.45,14.72],'Saint-Louis':[-16.49,16.03],'Gorée Island':[-17.4,14.67],
+  // Botswana
+  'Gaborone':[25.91,-24.66],'Okavango Delta':[22.9,-19.3],'Chobe':[24.6,-18.6],
+  // Zimbabwe
+  'Victoria Falls':[25.86,-17.93],'Harare':[31.05,-17.83],'Hwange':[26.48,-18.63],
+  // Uganda
+  'Kampala':[32.58,0.35],'Bwindi':[29.63,-1.05],'Jinja':[33.2,0.44],
+  // Tunisia
+  'Tunis':[10.18,36.81],'Sousse':[10.64,35.83],'Djerba':[10.86,33.81],'Sidi Bou Said':[10.35,36.87],
+  // Algeria
+  'Algiers':[3.06,36.75],'Oran':[-0.63,35.7],'Constantine':[6.61,36.37],
+  // Mozambique
+  'Maputo':[32.59,-25.97],'Bazaruto Archipelago':[35.47,-21.65],
+  // Namibia
+  'Windhoek':[17.08,-22.56],'Sossusvlei':[15.35,-24.73],'Etosha':[16.33,-18.83],
+  // Madagascar
+  'Antananarivo':[47.52,-18.88],'Nosy Be':[48.26,-13.32],
+  // Malawi
+  'Lilongwe':[33.78,-13.96],'Lake Malawi':[34.5,-12.3],
+  // Zambia
+  'Lusaka':[28.32,-15.39],'Livingstone':[25.85,-17.85],'South Luangwa':[31.7,-13.1],
+  // Libya
+  'Tripoli':[13.19,32.89],'Benghazi':[20.08,32.12],
+  // Sudan / Angola
+  'Khartoum':[32.53,15.59],'Luanda':[13.23,-8.84],
+  // Cameroon
+  'Yaoundé':[11.52,3.85],'Douala':[9.71,4.05],
+  // Côte d'Ivoire
+  'Abidjan':[-4.03,5.36],'Yamoussoukro':[-5.28,6.82],
+  // Mali
+  'Bamako':[-8.0,12.65],'Timbuktu':[-3.0,16.77],
+  // Burkina Faso / Lesotho / Eswatini
+  'Ouagadougou':[-1.52,12.37],'Maseru':[27.48,-29.32],
+  'Mbabane':[31.14,-26.32],'Ezulwini Valley':[31.25,-26.45],
+  // Iran
+  'Tehran':[51.39,35.69],'Isfahan':[51.68,32.65],'Shiraz':[52.54,29.61],'Yazd':[54.37,31.9],
+  // Kuwait
+  'Kuwait City':[47.98,29.38],
+  // Lebanon
+  'Beirut':[35.5,33.89],'Byblos':[35.65,34.12],'Baalbek':[36.21,34.01],
+  // Bahrain
+  'Manama':[50.59,26.23],
+  // Iraq
+  'Baghdad':[44.37,33.31],'Erbil':[44.01,36.19],
+  // Armenia
+  'Yerevan':[44.51,40.18],'Lake Sevan':[45.0,40.4],
+  // Azerbaijan
+  'Baku':[49.87,40.41],'Gabala':[47.85,40.98],
+  // Papua New Guinea
+  'Port Moresby':[147.18,-9.48],'Tufi':[149.32,-9.08],
+  // Pacific islands
+  'Honiara':[159.95,-9.43],'Port Vila':[168.32,-17.73],'Apia':[-171.76,-13.83],
+  'Nukuʻalofa':[-175.2,-21.14],'Koror':[134.48,7.34],'Pohnpei':[158.22,6.92],'Chuuk':[151.85,7.45],
 }
 
 // Base projection scale — ZoomableGroup multiplies on top of this
