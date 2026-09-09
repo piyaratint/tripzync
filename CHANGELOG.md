@@ -6,6 +6,16 @@
 
 ---
 
+## v1.2.1 — 2026-09-09 — Hotfix
+
+**Reported by PM:** after clicking "Sign Up" (or "Plan My Trip"), the persistent TripZync logo/header seen on every other page disappeared on the page that loaded next.
+
+| # | Area | Type | Previous (v1.2) | Current (v1.2.1) |
+|---|------|------|------------------|------------------|
+| 1 | Login page (`app/(auth)/login/page.tsx`) — reached via "Sign Up" (`/home`) and "Plan My Trip" (`app/page.tsx`), both of which route to `/login` | Bug Fix | No persistent header — only a centered logo above the hero headline, so the top-left nav bar every other page has was absent here | Added the same fixed `ob-nav` bar + `TripZyncLogo` used on the landing/onboarding pages, so `/login` now matches the site-wide header pattern |
+
+---
+
 ## v1.2 — 2026-09-08 — ✅ DEPLOYED 2026-09-09 (pushed to `origin/main`, PM sign-off given)
 
 **Design rationale:** the onboarding flow gated its strongest selling point — proof of what TripZync actually produces — behind a click on a "Sign Up vs. Guest Mode" choice screen that a cold visitor had no reason yet to engage with. Team call (PM + UX/UI + Business Dev, working session 2026-09-08) was to remove that gate entirely: show a fully-styled sample itinerary immediately, let the hero and the proof live on one continuous scroll, and move the sign-up/guest decision to *after* the visitor has seen the payoff, not before.

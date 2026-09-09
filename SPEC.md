@@ -265,6 +265,7 @@ All routes under `(app)/` are protected — redirect to `/login` if unauthentica
 
 - **Auth.js v5** (NextAuth) with Google OAuth provider
 - Login page at `/login` with Google sign-in button
+- Fixed top-left nav bar (`ob-nav` + `TripZyncLogo`) matching the header on other pages
 - Server action (`app/actions/auth.ts`) handles sign-in
 - Cookie-clear route at `/api/auth/clear` for stale session recovery
 - Error page at `/auth/error`

@@ -3,12 +3,17 @@ import { TripZyncLogo } from '@/components/TripZyncLogo'
 
 export default function LoginPage() {
   return (
+    <>
+    <nav className="ob-nav">
+      <TripZyncLogo href="/" />
+    </nav>
     <div style={{
       minHeight: '100vh',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       background: 'var(--bg)',
+      paddingTop: 52,
     }}>
       <div style={{
         textAlign: 'center',
@@ -19,9 +24,6 @@ export default function LoginPage() {
       }}>
 
         <div>
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 14 }}>
-            <TripZyncLogo href="/" />
-          </div>
           <div style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontSize: 'clamp(48px,10vw,80px)',
@@ -77,5 +79,6 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+    </>
   )
 }
