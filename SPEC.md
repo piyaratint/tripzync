@@ -1,8 +1,8 @@
 # TripZync® — Product Requirements & Implementation Status
 
 > Spec version: **v1.2** (previous: v1.1, 2026-08-28) — see [CHANGELOG.md](./CHANGELOG.md) for the full version history  
-> Last updated: 2026-09-08 (local HEAD `ffc48c3` — 🚧 **10 commits ahead of `origin/main`, not pushed / not deployed**; see CHANGELOG v1.2 for what's pending review)  
-> Production URL: https://tripzync-fresh.vercel.app (Vercel — being migrated) — **still serving the v1.1 behavior described below as "Step 02 (deployed)"**  
+> Last updated: 2026-09-09 (pushed `origin/main` @ `9a61269` — ✅ **v1.2 deployed**, PM sign-off given 2026-09-09; see CHANGELOG v1.2 for full rationale)  
+> Production URL: https://tripzync-fresh.vercel.app (Vercel — being migrated) — **should now be serving v1.2 once Vercel finishes its build off the new push; confirm before treating the section below as current**  
 > Target deploy: Jelastic cloud server (Node 26, PM2, standalone build)  
 > Repository: private GitHub repo (macOS Keychain credentials)
 
@@ -54,13 +54,13 @@ ISO_NUM                  // ISO A3 → TopoJSON numeric code mapping
 
 ### Step 02 — Travel Mode / Sample Dashboard
 
-**Status: ✅ Complete on production (deployed) — 🚧 Superseded locally, pending review (not deployed)**
+**Status: ✅ Pushed to `origin/main` 2026-09-09 — pending confirmation that Vercel has finished deploying**
 
-**Currently live on Vercel:** card selection — **Solo**, **Couple**, **Group** — choice persisted in component state, passed to trip metadata on save.
+**Previously live on Vercel (pre-v1.2, unconfirmed whether still current):** card selection — **Solo**, **Couple**, **Group** — choice persisted in component state, passed to trip metadata on save.
 
-*(Note found during the 2026-09-08 session: by the time that session started, production had already diverged from this — the deployed screen was actually a "Sign Up vs. Guest Mode" choice, not Solo/Couple/Group. Documenting both here since it's unclear which was last verified against a real deploy; whoever pushes v1.2 should confirm current production behavior first.)*
+*(Note found during the 2026-09-08 session: by the time that session started, production had already diverged from this — the deployed screen was actually a "Sign Up vs. Guest Mode" choice, not Solo/Couple/Group. Documented both here since it was unclear which was last verified against a real deploy. v1.2 was pushed 2026-09-09 — next session should confirm the live site actually reflects it, not assume from this doc alone.)*
 
-**Built locally, not yet pushed (see [CHANGELOG.md v1.2](./CHANGELOG.md#v12--2026-09-08--not-deployed-local-commits-only-pending-review) for full rationale and diff):** the Travel Mode / choice-card step is removed entirely. The hero and a new **Sample Dashboard** section render as one continuous scroll instead of two gated screens — "START PLANNING →" smooth-scrolls to the dashboard rather than switching screens. The dashboard shows a fictional, fully-styled 7-day Tokyo itinerary (destination + dynamically-computed dates, weather forecast, flight, hotels, one scrollable day-card per calendar day, a "What To Eat" photo strip) intended to prove the product's value before asking for a decision. Sign Up / Continue as Guest ("Guest") now sit as CTAs *underneath* the sample dashboard rather than as the gate in front of it.
+**Shipped in v1.2, pushed 2026-09-09 (see [CHANGELOG.md](./CHANGELOG.md) for full rationale and diff):** the Travel Mode / choice-card step is removed entirely. The hero and a new **Sample Dashboard** section render as one continuous scroll instead of two gated screens — "START PLANNING →" smooth-scrolls to the dashboard rather than switching screens. The dashboard shows a fictional, fully-styled 7-day Tokyo itinerary (destination + dynamically-computed dates, weather forecast, flight, hotels, one scrollable day-card per calendar day, a "What To Eat" photo strip) intended to prove the product's value before asking for a decision. Sign Up / Continue as Guest ("Guest") now sit as CTAs *underneath* the sample dashboard rather than as the gate in front of it.
 
 ---
 

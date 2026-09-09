@@ -6,11 +6,11 @@
 
 ---
 
-## v1.2 — 2026-09-08 — 🚧 NOT DEPLOYED (local commits only, pending review)
+## v1.2 — 2026-09-08 — ✅ DEPLOYED 2026-09-09 (pushed to `origin/main`, PM sign-off given)
 
 **Design rationale:** the onboarding flow gated its strongest selling point — proof of what TripZync actually produces — behind a click on a "Sign Up vs. Guest Mode" choice screen that a cold visitor had no reason yet to engage with. Team call (PM + UX/UI + Business Dev, working session 2026-09-08) was to remove that gate entirely: show a fully-styled sample itinerary immediately, let the hero and the proof live on one continuous scroll, and move the sign-up/guest decision to *after* the visitor has seen the payoff, not before.
 
-Audited against local HEAD `ffc48c3` (10 commits ahead of `origin/main` @ `f126f60`, none pushed).
+Audited against local HEAD `ffc48c3` (12 commits ahead of `origin/main` @ `f126f60` at the time). Pushed 2026-09-09: `origin/main` now at `9a61269` (`f126f60..9a61269`).
 
 | # | Area | Type | Previous (v1.1) | Current (v1.2) |
 |---|------|------|------------------|------------------|
@@ -25,7 +25,7 @@ Audited against local HEAD `ffc48c3` (10 commits ahead of `origin/main` @ `f126f
 
 | # | Item | Note |
 |---|------|------|
-| 1 | Push to `origin/main` / deploy to Vercel | Explicitly held back per PM instruction — this version is documented for review, not shipped |
+| 1 | ~~Push to `origin/main` / deploy to Vercel~~ | **Done 2026-09-09** — PM approved, pushed `f126f60..9a61269`. Confirm Vercel build succeeds and spot-check the live site. |
 | 2 | Full spec audit of Steps 01/03/04/05 | This session only touched Step 02; the rest of Section 1 may have its own pre-existing staleness (see row 1 above) not yet investigated |
 | 3 | Photo pipeline | Sample Dashboard images are hand-picked stock photos, not pulled from the real Google Places pipeline used elsewhere in the app — fine for a static marketing sample, worth knowing if this pattern gets reused |
 | 4 | Hydration warning in `PARTICLES` (hero background) | Pre-existing bug found during this work, unrelated to it — flagged separately, not fixed here |
