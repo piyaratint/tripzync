@@ -135,7 +135,7 @@ export default async function LogbookPage({ params }: Props) {
       </div>
 
       <div style={{ marginTop: 48, paddingTop: 24, borderTop: '1px solid var(--border)', textAlign: 'center', fontFamily: "'Barlow Condensed'", fontSize: 9, letterSpacing: '.16em', color: '#fff', textTransform: 'uppercase' }}>
-        TripZync® · {trip.title1} {trip.title2}
+        Marenn · {trip.title1} {trip.title2}
       </div>
     </div>
   )

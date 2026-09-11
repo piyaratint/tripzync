@@ -62,7 +62,7 @@ export default function SiteFooter() {
 
       {/* Bottom bar */}
       <div className="sf-bottom">
-        <span>© {year} TripZync. All rights reserved.</span>
+        <span>© {year} Marenn. All rights reserved.</span>
         <span className="sf-bottom-links">
           <a href="/privacy" className="sf-bottom-link">Privacy Policy</a>
           <span className="sf-dot">·</span>

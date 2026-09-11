@@ -7,7 +7,7 @@ const THEMES = [
     id: '',
     name: 'Midnight',
     desc: 'Deep Navy · Cyan · Gold',
-    bg: '#07080F', accent: '#40E0D0', hi: '#FFC947',
+    bg: '#07080F', accent: '#5C8368', hi: '#5C8368',
   },
   {
     id: 't-obsidian',
@@ -25,7 +25,7 @@ const THEMES = [
     id: 't-arctic',
     name: 'Arctic',
     desc: 'Light Mode · Cyan · Gold',
-    bg: '#F9FAFB', accent: '#40E0D0', hi: '#FFC947',
+    bg: '#F9FAFB', accent: '#5C8368', hi: '#5C8368',
   },
   {
     id: 't-forest',
@@ -74,7 +74,7 @@ export default function SettingsPage() {
       <header style={{ padding: '48px 0 32px', borderBottom: '1px solid var(--border)', marginBottom: '40px' }}>
         <div className="hero-eyebrow">
           <div className="eyebrow-dots"><span /><span className="r" /><span /></div>
-          <span className="eyebrow-text">TripZync® · Settings</span>
+          <span className="eyebrow-text">Marenn · Settings</span>
         </div>
         <h1 style={{ fontFamily: "'Barlow Condensed'", fontSize: 'clamp(40px,8vw,72px)', fontWeight: 900, fontStyle: 'italic', textTransform: 'uppercase', lineHeight: 0.9, marginTop: 8 }}>
           App <em style={{ color: 'var(--red)' }}>Settings</em>
@@ -148,7 +148,7 @@ export default function SettingsPage() {
 
       <section style={{ maxWidth: 480, marginBottom: 60 }}>
         <p style={{ fontFamily: "'Rajdhani', sans-serif", fontSize: 14, color: 'var(--dim)', marginBottom: 20 }}>
-          Manage your TripZync account and connected services.
+          Manage your Marenn account and connected services.
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

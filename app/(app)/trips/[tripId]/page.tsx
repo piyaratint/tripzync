@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: Props) {
   const session = await auth()
   const [trip] = await db.select().from(trips).where(eq(trips.id, tripId))
   if (!trip) return { title: 'Trip not found' }
-  return { title: `${trip.title1} ${trip.title2} — TripZync®` }
+  return { title: `${trip.title1} ${trip.title2} — Marenn` }
 }
 
 export default async function TripPage({ params }: Props) {

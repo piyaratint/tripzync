@@ -195,10 +195,10 @@ export function TripClient({ trip, hotels, events, expenses, flights, isOwner, m
                   letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer',
                 }}>🖨 Print / PDF</button>
                 <button onClick={togglePetals} title={showPetals ? 'Hide particles' : 'Show particles'} style={{
-                  background: showPetals ? 'rgba(64,224,208,.1)' : 'none',
-                  border: `1px solid ${showPetals ? 'rgba(64,224,208,.35)' : 'rgba(255,255,255,.15)'}`,
+                  background: showPetals ? 'rgba(92,131,104,.1)' : 'none',
+                  border: `1px solid ${showPetals ? 'rgba(92,131,104,.35)' : 'rgba(255,255,255,.15)'}`,
                   borderRadius: 6, padding: '4px 10px',
-                  color: showPetals ? 'rgba(64,224,208,.9)' : 'rgba(255,255,255,.4)',
+                  color: showPetals ? 'rgba(92,131,104,.9)' : 'rgba(255,255,255,.4)',
                   fontFamily: "'Barlow Condensed'", fontSize: 10,
                   letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer',
                 }}>✦ Particles</button>
@@ -887,7 +887,7 @@ function SakuraPetals() {
     if (saved === 'false') { c.style.display = 'none'; return }
     const ctx = c.getContext('2d')!
     let W: number, H: number
-    const COLS = ['#40E0D0','#FFC947','rgba(255,255,255,.5)','#20B2AA','#FFD470']
+    const COLS = ['#5C8368','#5C8368','rgba(255,255,255,.5)','#43614C','#FFD470']
     const resize = () => { W = c.width = window.innerWidth; H = c.height = window.innerHeight }
     window.addEventListener('resize', resize); resize()
 
