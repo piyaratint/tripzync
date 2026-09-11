@@ -6,6 +6,35 @@
 
 ---
 
+## Unreleased — 2026-09-11 — Rebrand preview (TripZync → Marenn)
+
+**Branch:** `rebrand/maren` (PR [#1](https://github.com/piyaratint/tripzync/pull/1)) — **not merged to `main`, not deployed to production.** This is a design preview only; see "Known follow-ups" below for what's blocking a real ship decision.
+
+**Why:** "TripZync" collides with existing brands and needed a new name before public launch. Marketing ran a naming session (documented separately) and landed on a "luxury minimal" identity direction (Aesop/Rimowa/Aman reference), rejecting ~25+ other candidate names along the way for either real trademark/domain collisions or not fitting the target user (someone who wants a *planned, controlled* trip, not a spontaneous one).
+
+| # | Area | Type | Previous | Current |
+|---|------|------|----------|---------|
+| 1 | Site name | Rebrand | TripZync | **Marenn** — chosen after the first choice, "Maren," was found to collide with `maren.com`, owned by a real US healthcare provider (Maren Medical Group). "Marenn" (double n) clears that domain but is a known trade-off: reads a little more "startup" (double-letter naming, cf. Fiverr/Tumblr) than pure quiet-luxury |
+| 2 | Default color theme (`app/globals.css` `:root`) | Style | "Midnight" — near-black + neon teal/cyan/violet/gold gradient accents | "Graphite" — warm-neutral dark palette, single deep forest-green accent (`#5C8368` dark-mode / `#3F6B4F` light-mode). No more multi-color gradients |
+| 3 | Default theme mode (`app/layout.tsx`, `components/ui/ThemeToggle.tsx`) | App Change | Dark only; a light "arctic" theme existed but had to be manually toggled every visit (not persisted for first-time visitors) | **Light theme is now the site-wide default** for new visitors. Dark is still available via the toggle and persists correctly once chosen |
+| 4 | Light theme palette (`body.t-arctic` block) | Style | Cool grey (`#F9FAFB`) bg, same old teal/gold accents as dark mode | Warm "stone" bg (`#F2F0EA`), same forest-green accent family as dark mode, warm ink text instead of cool grey |
+| 5 | Display typography (hero/headline moments only — `.hero-title`, `.ob-headline`, `.ob-screen-title`, `/login` headline, `.policy-page h1`) | Style | Bebas Neue / Barlow Condensed, bold italic, uppercase | **Schibsted Grotesk**, normal case, weight 600. Went through 4 rejected fonts first (Fraunces italic → "hard to read", Newsreader → still hard to read, Manrope → "too plain", Bricolage Grotesque → "too childish") before this one landed. Structural/label text (nav links, buttons, eyebrows, meta) intentionally still uses Barlow Condensed — only the big brand-voice headlines changed |
+| 6 | Logo (`components/TripZyncLogo.tsx`) | Style | Three status-dots + "TRIPZYNC® · {year}" in Barlow Condensed uppercase | Plain "Marenn" wordmark in Schibsted Grotesk, no ® mark, no dot motif. **Component/file name intentionally left as `TripZyncLogo`** to avoid touching every import site — only what it renders changed |
+| 7 | User-visible "TripZync" text, app-wide | Copy | — | Replaced with "Marenn" everywhere it's shown to a user (nav, footer, page titles, meta tags, policy pages). Internal-only identifiers were **deliberately left alone**: `localStorage` keys (`tripzync_theme`, `tripzync_onboarding`, `tripzync-petals`, etc.), the `TripClient.tsx`/`TripZyncLogo.tsx` file and component names, and the `tripzync.vercel.app` / `tripzync-fresh.vercel.app` deployment URLs — renaming those would either lose existing users' saved data or require an actual Vercel project rename, neither of which is a "swap the brand text" change |
+| 8 | Privacy/Cookie policy contact email (`app/privacy/page.tsx`, `app/cookies/page.tsx`, and the Wikipedia-image-fetch User-Agent string in `app/api/places/route.ts`) | Copy | `privacy@tripzync.com` | `privacy@marenn.com` — **placeholder, not a live inbox.** Explicit product call: change the visible text now, wire up a real inbox later |
+| 9 | Button/badge text contrast on accent-colored backgrounds (7 spots in `app/home/page.tsx`, `.ob-cta-btn`/`.ob-auth-signup`/`.ob-step-next` in `app/globals.css`, save button in `components/trip/EditTripModal.tsx`) | Bug Fix | Text color was `var(--bg)` (auto-inverts to match the *background* token) — worked by accident on the old dark-only default, but produced unreadable dark-on-dark-green text once light became the default theme | Hardcoded to `#fff`, with a new shared class `.btn-on-accent` added to the light-theme override allowlist so it isn't force-flipped back to dark text by the existing `body.t-arctic` contrast-correction system |
+
+**Known follow-ups (not yet done):**
+
+| # | Item | Note |
+|---|------|------|
+| 1 | Trademark / domain / WHOIS verification | Everything above was checked with informal web search only, not a real registrar or trademark search. Do not treat "Marenn" as final until this is done |
+| 2 | Vercel preview deployment is failing | Root cause found: the `tripzync` Vercel project's env vars (`DATABASE_URL` etc.) are scoped to "Production" only, so Preview builds (this PR) can't see them and `drizzle-kit migrate` fails before the build even starts. Fix is in Vercel dashboard → Settings → Environment Variables → edit each var → add "Preview" to its environment scope. Also note this repo's Vercel project may be a different/stale project than `tripzync-fresh`, which looks like the real production deployment — worth confirming the Git↔Vercel project link is correct |
+| 3 | Deeper app screens not fully audited | Landing page, all 4 onboarding steps, `/login`, `/privacy`, `/cookies`, and the guest-mode `/home` trip dashboard were checked directly. Logged-in-only screens (`/dashboard`, `/settings`, `/trips/[tripId]`, `/trips/new`) had their hardcoded old-teal/gold literals swapped programmatically but were **not visually spot-checked**, since they require auth to reach |
+| 4 | Placeholder email | `privacy@marenn.com` needs a real inbox before this can go live — it's on the PDPA/GDPR compliance pages |
+
+---
+
 ## v1.2.1 — 2026-09-09 — Hotfix
 
 **Reported by PM:** after clicking "Sign Up" (or "Plan My Trip"), the persistent TripZync logo/header seen on every other page disappeared on the page that loaded next.
