@@ -1,6 +1,6 @@
 // Shared logo component — quiet editorial wordmark:
-//   Maren
-// Use wherever you need the Maren brand mark.
+//   Marenn
+// Use wherever you need the Marenn brand mark.
 
 interface Props {
   href?: string      // defaults to '/'
@@ -32,7 +32,7 @@ export function TripZyncLogo({ href = '/', className, style }: Props) {
         lineHeight: 1,
         whiteSpace: 'nowrap',
       }}>
-        Maren
+        Marenn
       </span>
       <span style={{ display: 'block', width: 4, height: 4, borderRadius: '50%', background: 'var(--accent, #C6A876)', transform: 'translateY(-1px)' }} />
     </a>

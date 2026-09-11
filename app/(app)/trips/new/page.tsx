@@ -88,7 +88,7 @@ export default function NewTripPage() {
       <header style={{ padding: '48px 0 32px', borderBottom: '1px solid var(--border)', marginBottom: '32px' }}>
         <div className="hero-eyebrow">
           <div className="eyebrow-dots"><span /><span className="r" /><span /></div>
-          <span className="eyebrow-text">Maren · New Trip</span>
+          <span className="eyebrow-text">Marenn · New Trip</span>
         </div>
         <h1 style={{ fontFamily: "'Barlow Condensed'", fontSize: 'clamp(40px,8vw,72px)', fontWeight: 900, fontStyle: 'italic', textTransform: 'uppercase', lineHeight: 0.9, marginTop: 8 }}>
           New <em style={{ color: 'var(--red)' }}>Trip</em>

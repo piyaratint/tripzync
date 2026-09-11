@@ -74,7 +74,7 @@ export default function SettingsPage() {
       <header style={{ padding: '48px 0 32px', borderBottom: '1px solid var(--border)', marginBottom: '40px' }}>
         <div className="hero-eyebrow">
           <div className="eyebrow-dots"><span /><span className="r" /><span /></div>
-          <span className="eyebrow-text">Maren · Settings</span>
+          <span className="eyebrow-text">Marenn · Settings</span>
         </div>
         <h1 style={{ fontFamily: "'Barlow Condensed'", fontSize: 'clamp(40px,8vw,72px)', fontWeight: 900, fontStyle: 'italic', textTransform: 'uppercase', lineHeight: 0.9, marginTop: 8 }}>
           App <em style={{ color: 'var(--red)' }}>Settings</em>
@@ -148,7 +148,7 @@ export default function SettingsPage() {
 
       <section style={{ maxWidth: 480, marginBottom: 60 }}>
         <p style={{ fontFamily: "'Rajdhani', sans-serif", fontSize: 14, color: 'var(--dim)', marginBottom: 20 }}>
-          Manage your Maren account and connected services.
+          Manage your Marenn account and connected services.
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
