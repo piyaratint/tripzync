@@ -25,16 +25,17 @@ export default function LoginPage() {
 
         <div>
           <div style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontSize: 'clamp(48px,10vw,80px)',
-            fontWeight: 900,
-            fontStyle: 'italic',
-            textTransform: 'uppercase',
-            lineHeight: 0.9,
+            fontFamily: 'var(--display-font)',
+            fontSize: 'clamp(36px,7vw,56px)',
+            fontWeight: 600,
+            fontStyle: 'normal',
+            textTransform: 'none',
+            letterSpacing: '-0.02em',
+            lineHeight: 1.2,
             color: 'var(--text, #fff)',
           }}>
             Your<br />
-            <em style={{ color: 'var(--red)' }}>Travel Logbook</em>
+            <em style={{ color: 'var(--accent)', fontStyle: 'normal' }}>travel logbook</em>
           </div>
         </div>
 

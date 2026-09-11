@@ -638,7 +638,7 @@ async function fetchWikiImage(placeName: string): Promise<string> {
   const key = placeName.toLowerCase()
   if (wikiCache.has(key)) return wikiCache.get(key)!
 
-  const ua = 'TripZync/1.0 (https://tripzync.vercel.app; privacy@tripzync.com)'
+  const ua = 'Maren/1.0 (https://tripzync.vercel.app; privacy@maren.com)'
 
   // 1st attempt — direct article lookup by place name
   try {

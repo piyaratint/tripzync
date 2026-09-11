@@ -88,7 +88,7 @@ export default function NewTripPage() {
       <header style={{ padding: '48px 0 32px', borderBottom: '1px solid var(--border)', marginBottom: '32px' }}>
         <div className="hero-eyebrow">
           <div className="eyebrow-dots"><span /><span className="r" /><span /></div>
-          <span className="eyebrow-text">TripZync® · New Trip</span>
+          <span className="eyebrow-text">Maren · New Trip</span>
         </div>
         <h1 style={{ fontFamily: "'Barlow Condensed'", fontSize: 'clamp(40px,8vw,72px)', fontWeight: 900, fontStyle: 'italic', textTransform: 'uppercase', lineHeight: 0.9, marginTop: 8 }}>
           New <em style={{ color: 'var(--red)' }}>Trip</em>
@@ -159,8 +159,8 @@ export default function NewTripPage() {
 
         {/* Onboarding places preview */}
         {onboardingPlaces.length > 0 && (
-          <div style={{ background: 'rgba(64,224,208,.05)', border: '1px solid rgba(64,224,208,.2)', borderRadius: 10, padding: '12px 16px' }}>
-            <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 10, letterSpacing: '.16em', textTransform: 'uppercase', color: 'rgba(64,224,208,.8)', marginBottom: 8 }}>
+          <div style={{ background: 'rgba(92,131,104,.05)', border: '1px solid rgba(92,131,104,.2)', borderRadius: 10, padding: '12px 16px' }}>
+            <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 10, letterSpacing: '.16em', textTransform: 'uppercase', color: 'rgba(92,131,104,.8)', marginBottom: 8 }}>
               ✓ {onboardingPlaces.length} places from your plan will be added to your itinerary
             </div>
             <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, color: '#fff', lineHeight: 1.6 }}>

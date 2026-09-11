@@ -41,7 +41,7 @@ export default async function DashboardPage() {
       <header style={{ padding: '32px 0 28px', borderBottom: '1px solid var(--border)', marginBottom: '32px' }}>
         <div className="hero-eyebrow">
           <div className="eyebrow-dots"><span /><span className="r" /><span /></div>
-          <span className="eyebrow-text">TripZync® · Dashboard</span>
+          <span className="eyebrow-text">Maren · Dashboard</span>
         </div>
         <h1 style={{ fontFamily: "'Barlow Condensed'", fontSize: 'clamp(40px,8vw,72px)', fontWeight: 900, fontStyle: 'italic', textTransform: 'uppercase', lineHeight: 0.9, marginTop: 8 }}>
           My <em style={{ color: 'var(--red)' }}>Trips</em>

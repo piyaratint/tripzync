@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
+import { TripZyncLogo } from '@/components/TripZyncLogo'
 
 export const metadata: Metadata = {
   title: 'Cookie Policy',
-  description: 'TripZync Cookie Policy — what cookies we use, why we use them, and how you can manage your preferences in compliance with Thailand PDPA B.E. 2562.',
+  description: 'Maren Cookie Policy — what cookies we use, why we use them, and how you can manage your preferences in compliance with Thailand PDPA B.E. 2562.',
 }
 
 const EFFECTIVE_DATE = '1 May 2025'
@@ -11,7 +12,7 @@ export default function CookiesPage() {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
       <nav className="ob-nav">
-        <a href="/" className="ob-nav-logo" style={{ textDecoration: 'none' }}>TRIPZYNC</a>
+        <TripZyncLogo href="/" />
         <a href="/login" className="ob-nav-link">Sign in ↗</a>
       </nav>
 
@@ -25,7 +26,7 @@ export default function CookiesPage() {
 
         <div className="policy-box">
           <p>
-            This Cookie Policy explains what cookies and similar technologies TripZync uses, why we use them, and how you can control them. It supplements our <a href="/privacy">Privacy Policy</a> and complies with the <strong>Thailand Personal Data Protection Act B.E. 2562 (PDPA)</strong>.
+            This Cookie Policy explains what cookies and similar technologies Maren uses, why we use them, and how you can control them. It supplements our <a href="/privacy">Privacy Policy</a> and complies with the <strong>Thailand Personal Data Protection Act B.E. 2562 (PDPA)</strong>.
           </p>
         </div>
 
@@ -81,23 +82,23 @@ export default function CookiesPage() {
           </p>
         </div>
         <p>
-          TripZync currently uses only privacy-friendly, server-side analytics without third-party tracking scripts. If third-party analytics (e.g. Google Analytics) are introduced in future, this policy will be updated and your consent will be re-requested before activation.
+          Maren currently uses only privacy-friendly, server-side analytics without third-party tracking scripts. If third-party analytics (e.g. Google Analytics) are introduced in future, this policy will be updated and your consent will be re-requested before activation.
         </p>
 
         <h3>2.4 Marketing Cookies (Not Used)</h3>
         <p>
-          TripZync does <strong>not</strong> currently use any marketing, retargeting, or advertising cookies. We do not share your browsing behaviour with any advertising networks.
+          Maren does <strong>not</strong> currently use any marketing, retargeting, or advertising cookies. We do not share your browsing behaviour with any advertising networks.
         </p>
 
         {/* 3. Third-party technologies */}
         <h2>3. Third-Party Technologies</h2>
-        <p>The following third-party services may set their own cookies or access data when you use TripZync:</p>
+        <p>The following third-party services may set their own cookies or access data when you use Maren:</p>
         <ul>
           <li>
             <strong>Google Sign-In (accounts.google.com)</strong> — When you sign in with Google, Google may set cookies on its own domain to manage the OAuth flow. These are governed by <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google&apos;s Privacy Policy</a>.
           </li>
           <li>
-            <strong>Google Fonts (fonts.googleapis.com)</strong> — Loads typefaces used in the app. Google may log the request. No personal data from TripZync is shared. See Google&apos;s policy for details.
+            <strong>Google Fonts (fonts.googleapis.com)</strong> — Loads typefaces used in the app. Google may log the request. No personal data from Maren is shared. See Google&apos;s policy for details.
           </li>
           <li>
             <strong>open-meteo.com</strong> — Receives your destination city name (not your personal identity) to return weather data. No cookies are set by this service on your device.
@@ -116,7 +117,7 @@ export default function CookiesPage() {
           Under Thailand PDPA, you have the right to consent to or refuse non-essential cookies and to withdraw that consent at any time without affecting the lawfulness of prior processing.
         </p>
         <p>
-          When you first visit TripZync, a cookie notice will inform you of the cookies in use. Strictly necessary cookies are activated without consent; optional categories require your opt-in.
+          When you first visit Maren, a cookie notice will inform you of the cookies in use. Strictly necessary cookies are activated without consent; optional categories require your opt-in.
         </p>
 
         {/* 5. How to manage cookies */}
@@ -142,7 +143,7 @@ export default function CookiesPage() {
 
         <h3>5.2 Clearing localStorage</h3>
         <p>
-          To remove TripZync&apos;s local storage data (your offline trip plan), open browser Developer Tools (F12), go to <em>Application → Local Storage → [tripzync domain]</em>, and delete the <code>tripzync_onboarding</code> key, or clear all site data.
+          To remove Maren&apos;s local storage data (your offline trip plan), open browser Developer Tools (F12), go to <em>Application → Local Storage → [your Maren domain]</em>, and delete the <code>tripzync_onboarding</code> key, or clear all site data.
         </p>
 
         <h3>5.3 Effect of Blocking Cookies</h3>
@@ -171,7 +172,7 @@ export default function CookiesPage() {
         <div className="policy-box">
           <p>
             For questions about this Cookie Policy or to exercise your PDPA rights:<br />
-            <strong>Email:</strong> <a href="mailto:privacy@tripzync.com">privacy@tripzync.com</a><br />
+            <strong>Email:</strong> <a href="mailto:privacy@maren.com">privacy@maren.com</a><br />
             <strong>Subject:</strong> Cookie Policy — [Your Question]<br /><br />
             You may also refer to our full <a href="/privacy">Privacy Policy</a> for broader data protection information.
           </p>

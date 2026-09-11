@@ -204,10 +204,10 @@ export function EditTripModal({ open, onClose }: Props) {
             fontFamily: "'Barlow Condensed'", fontSize: 13,
             letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer',
           }}>Cancel</button>
-          <button onClick={handleSave} disabled={loading} style={{
+          <button onClick={handleSave} disabled={loading} className="btn-on-accent" style={{
             flex: 2, padding: '10px 0',
             background: 'var(--accent)', border: 'none',
-            borderRadius: 8, color: 'var(--bg)',
+            borderRadius: 8, color: '#fff',
             fontFamily: "'Barlow Condensed'", fontSize: 13,
             letterSpacing: '.1em', textTransform: 'uppercase',
             cursor: loading ? 'not-allowed' : 'pointer',

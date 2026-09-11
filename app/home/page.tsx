@@ -762,7 +762,7 @@ function PlaceAddInput({ value, onChange, onAdd, onCancel, photoMap, city }: {
           style={{ flex:1, background:'var(--bg)', border:'1px solid var(--border2)', borderRadius:8, padding:'7px 12px', color:'#fff', fontFamily:"'Rajdhani',sans-serif", fontSize:14, outline:'none' }}
         />
         <button onClick={() => { onAdd(value); setShowDrop(false) }}
-          style={{ background:'var(--accent)', border:'none', borderRadius:8, padding:'7px 16px', color:'var(--bg)', fontFamily:"'Barlow Condensed',sans-serif", fontSize:12, fontWeight:700, letterSpacing:2, textTransform:'uppercase', cursor:'pointer' }}>
+          className="btn-on-accent" style={{ background:'var(--accent)', border:'none', borderRadius:8, padding:'7px 16px', color:'#fff', fontFamily:"'Barlow Condensed',sans-serif", fontSize:12, fontWeight:700, letterSpacing:2, textTransform:'uppercase', cursor:'pointer' }}>
           Add
         </button>
         <button onClick={onCancel}
@@ -812,7 +812,7 @@ function PlaceAddInput({ value, onChange, onAdd, onCancel, photoMap, city }: {
                 onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,.08)')}
                 onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                 >
-                  <div style={{ width:34, height:34, borderRadius:8, background:'rgba(64,224,208,.1)', border:'1px solid rgba(64,224,208,.2)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, fontSize:14, color:'rgba(64,224,208,.7)' }}>
+                  <div style={{ width:34, height:34, borderRadius:8, background:'rgba(92,131,104,.1)', border:'1px solid rgba(92,131,104,.2)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, fontSize:14, color:'rgba(92,131,104,.7)' }}>
                     📍
                   </div>
                   <div style={{ minWidth:0 }}>
@@ -1507,7 +1507,7 @@ export default function GuestHomePage() {
               <div className="hero-title"><em className="em">{destWords.slice(1).join(' ') || String(year)}</em></div>
             </div>
 
-            <div style={{ display:'inline-block', fontFamily:"'Space Mono',monospace", fontSize:9, letterSpacing:3, color: isLoggedIn ? '#3ecf78' : 'var(--accent)', textTransform:'uppercase', background: isLoggedIn ? 'rgba(62,207,120,.08)' : 'rgba(64,224,208,.08)', border: `1px solid ${isLoggedIn ? 'rgba(62,207,120,.25)' : 'rgba(64,224,208,.2)'}`, borderRadius:6, padding:'4px 10px', marginBottom:14 }}>
+            <div style={{ display:'inline-block', fontFamily:"'Space Mono',monospace", fontSize:9, letterSpacing:3, color: isLoggedIn ? '#3ecf78' : 'var(--accent)', textTransform:'uppercase', background: isLoggedIn ? 'rgba(62,207,120,.08)' : 'rgba(92,131,104,.08)', border: `1px solid ${isLoggedIn ? 'rgba(62,207,120,.25)' : 'rgba(92,131,104,.2)'}`, borderRadius:6, padding:'4px 10px', marginBottom:14 }}>
               {isLoggedIn ? (tripId ? '✓ Saved to Dashboard' : 'Logged In · Unsaved') : 'Guest Mode · Draft'}
             </div>
 
@@ -1541,11 +1541,11 @@ export default function GuestHomePage() {
                 </div>
                 <div style={{ display:'flex', gap:6, marginTop:8 }}>
                   <button onClick={() => scrollToDay(sec.days[0]?.dayNumber ?? sec.startDay)}
-                    style={{ flex:1, background:'var(--accent)', border:'none', borderRadius:6, padding:'5px 8px', color:'var(--bg)', fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, fontWeight:700, letterSpacing:2, textTransform:'uppercase', cursor:'pointer' }}>
+                    className="btn-on-accent" style={{ flex:1, background:'var(--accent)', border:'none', borderRadius:6, padding:'5px 8px', color:'#fff', fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, fontWeight:700, letterSpacing:2, textTransform:'uppercase', cursor:'pointer' }}>
                     Go →
                   </button>
                   <button onClick={() => addDay(si)}
-                    style={{ flex:1, background:'var(--accent)', border:'none', borderRadius:6, padding:'5px 8px', color:'var(--bg)', fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, fontWeight:700, letterSpacing:2, textTransform:'uppercase', cursor:'pointer' }}>
+                    className="btn-on-accent" style={{ flex:1, background:'var(--accent)', border:'none', borderRadius:6, padding:'5px 8px', color:'#fff', fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, fontWeight:700, letterSpacing:2, textTransform:'uppercase', cursor:'pointer' }}>
                     + Day
                   </button>
                 </div>
@@ -1565,7 +1565,7 @@ export default function GuestHomePage() {
               </a>
             </div>
           ) : (
-            <div style={{ background:'linear-gradient(135deg,rgba(64,224,208,.08),rgba(64,224,208,.03))', border:'1px solid rgba(64,224,208,.2)', borderRadius:12, padding:'18px 20px' }}>
+            <div style={{ background:'linear-gradient(135deg,rgba(92,131,104,.08),rgba(92,131,104,.03))', border:'1px solid rgba(92,131,104,.2)', borderRadius:12, padding:'18px 20px' }}>
               <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:18, fontWeight:700, letterSpacing:3, textTransform:'uppercase', color:'#fff', marginBottom:6 }}>Save Your Plan</div>
               <p style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:13, color:'rgba(255,255,255,.7)', marginBottom:14 }}>
                 Create a free account to keep this itinerary and access it anywhere.
@@ -1584,7 +1584,7 @@ export default function GuestHomePage() {
                   localStorage.setItem('tripzync_pending_trip', JSON.stringify(pendingTrip))
                   window.location.href = '/login?callbackUrl=%2Fdashboard'
                 }}
-                style={{ display:'block', width:'100%', textAlign:'center', fontFamily:"'Barlow Condensed',sans-serif", fontSize:13, fontWeight:700, letterSpacing:3, textTransform:'uppercase', padding:'10px', background:'var(--accent)', color:'var(--bg)', borderRadius:8, textDecoration:'none', border:'none', cursor:'pointer' }}>
+                className="btn-on-accent" style={{ display:'block', width:'100%', textAlign:'center', fontFamily:"'Barlow Condensed',sans-serif", fontSize:13, fontWeight:700, letterSpacing:3, textTransform:'uppercase', padding:'10px', background:'var(--accent)', color:'#fff', borderRadius:8, textDecoration:'none', border:'none', cursor:'pointer' }}>
                 Sign Up Free →
               </button>
             </div>
@@ -1610,15 +1610,15 @@ export default function GuestHomePage() {
               <div style={{ display:'flex', gap:4 }}>
                 <button onClick={() => setHotelSortByPrice(false)}
                   style={{ fontFamily:"'Space Mono',monospace", fontSize:8, letterSpacing:1, padding:'3px 9px', borderRadius:20, cursor:'pointer', border:'1px solid', transition:'all .2s',
-                    background: !hotelSortByPrice ? 'rgba(64,224,208,.15)' : 'rgba(255,255,255,.05)',
-                    borderColor: !hotelSortByPrice ? 'rgba(64,224,208,.4)' : 'rgba(255,255,255,.12)',
+                    background: !hotelSortByPrice ? 'rgba(92,131,104,.15)' : 'rgba(255,255,255,.05)',
+                    borderColor: !hotelSortByPrice ? 'rgba(92,131,104,.4)' : 'rgba(255,255,255,.12)',
                     color: !hotelSortByPrice ? 'var(--accent)' : 'rgba(255,255,255,.3)',
                   }}>⏱ Nearest</button>
                 <button onClick={() => setHotelSortByPrice(true)}
                   style={{ fontFamily:"'Space Mono',monospace", fontSize:8, letterSpacing:1, padding:'3px 9px', borderRadius:20, cursor:'pointer', border:'1px solid', transition:'all .2s',
-                    background: hotelSortByPrice ? 'rgba(255,201,71,.15)' : 'rgba(255,255,255,.05)',
-                    borderColor: hotelSortByPrice ? 'rgba(255,201,71,.4)' : 'rgba(255,255,255,.12)',
-                    color: hotelSortByPrice ? '#FFC947' : 'rgba(255,255,255,.3)',
+                    background: hotelSortByPrice ? 'rgba(92,131,104,.15)' : 'rgba(255,255,255,.05)',
+                    borderColor: hotelSortByPrice ? 'rgba(92,131,104,.4)' : 'rgba(255,255,255,.12)',
+                    color: hotelSortByPrice ? '#5C8368' : 'rgba(255,255,255,.3)',
                   }}>💰 Price</button>
               </div>
             )
@@ -1678,12 +1678,12 @@ export default function GuestHomePage() {
                         onClick={() => setBrandVisibility(prev => ({ ...prev, [brand]: prev[brand] === false ? true : false }))}
                         style={{
                           display:'flex', alignItems:'center', gap:4, flexShrink:0,
-                          background: brandVisibility[brand] !== false ? 'rgba(255,201,71,.12)' : 'rgba(255,255,255,.06)',
-                          border: `1px solid ${brandVisibility[brand] !== false ? 'rgba(255,201,71,.3)' : 'rgba(255,255,255,.12)'}`,
+                          background: brandVisibility[brand] !== false ? 'rgba(92,131,104,.12)' : 'rgba(255,255,255,.06)',
+                          border: `1px solid ${brandVisibility[brand] !== false ? 'rgba(92,131,104,.3)' : 'rgba(255,255,255,.12)'}`,
                           borderRadius:20, padding:'3px 10px', cursor:'pointer',
                           fontFamily:"'Barlow Condensed',sans-serif", fontSize:8, fontWeight:700,
                           letterSpacing:2, textTransform:'uppercase',
-                          color: brandVisibility[brand] !== false ? '#FFC947' : 'rgba(255,255,255,.3)',
+                          color: brandVisibility[brand] !== false ? '#5C8368' : 'rgba(255,255,255,.3)',
                           transition:'all .2s',
                         }}
                       >
@@ -1711,7 +1711,7 @@ export default function GuestHomePage() {
                                   onError={e => { (e.currentTarget as HTMLImageElement).style.opacity='0' }}
                                 />
                                 <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(7,8,15,.85) 0%, transparent 60%)' }} />
-                                <div style={{ position:'absolute', bottom:6, right:8, color:'#FFC947', fontSize:9, letterSpacing:1 }}>
+                                <div style={{ position:'absolute', bottom:6, right:8, color:'#5C8368', fontSize:9, letterSpacing:1 }}>
                                   {'★'.repeat(h.stars)}
                                 </div>
                               </div>
@@ -1721,7 +1721,7 @@ export default function GuestHomePage() {
                                   <div style={{ display:'flex', alignItems:'center', gap:6, marginTop:2 }}>
                                     <span style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:9, letterSpacing:1, textTransform:'uppercase', color:'rgba(255,255,255,.5)' }}>{h.tier}</span>
                                     {h.travelMins !== undefined && (
-                                      <span style={{ fontFamily:"'Space Mono',monospace", fontSize:8, color:'rgba(64,224,208,.8)', background:'rgba(64,224,208,.08)', border:'1px solid rgba(64,224,208,.2)', borderRadius:10, padding:'1px 6px' }}>
+                                      <span style={{ fontFamily:"'Space Mono',monospace", fontSize:8, color:'rgba(92,131,104,.8)', background:'rgba(92,131,104,.08)', border:'1px solid rgba(92,131,104,.2)', borderRadius:10, padding:'1px 6px' }}>
                                         ~{h.travelMins} min
                                       </span>
                                     )}
@@ -1742,7 +1742,7 @@ export default function GuestHomePage() {
                     })}
 
                     <div style={{ padding:'10px 14px', borderTop:'1px solid var(--border)' }}>
-                      <a href="/login" style={{ display:'block', textAlign:'center', fontFamily:"'Barlow Condensed',sans-serif", fontSize:11, fontWeight:700, letterSpacing:2, textTransform:'uppercase', padding:'8px', background:'var(--accent)', color:'var(--bg)', borderRadius:6, textDecoration:'none' }}>
+                      <a href="/login" className="btn-on-accent" style={{ display:'block', textAlign:'center', fontFamily:"'Barlow Condensed',sans-serif", fontSize:11, fontWeight:700, letterSpacing:2, textTransform:'uppercase', padding:'8px', background:'var(--accent)', color:'#fff', borderRadius:6, textDecoration:'none' }}>
                         Sign In to Book →
                       </a>
                     </div>
@@ -1818,7 +1818,7 @@ export default function GuestHomePage() {
                     <span style={{ fontFamily:"'Space Mono',monospace", fontSize:9, letterSpacing:3, textTransform:'uppercase', opacity:.7 }}>
                       {sec.days.length} {sec.days.length === 1 ? 'day' : 'days'}
                     </span>
-                    <button onClick={() => addDay(si)} style={{ marginLeft:'auto', background:'var(--accent)', border:'none', borderRadius:6, padding:'4px 12px', color:'var(--bg)', fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, fontWeight:700, letterSpacing:2, textTransform:'uppercase', cursor:'pointer' }}>
+                    <button onClick={() => addDay(si)} className="btn-on-accent" style={{ marginLeft:'auto', background:'var(--accent)', border:'none', borderRadius:6, padding:'4px 12px', color:'#fff', fontFamily:"'Barlow Condensed',sans-serif", fontSize:10, fontWeight:700, letterSpacing:2, textTransform:'uppercase', cursor:'pointer' }}>
                       + Add Day
                     </button>
                   </div>
@@ -1841,9 +1841,9 @@ export default function GuestHomePage() {
                       style={{
                         padding:'14px 18px', borderBottom:'1px solid var(--border)', transition:'background .2s, border-color .2s',
                         background: dropTarget?.si === si && dropTarget?.di === di
-                          ? 'rgba(64,224,208,.12)'
-                          : activeDay === day.dayNumber ? 'rgba(64,224,208,.04)' : 'transparent',
-                        borderLeft: dropTarget?.si === si && dropTarget?.di === di ? '3px solid rgba(64,224,208,.6)' : '3px solid transparent',
+                          ? 'rgba(92,131,104,.12)'
+                          : activeDay === day.dayNumber ? 'rgba(92,131,104,.04)' : 'transparent',
+                        borderLeft: dropTarget?.si === si && dropTarget?.di === di ? '3px solid rgba(92,131,104,.6)' : '3px solid transparent',
                       }}
                     >
                       {/* Day label row */}
@@ -1905,7 +1905,7 @@ export default function GuestHomePage() {
                         {/* Inline add button at end of chip row */}
                         {!(addingTo?.si === si && addingTo?.di === di) && (
                           <button onClick={() => { setAddingTo({ si, di }); setAddVal('') }}
-                            style={{ background:'var(--accent)', border:'none', borderRadius:20, padding:'5px 12px', color:'var(--bg)', fontFamily:"'Barlow Condensed',sans-serif", fontSize:11, fontWeight:700, letterSpacing:2, textTransform:'uppercase', cursor:'pointer' }}>
+                            className="btn-on-accent" style={{ background:'var(--accent)', border:'none', borderRadius:20, padding:'5px 12px', color:'#fff', fontFamily:"'Barlow Condensed',sans-serif", fontSize:11, fontWeight:700, letterSpacing:2, textTransform:'uppercase', cursor:'pointer' }}>
                             + Add
                           </button>
                         )}

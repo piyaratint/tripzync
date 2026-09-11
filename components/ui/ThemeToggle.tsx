@@ -8,10 +8,10 @@ export function ThemeToggle() {
 
   useEffect(() => {
     setMounted(true)
-    const stored = localStorage.getItem('tripzync_theme') || ''
-    const light = stored === 't-arctic'
-    setIsLight(light)
-    if (light) document.body.className = 't-arctic'
+    const stored = localStorage.getItem('tripzync_theme')
+    const themeId = stored === null ? 't-arctic' : stored
+    setIsLight(themeId === 't-arctic')
+    document.body.className = themeId
   }, [])
 
   const toggle = () => {

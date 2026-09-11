@@ -110,7 +110,7 @@ export default function PlanPage() {
         {tripSummary.destination && (
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 8,
-            background: 'rgba(64,224,208,.08)', border: '1px solid rgba(64,224,208,.2)',
+            background: 'rgba(92,131,104,.08)', border: '1px solid rgba(92,131,104,.2)',
             borderRadius: 20, padding: '4px 14px', marginBottom: 20,
           }}>
             <span style={{ fontSize: 14 }}>📍</span>
@@ -158,7 +158,7 @@ export default function PlanPage() {
           {durationDays && (
             <div style={{
               display: 'flex', alignItems: 'center', gap: 12,
-              background: 'rgba(64,224,208,.07)', border: '1px solid rgba(64,224,208,.2)',
+              background: 'rgba(92,131,104,.07)', border: '1px solid rgba(92,131,104,.2)',
               borderRadius: 10, padding: '12px 16px',
             }}>
               <span style={{ fontSize: 20 }}>📅</span>
@@ -184,8 +184,8 @@ export default function PlanPage() {
                   <span key={h} style={{
                     fontFamily: "'Barlow Condensed', sans-serif", fontSize: 10,
                     fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase',
-                    background: 'rgba(255,201,71,.1)', border: '1px solid rgba(255,201,71,.25)',
-                    borderRadius: 20, padding: '2px 10px', color: '#FFC947',
+                    background: 'rgba(92,131,104,.1)', border: '1px solid rgba(92,131,104,.25)',
+                    borderRadius: 20, padding: '2px 10px', color: '#5C8368',
                   }}>
                     {HOTEL_NAMES[h] || h}
                   </span>

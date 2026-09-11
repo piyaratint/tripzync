@@ -607,7 +607,7 @@ export function WorldMap({ selectedISOs, selectedCities }: WorldMapProps) {
       background: isLight ? '#F3F4F6' : 'rgba(7,10,25,0.95)',
       borderRadius: 16,
       overflow: 'hidden',
-      border: '1px solid rgba(64,224,208,0.18)',
+      border: '1px solid rgba(92,131,104,0.18)',
       boxShadow: isLight ? '0 4px 16px rgba(0,0,0,0.08)' : '0 8px 32px rgba(0,0,0,0.5)',
       position: 'relative',
       cursor: isDragging ? 'grabbing' : 'grab',
@@ -647,7 +647,7 @@ export function WorldMap({ selectedISOs, selectedCities }: WorldMapProps) {
             style={{
               width: 32, height: 32,
               background: isLight ? 'rgba(255,255,255,0.92)' : 'rgba(7,10,25,0.90)',
-              border: '1px solid rgba(64,224,208,0.30)',
+              border: '1px solid rgba(92,131,104,0.30)',
               borderRadius: 8,
               color: 'var(--accent)',
               fontSize: label === '⊙' ? 16 : 20,
@@ -658,12 +658,12 @@ export function WorldMap({ selectedISOs, selectedCities }: WorldMapProps) {
               transition: 'border-color 0.15s, background 0.15s',
             }}
             onMouseEnter={e => {
-              (e.currentTarget as HTMLButtonElement).style.background = 'rgba(64,224,208,0.15)'
+              (e.currentTarget as HTMLButtonElement).style.background = 'rgba(92,131,104,0.15)'
               ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--accent)'
             }}
             onMouseLeave={e => {
               (e.currentTarget as HTMLButtonElement).style.background = isLight ? 'rgba(255,255,255,0.92)' : 'rgba(7,10,25,0.90)'
-              ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(64,224,208,0.30)'
+              ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(92,131,104,0.30)'
             }}
           >
             {label}
@@ -713,18 +713,18 @@ export function WorldMap({ selectedISOs, selectedCities }: WorldMapProps) {
                     key={geo.rsmKey}
                     geography={geo}
                     fill={isSelected
-                      ? 'rgba(64,224,208,0.32)'
+                      ? 'rgba(92,131,104,0.32)'
                       : isLight ? '#D1D5DB' : '#0B1830'
                     }
                     stroke={isSelected
-                      ? '#40E0D0'
+                      ? '#5C8368'
                       : isLight ? '#E5E7EB' : '#162540'
                     }
                     strokeWidth={isSelected ? 1.0 / mapZoom : 0.4 / mapZoom}
                     style={{
                       default: { outline: 'none' },
                       hover:   { outline: 'none', fill: isSelected
-                        ? 'rgba(64,224,208,0.45)'
+                        ? 'rgba(92,131,104,0.45)'
                         : isLight ? '#C5CAD1' : '#12203a'
                       },
                       pressed: { outline: 'none' },
@@ -743,10 +743,10 @@ export function WorldMap({ selectedISOs, selectedCities }: WorldMapProps) {
               <Marker key={city} coordinates={coords}>
                 <circle
                   r={dotR / mapZoom}
-                  fill="#FFC947"
+                  fill="#5C8368"
                   stroke="rgba(255,255,255,0.9)"
                   strokeWidth={1.2 / mapZoom}
-                  style={{ filter: 'drop-shadow(0 0 4px rgba(255,201,71,0.9))' }}
+                  style={{ filter: 'drop-shadow(0 0 4px rgba(92,131,104,0.9))' }}
                 />
                 {showLabels && (
                   <text

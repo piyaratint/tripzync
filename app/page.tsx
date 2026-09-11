@@ -12,7 +12,7 @@ const WorldMap = dynamic(
     loading: () => (
       <div style={{
         height: 320, background: 'rgba(7,10,25,0.95)', borderRadius: 16,
-        border: '1px solid rgba(64,224,208,0.18)', display: 'flex',
+        border: '1px solid rgba(92,131,104,0.18)', display: 'flex',
         alignItems: 'center', justifyContent: 'center',
         fontFamily: "'Space Mono',monospace", fontSize: 11,
         color: 'rgba(255,255,255,0.25)', letterSpacing: '0.1em',
@@ -674,11 +674,10 @@ export default function LandingPage() {
           Your journey starts here
         </div>
         <h1 className="ob-headline">
-          THE WORLD<br />
-          IS <span className="ob-em">YOURS</span><br />
-          TO DISCOVER
+          Every day of your trip,<br />
+          already <span className="ob-em">arranged</span>.
         </h1>
-        <p className="ob-subtext">Plan smarter · Travel deeper · Live the route</p>
+        <p className="ob-subtext">ITINERARY · BUDGET · EVERY DETAIL, IN ORDER</p>
         <button className="ob-cta-btn" onClick={() => sampleDashRef.current?.scrollIntoView({ behavior: 'smooth' })}>
           START PLANNING →
         </button>
@@ -920,7 +919,7 @@ export default function LandingPage() {
                       ? '1px solid var(--border)' : 'none',
                     transition: 'background 0.12s',
                   }}
-                  onMouseEnter={e => (e.currentTarget.style.background = 'rgba(64,224,208,0.08)')}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'rgba(92,131,104,0.08)')}
                   onMouseLeave={e => (e.currentTarget.style.background = 'none')}
                 >
                   <span style={{ fontSize: 16 }}>📍</span>
@@ -953,7 +952,7 @@ export default function LandingPage() {
                       ? '1px solid var(--border)' : 'none',
                     transition: 'background 0.12s',
                   }}
-                  onMouseEnter={e => (e.currentTarget.style.background = 'rgba(64,224,208,0.08)')}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'rgba(92,131,104,0.08)')}
                   onMouseLeave={e => (e.currentTarget.style.background = 'none')}
                 >
                   <span style={{ fontSize: 16 }}>🌍</span>
@@ -977,7 +976,7 @@ export default function LandingPage() {
           {showDropdown && searchQuery.length > 1 && filteredCities.length === 0 && liveOnlySuggestions.length === 0 && (
             <div style={{
               position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50,
-              background: '#0D1528', border: '1.5px solid rgba(64,224,208,0.2)',
+              background: '#0D1528', border: '1.5px solid rgba(92,131,104,0.2)',
               borderTop: 'none', borderRadius: '0 0 12px 12px',
               padding: '14px 16px',
               fontFamily: "'Space Mono', monospace", fontSize: 10,
@@ -996,8 +995,8 @@ export default function LandingPage() {
               return (
                 <div key={city} style={{
                   display: 'flex', alignItems: 'center', gap: 7,
-                  background: 'rgba(64,224,208,0.10)',
-                  border: '1px solid rgba(64,224,208,0.35)',
+                  background: 'rgba(92,131,104,0.10)',
+                  border: '1px solid rgba(92,131,104,0.35)',
                   borderRadius: 20, padding: '6px 12px 6px 10px',
                 }}>
                   <span style={{ fontSize: 13 }}>📍</span>
@@ -1285,7 +1284,7 @@ export default function LandingPage() {
             </div>
 
             {durationDays && (
-              <div style={{ display:'flex', alignItems:'center', gap:12, background:'rgba(64,224,208,.07)', border:'1px solid rgba(64,224,208,.2)', borderRadius:10, padding:'12px 16px' }}>
+              <div style={{ display:'flex', alignItems:'center', gap:12, background:'rgba(92,131,104,.07)', border:'1px solid rgba(92,131,104,.2)', borderRadius:10, padding:'12px 16px' }}>
                 <span style={{ fontSize:24 }}>📅</span>
                 <div>
                   <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:22, fontWeight:900, color:'var(--accent)' }}>

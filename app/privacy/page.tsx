@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
+import { TripZyncLogo } from '@/components/TripZyncLogo'
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
-  description: 'TripZync Privacy Policy — how we collect, use, and protect your personal data in compliance with Thailand PDPA B.E. 2562 and international standards.',
+  description: 'Maren Privacy Policy — how we collect, use, and protect your personal data in compliance with Thailand PDPA B.E. 2562 and international standards.',
 }
 
 const EFFECTIVE_DATE = '1 May 2025'
@@ -12,7 +13,7 @@ export default function PrivacyPage() {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
       <nav className="ob-nav">
-        <a href="/" className="ob-nav-logo" style={{ textDecoration: 'none' }}>TRIPZYNC</a>
+        <TripZyncLogo href="/" />
         <a href="/login" className="ob-nav-link">Sign in ↗</a>
       </nav>
 
@@ -28,7 +29,7 @@ export default function PrivacyPage() {
 
         <div className="policy-box">
           <p>
-            TripZync (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;) is committed to protecting your personal data. This Policy explains what data we collect, why we collect it, how we use and protect it, and the rights you have under the <strong>Thailand Personal Data Protection Act B.E. 2562 (PDPA)</strong> and other applicable laws.
+            Maren (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;) is committed to protecting your personal data. This Policy explains what data we collect, why we collect it, how we use and protect it, and the rights you have under the <strong>Thailand Personal Data Protection Act B.E. 2562 (PDPA)</strong> and other applicable laws.
           </p>
         </div>
 
@@ -37,8 +38,8 @@ export default function PrivacyPage() {
         <p>The data controller responsible for your personal data is:</p>
         <div className="policy-box">
           <p>
-            <strong>TripZync</strong><br />
-            Contact: <a href="mailto:privacy@tripzync.com">privacy@tripzync.com</a><br />
+            <strong>Maren</strong><br />
+            Contact: <a href="mailto:privacy@maren.com">privacy@maren.com</a><br />
             For PDPA inquiries or to exercise your rights, please email the address above with the subject line &ldquo;PDPA Request&rdquo;.
           </p>
         </div>
@@ -118,7 +119,7 @@ export default function PrivacyPage() {
         {/* 6. International Transfers */}
         <h2>6. International Data Transfers</h2>
         <p>
-          TripZync is hosted on Vercel infrastructure, which may process data outside Thailand (including the United States and European Union). We ensure such transfers comply with PDPA Chapter VI and, where applicable, the EU Standard Contractual Clauses. Your data is subject to appropriate safeguards at all times.
+          Maren is hosted on Vercel infrastructure, which may process data outside Thailand (including the United States and European Union). We ensure such transfers comply with PDPA Chapter VI and, where applicable, the EU Standard Contractual Clauses. Your data is subject to appropriate safeguards at all times.
         </p>
 
         {/* 7. Data Retention */}
@@ -168,7 +169,7 @@ export default function PrivacyPage() {
           </div>
         </div>
         <p>
-          To exercise any right, contact us at <a href="mailto:privacy@tripzync.com">privacy@tripzync.com</a>. We will respond within 30 days. We may need to verify your identity before processing your request.
+          To exercise any right, contact us at <a href="mailto:privacy@maren.com">privacy@maren.com</a>. We will respond within 30 days. We may need to verify your identity before processing your request.
         </p>
 
         {/* 9. Security */}
@@ -187,7 +188,7 @@ export default function PrivacyPage() {
         {/* 10. Children */}
         <h2>10. Children&apos;s Privacy</h2>
         <p>
-          TripZync is not directed at individuals under the age of 20 (the age of majority in Thailand). We do not knowingly collect personal data from minors. If you believe a minor has provided us with data, please contact us and we will delete it promptly.
+          Maren is not directed at individuals under the age of 20 (the age of majority in Thailand). We do not knowingly collect personal data from minors. If you believe a minor has provided us with data, please contact us and we will delete it promptly.
         </p>
 
         {/* 11. Cookies */}
@@ -199,7 +200,7 @@ export default function PrivacyPage() {
         {/* 12. Changes */}
         <h2>12. Changes to This Policy</h2>
         <p>
-          We may update this Privacy Policy from time to time. When we make material changes, we will notify you via email (if you have an account) and update the &ldquo;Effective&rdquo; date at the top. Continued use of TripZync after the effective date constitutes acceptance of the updated policy.
+          We may update this Privacy Policy from time to time. When we make material changes, we will notify you via email (if you have an account) and update the &ldquo;Effective&rdquo; date at the top. Continued use of Maren after the effective date constitutes acceptance of the updated policy.
         </p>
 
         {/* 13. Contact */}
@@ -207,7 +208,7 @@ export default function PrivacyPage() {
         <div className="policy-box">
           <p>
             For any privacy-related questions, requests, or complaints:<br />
-            <strong>Email:</strong> <a href="mailto:privacy@tripzync.com">privacy@tripzync.com</a><br />
+            <strong>Email:</strong> <a href="mailto:privacy@maren.com">privacy@maren.com</a><br />
             <strong>Subject line:</strong> PDPA Request — [Your Request Type]<br /><br />
             You also have the right to lodge a complaint with the <strong>Personal Data Protection Committee (PDPC)</strong> of Thailand if you believe your rights have not been upheld.
           </p>
